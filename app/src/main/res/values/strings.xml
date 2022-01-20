@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">first_responder_app</string>
     <string name="submit">submit</string>
+    <string name="incidents">Incidents</string>
+    <string name="home_responding">Responding</string>
 
     <!-- Strings related to login -->
 
