@@ -43,6 +43,12 @@ public class HomeFragment extends Fragment {
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
+
+        binding.homeIncidents.setOnClickListener(v -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentGroupFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
         return binding.getRoot();
     }
 
