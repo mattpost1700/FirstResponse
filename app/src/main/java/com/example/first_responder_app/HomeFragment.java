@@ -49,6 +49,11 @@ public class HomeFragment extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
+        binding.homeResponding.setOnClickListener(v -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToRespondingFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
         return binding.getRoot();
     }
 

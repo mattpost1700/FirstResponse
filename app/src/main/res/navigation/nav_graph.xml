@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_homeFragment_to_incidentGroupFragment"
             app:destination="@id/incidentGroupFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_respondingFragment"
+            app:destination="@id/respondingFragment" />
     </fragment>
     <fragment
         android:id="@+id/incidentFragment"
@@ -36,4 +39,10 @@
         android:name="com.example.first_responder_app.IncidentGroupFragment"
         android:label="incident_group_fragment"
         tools:layout="@layout/fragment_incident_group" />
+
+    <fragment
+        android:id="@+id/respondingFragment"
+        android:name="com.example.first_responder_app.RespondingFragment"
+        android:label="responding_fragment"
+        tools:layout="@layout/fragment_responding" />
 </navigation>
