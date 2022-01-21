@@ -14,6 +14,7 @@
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.first_responder_app.HomeFragment"
@@ -29,11 +30,13 @@
             android:id="@+id/action_homeFragment_to_respondingFragment"
             app:destination="@id/respondingFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/incidentFragment"
         android:name="com.example.first_responder_app.IncidentFragment"
         android:label="incident_fragment"
         tools:layout="@layout/fragment_incident" />
+
     <fragment
         android:id="@+id/incidentGroupFragment"
         android:name="com.example.first_responder_app.IncidentGroupFragment"
