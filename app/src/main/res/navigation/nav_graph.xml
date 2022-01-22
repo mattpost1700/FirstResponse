@@ -58,7 +58,11 @@
         android:id="@+id/announcementFragment"
         android:name="com.example.first_responder_app.AnnouncementFragment"
         android:label="fragment_announcement"
-        tools:layout="@layout/fragment_announcement" />
+        tools:layout="@layout/fragment_announcement" >
+        <action
+            android:id="@+id/action_announcementFragment_to_newAnnouncementFragment"
+            app:destination="@id/newAnnouncementFragment" />
+    </fragment>
     <fragment
         android:id="@+id/eventGroupFragment"
         android:name="com.example.first_responder_app.EventGroupFragment"
@@ -67,10 +71,35 @@
         <action
             android:id="@+id/action_eventGroupFragment_to_eventFragment"
             app:destination="@id/eventFragment" />
+        <action
+            android:id="@+id/action_eventGroupFragment_to_newEventFragment"
+            app:destination="@id/newEventFragment" />
     </fragment>
     <fragment
         android:id="@+id/eventFragment"
         android:name="com.example.first_responder_app.EventFragment"
         android:label="fragment_event"
-        tools:layout="@layout/fragment_event" />
+        tools:layout="@layout/fragment_event" >
+        <action
+            android:id="@+id/action_eventFragment_to_eventGroupFragment"
+            app:destination="@id/eventGroupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newEventFragment"
+        android:name="com.example.first_responder_app.NewEventFragment"
+        android:label="fragment_new_event"
+        tools:layout="@layout/fragment_event_new" >
+        <action
+            android:id="@+id/action_newEventFragment_to_eventGroupFragment"
+            app:destination="@id/eventGroupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newAnnouncementFragment"
+        android:name="com.example.first_responder_app.NewAnnouncementFragment"
+        android:label="fragment_announcement_new"
+        tools:layout="@layout/fragment_announcement_new" >
+        <action
+            android:id="@+id/action_newAnnouncementFragment_to_announcementFragment"
+            app:destination="@id/announcementFragment" />
+    </fragment>
 </navigation>
