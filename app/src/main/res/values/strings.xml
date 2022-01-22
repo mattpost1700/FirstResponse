@@ -3,12 +3,6 @@
     <string name="submit">submit</string>
     <string name="incidents">Incidents</string>
     <string name="home_responding">Responding</string>
-    <string name="announcement">Announcement</string>
-    <string name="event">Event</string>
-    <string name="events">Events</string>
-    <string name="location">Location</string>
-    <string name="description">Description</string>
-    <string name="sign_up">Sign up</string>
 
     <!-- Strings related to login -->
 
