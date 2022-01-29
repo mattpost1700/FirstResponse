@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.fragments;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,24 +12,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class EditUserFragment extends Fragment {
+import com.example.first_responder_app.viewModels.EventGroupViewModel;
+import com.example.first_responder_app.R;
 
-    private EditUserViewModel mViewModel;
+public class EventGroupFragment extends Fragment {
 
-    public static EditUserFragment newInstance() {
-        return new EditUserFragment();
+    private EventGroupViewModel mViewModel;
+
+    public static EventGroupFragment newInstance() {
+        return new EventGroupFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.edit_user_fragment, container, false);
+        return inflater.inflate(R.layout.fragment_event_group, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(EditUserViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(EventGroupViewModel.class);
         // TODO: Use the ViewModel
     }
 

@@ -1,6 +1,6 @@
 package com.example.first_responder_app.messaging;
 
-import com.example.first_responder_app.ChatFragment;
+import com.example.first_responder_app.fragments.ChatFragment;
 
 public class Message {
     private String text; // message body

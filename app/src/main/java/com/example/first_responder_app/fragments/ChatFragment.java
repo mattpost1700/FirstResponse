@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.fragments;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -11,6 +11,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.first_responder_app.viewModels.ChatViewModel;
+import com.example.first_responder_app.R;
 
 public class ChatFragment extends Fragment {
 

@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.fragments;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,24 +12,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class IncidentGroupFragment extends Fragment {
+import com.example.first_responder_app.R;
+import com.example.first_responder_app.viewModels.RespondingViewModel;
 
-    private IncidentGroupViewModel mViewModel;
+public class RespondingFragment extends Fragment {
 
-    public static IncidentGroupFragment newInstance() {
-        return new IncidentGroupFragment();
+    private RespondingViewModel mViewModel;
+
+    public static RespondingFragment newInstance() {
+        return new RespondingFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_incident_group, container, false);
+        return inflater.inflate(R.layout.fragment_responding, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(IncidentGroupViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(RespondingViewModel.class);
         // TODO: Use the ViewModel
     }
 

@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.fragments;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,24 +12,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class ReportFragment extends Fragment {
+import com.example.first_responder_app.viewModels.EventViewModel;
+import com.example.first_responder_app.R;
 
-    private ReportViewModel mViewModel;
+public class EventFragment extends Fragment {
 
-    public static ReportFragment newInstance() {
-        return new ReportFragment();
+    private EventViewModel mViewModel;
+
+    public static EventFragment newInstance() {
+        return new EventFragment();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.report_fragment, container, false);
+        return inflater.inflate(R.layout.fragment_event, container, false);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(ReportViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(EventViewModel.class);
         // TODO: Use the ViewModel
     }
 

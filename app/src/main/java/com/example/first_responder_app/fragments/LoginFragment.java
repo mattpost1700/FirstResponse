@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.fragments;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,11 +17,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.example.first_responder_app.viewModels.LoginViewModel;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
-
-import java.util.Observable;
 
 public class LoginFragment extends Fragment {
 

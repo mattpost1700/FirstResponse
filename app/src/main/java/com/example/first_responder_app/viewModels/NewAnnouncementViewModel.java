@@ -1,6 +1,4 @@
-package com.example.first_responder_app;
-
-import androidx.lifecycle.ViewModel;
+package com.example.first_responder_app.viewModels;
 
 public class NewAnnouncementViewModel extends BaseViewModel {
     // TODO: Implement the ViewModel

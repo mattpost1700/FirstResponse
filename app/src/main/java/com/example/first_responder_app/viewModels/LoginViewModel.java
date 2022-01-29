@@ -1,7 +1,4 @@
-package com.example.first_responder_app;
-
-import android.util.Log;
-
+package com.example.first_responder_app.viewModels;
 
 
 public class LoginViewModel extends BaseViewModel {

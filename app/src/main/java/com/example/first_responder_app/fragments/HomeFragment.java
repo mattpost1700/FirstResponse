@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.fragments;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.viewModels.HomeViewModel;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
 //TODO, haven't implement anything

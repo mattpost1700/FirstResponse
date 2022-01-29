@@ -1,6 +1,4 @@
-package com.example.first_responder_app;
-
-import java.util.Observable;
+package com.example.first_responder_app.viewModels;
 
 public class HomeViewModel extends BaseViewModel {
     public HomeViewModel() {

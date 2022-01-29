@@ -3,13 +3,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".IncidentFragment">
+    tools:context=".fragments.IncidentFragment">
 
     <data>
 
         <variable
             name="viewModel"
-            type="com.example.first_responder_app.IncidentViewModel" />
+            type="com.example.first_responder_app.viewModels.IncidentViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

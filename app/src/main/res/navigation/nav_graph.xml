@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.first_responder_app.LoginFragment"
+        android:name="com.example.first_responder_app.fragments.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.first_responder_app.HomeFragment"
+        android:name="com.example.first_responder_app.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -45,7 +45,7 @@
 
     <fragment
         android:id="@+id/incidentFragment"
-        android:name="com.example.first_responder_app.IncidentFragment"
+        android:name="com.example.first_responder_app.fragments.IncidentFragment"
         android:label="incident_fragment"
         tools:layout="@layout/fragment_incident" >
         <action
@@ -55,18 +55,18 @@
 
     <fragment
         android:id="@+id/incidentGroupFragment"
-        android:name="com.example.first_responder_app.IncidentGroupFragment"
+        android:name="com.example.first_responder_app.fragments.IncidentGroupFragment"
         android:label="incident_group_fragment"
         tools:layout="@layout/fragment_incident_group" />
 
     <fragment
         android:id="@+id/respondingFragment"
-        android:name="com.example.first_responder_app.RespondingFragment"
+        android:name="com.example.first_responder_app.fragments.RespondingFragment"
         android:label="responding_fragment"
         tools:layout="@layout/fragment_responding" />
     <fragment
         android:id="@+id/announcementFragment"
-        android:name="com.example.first_responder_app.AnnouncementFragment"
+        android:name="com.example.first_responder_app.fragments.AnnouncementFragment"
         android:label="fragment_announcement"
         tools:layout="@layout/fragment_announcement" >
         <action
@@ -75,7 +75,7 @@
     </fragment>
     <fragment
         android:id="@+id/eventGroupFragment"
-        android:name="com.example.first_responder_app.EventGroupFragment"
+        android:name="com.example.first_responder_app.fragments.EventGroupFragment"
         android:label="fragment_event_group"
         tools:layout="@layout/fragment_event_group" >
         <action
@@ -87,7 +87,7 @@
     </fragment>
     <fragment
         android:id="@+id/eventFragment"
-        android:name="com.example.first_responder_app.EventFragment"
+        android:name="com.example.first_responder_app.fragments.EventFragment"
         android:label="fragment_event"
         tools:layout="@layout/fragment_event" >
         <action
@@ -96,7 +96,7 @@
     </fragment>
     <fragment
         android:id="@+id/newEventFragment"
-        android:name="com.example.first_responder_app.NewEventFragment"
+        android:name="com.example.first_responder_app.fragments.NewEventFragment"
         android:label="fragment_new_event"
         tools:layout="@layout/fragment_event_new" >
         <action
@@ -105,7 +105,7 @@
     </fragment>
     <fragment
         android:id="@+id/newAnnouncementFragment"
-        android:name="com.example.first_responder_app.NewAnnouncementFragment"
+        android:name="com.example.first_responder_app.fragments.NewAnnouncementFragment"
         android:label="fragment_announcement_new"
         tools:layout="@layout/fragment_announcement_new" >
         <action
@@ -114,17 +114,17 @@
     </fragment>
     <fragment
         android:id="@+id/chatFragment"
-        android:name="com.example.first_responder_app.ChatFragment"
+        android:name="com.example.first_responder_app.fragments.ChatFragment"
         android:label="chat_fragment"
         tools:layout="@layout/chat_fragment" />
     <fragment
         android:id="@+id/editUserFragment"
-        android:name="com.example.first_responder_app.EditUserFragment"
+        android:name="com.example.first_responder_app.fragments.EditUserFragment"
         android:label="edit_user_fragment"
         tools:layout="@layout/edit_user_fragment" />
     <fragment
         android:id="@+id/reportFragment"
-        android:name="com.example.first_responder_app.ReportFragment"
+        android:name="com.example.first_responder_app.fragments.ReportFragment"
         android:label="report_fragment"
         tools:layout="@layout/report_fragment" />
 </navigation>

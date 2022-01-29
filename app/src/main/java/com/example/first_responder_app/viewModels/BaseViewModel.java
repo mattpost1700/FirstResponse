@@ -1,8 +1,6 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.viewModels;
 
 import androidx.lifecycle.ViewModel;
-
-import java.util.Observable;
 
 public class BaseViewModel extends ViewModel {
 
