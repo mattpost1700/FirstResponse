@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "399840158780",
+    "project_id": "first-response-db",
+    "storage_bucket": "first-response-db.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:399840158780:android:4eb75c80c1875d5a43cf39",
+        "android_client_info": {
+          "package_name": "com.example.first_responder_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "399840158780-d6o6j1kd3f0qqkdp6mdg7cnfupuagrm4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBb7FjM0ayHw_4shQ8ALr13U-2WfrUmLkc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "399840158780-d6o6j1kd3f0qqkdp6mdg7cnfupuagrm4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
