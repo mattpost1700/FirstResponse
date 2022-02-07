@@ -14,8 +14,9 @@ public class UsersDataModel {
     private int phone_number;
     private String rank;
     private String username;
+    private boolean is_responding;
 
-    public UsersDataModel(String address, String first_name, String last_name, String password, int phone_number, String rank, String username) {
+    public UsersDataModel(String address, String first_name, String last_name, String password, int phone_number, String rank, String username, boolean is_responding) {
         this.address = address;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -23,6 +24,7 @@ public class UsersDataModel {
         this.phone_number = phone_number;
         this.rank = rank;
         this.username = username;
+        this.is_responding = is_responding;
     }
 
     public UsersDataModel() {}
@@ -44,4 +46,6 @@ public class UsersDataModel {
     public String getRank() { return rank; }
 
     public String getUsername() { return username; }
+
+    public boolean isIs_responding() { return is_responding; }
 }

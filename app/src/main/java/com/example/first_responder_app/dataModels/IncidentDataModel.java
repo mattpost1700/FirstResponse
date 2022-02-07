@@ -3,6 +3,7 @@ package com.example.first_responder_app.dataModels;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class IncidentDataModel {
@@ -17,6 +18,9 @@ public class IncidentDataModel {
     private String location;
     private String incident_type;
 
+    private IncidentTypesDataModel incidentTypesDataModel;
+    private List<UsersDataModel> listOfRespondingDataModel;
+
     public IncidentDataModel(List<String> units, List<String> responding, Timestamp received_time, boolean incident_complete, String location, String incident_type) {
         this.units = units;
         this.responding = responding;
@@ -24,11 +28,21 @@ public class IncidentDataModel {
         this.incident_complete = incident_complete;
         this.location = location;
         this.incident_type = incident_type;
+
+        this.listOfRespondingDataModel = new ArrayList<>();
     }
 
     public IncidentDataModel() {}
 
     public void setDocumentId(String documentId) { this.documentId = documentId; }
+
+    public void setListOfRespondingDataModel(List<UsersDataModel> listOfRespondingDataModel) { this.listOfRespondingDataModel = listOfRespondingDataModel; }
+
+    public void setIncidentTypesDataModel(IncidentTypesDataModel incidentTypesDataModel) { this.incidentTypesDataModel = incidentTypesDataModel; }
+
+    public IncidentTypesDataModel setIncidentTypesDataModel() { return incidentTypesDataModel; }
+
+    public List<UsersDataModel> getListOfRespondingDataModel() { return listOfRespondingDataModel; }
 
     public String getDocumentId() { return documentId; }
 
