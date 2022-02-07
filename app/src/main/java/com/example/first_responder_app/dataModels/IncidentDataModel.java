@@ -1,88 +1,46 @@
 package com.example.first_responder_app.dataModels;
 
-import com.google.type.DateTime;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentId;
 
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.List;
 
 public class IncidentDataModel {
 
+    @DocumentId
+    private String documentId;
+
+    private List<String> units;
+    private List<String> responding;
+    private Timestamp received_time;
+    private boolean incident_complete;
     private String location;
-    private String type;
-    private ArrayList<String> crossStreet;
-    private Date receivedTime;
-    private Integer responding;
-    private ArrayList<String> units;
+    private String incident_type;
 
-    public IncidentDataModel(String location, String type, ArrayList<String> crossStreet, Date receivedTime, Integer responding, ArrayList<String> units) {
-        this.location = location;
-        this.type = type;
-        this.crossStreet = crossStreet;
-        this.receivedTime = receivedTime;
-        this.responding = responding;
+    public IncidentDataModel(List<String> units, List<String> responding, Timestamp received_time, boolean incident_complete, String location, String incident_type) {
         this.units = units;
-    }
-
-    public IncidentDataModel(String location, String type, ArrayList<String> crossStreet, Date receivedTime) {
+        this.responding = responding;
+        this.received_time = received_time;
+        this.incident_complete = incident_complete;
         this.location = location;
-        this.type = type;
-        this.crossStreet = crossStreet;
-        this.receivedTime = receivedTime;
+        this.incident_type = incident_type;
     }
 
     public IncidentDataModel() {}
 
+    public void setDocumentId(String documentId) { this.documentId = documentId; }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getDocumentId() { return documentId; }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public List<String> getUnits() { return units; }
 
-    public String getType() {
-        return type;
-    }
+    public List<String> getResponding() { return responding; }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+    public Timestamp getReceived_time() { return received_time; }
 
-    public ArrayList<String> getCrossStreet() {
-        return crossStreet;
-    }
+    public boolean isIncident_complete() { return incident_complete; }
 
-    public void setCrossStreet(ArrayList<String> crossStreet) {
-        this.crossStreet = crossStreet;
-    }
+    public String getLocation() { return location; }
 
-    public Date getReceivedTime() {
-        return receivedTime;
-    }
-
-    public void setReceivedTime(Date receivedTime) {
-        this.receivedTime = receivedTime;
-    }
-
-    public Integer getResponding() {
-        return responding;
-    }
-
-    public void setResponding(Integer responding) {
-        this.responding = responding;
-    }
-
-    public ArrayList<String> getUnits() {
-        return units;
-    }
-
-    public void setUnits(ArrayList<String> units) {
-        this.units = units;
-    }
-
-
-
-
-
+    public String getIncident_type() { return incident_type; }
 }
