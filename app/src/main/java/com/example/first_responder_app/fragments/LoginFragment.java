@@ -18,13 +18,32 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.dataModels.IncidentDataModel;
+import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import com.example.first_responder_app.viewModels.LoginViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.content.ContentValues.TAG;
+
 public class LoginFragment extends Fragment {
 
     private LoginViewModel mViewModel;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private List<UsersDataModel> listOfUser;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
@@ -39,15 +58,34 @@ public class LoginFragment extends Fragment {
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
+
+        //get user info for comparison
+        listOfUser = new ArrayList<>();
+        populateUserList();
+
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
         binding.loginSubmit.setOnClickListener(v -> {
             mViewModel.setUsername(binding.loginUsername.getText().toString());
             mViewModel.setPassword(binding.loginPassword.getText().toString());
-            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-            Log.e( "testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword());
+            if (checkUsernameExists(mViewModel.getUsername())){
+                 if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())){
+                     NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+                     Navigation.findNavController(binding.getRoot()).navigate(action);
+                     Log.e( "testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
+                 }
+                 else {
+                     //TODO: make a pop up for erro msg
+                     Log.e("testing", "login failed: wrong username/password");
+                 }
+            }
+            else {
+                //TODO: make a pop up for erro msg
+                Log.e("testing", "login failed: wrong username/password");
+            }
         });
+
+
         return binding.getRoot();
     }
 
@@ -56,5 +94,46 @@ public class LoginFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         // TODO: Use the ViewModel
+    }
+
+    private void populateUserList(){
+        db.collection("users").get().addOnCompleteListener(usersTask -> {
+            if (usersTask.isSuccessful()) {
+                for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
+                    UsersDataModel usersDataModel = userDoc.toObject(UsersDataModel.class);
+
+                    listOfUser.add(usersDataModel);
+                }
+
+                if (listOfUser.size() == 0) {
+                    //TODO: is this even possible?
+
+                }
+            } else {
+                Log.d(TAG, "db get failed in Login page " + usersTask.getException());
+            }
+        });
+    }
+
+    //check if username is valid
+    private boolean checkUsernameExists(String username){
+        for (int i = 0; i < listOfUser.size(); i++){
+            if (listOfUser.get(i).getUsername().equals(username)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //check if password matches the record in db
+    private boolean checkPwMatch(String username, String pw){
+        for (int i = 0; i < listOfUser.size(); i++){
+            if (listOfUser.get(i).getUsername().equals(username)){
+                if (listOfUser.get(i).getPw().equals(pw)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

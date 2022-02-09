@@ -27,7 +27,7 @@ public class UsersDataModel {
         this.is_responding = is_responding;
     }
 
-    public UsersDataModel() {}
+    public UsersDataModel() { }
 
     public void setDocumentId(String documentId) { this.documentId = documentId; }
 
@@ -48,4 +48,6 @@ public class UsersDataModel {
     public String getUsername() { return username; }
 
     public boolean isIs_responding() { return is_responding; }
+
+    public String getPw() { return password; }
 }
