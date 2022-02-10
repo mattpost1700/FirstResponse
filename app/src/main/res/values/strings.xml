@@ -6,6 +6,12 @@
     <string name="sign_up">Sign up</string>
     <string name="announcement">Announcement</string>
     <string name="events">Events</string>
+    <string name="first_responder">First Responder</string>
+    <string name="defaultmsg">defaultMsg</string>
+    <string name="loginFailMsg">login failed: wrong username/password</string>
+    <string name="password">password</string>
+    <string name="username">username</string>
+    <string name="emtpyDbMsg">user entry from db is emtpy</string>
 
     <!-- Strings related to login -->
 

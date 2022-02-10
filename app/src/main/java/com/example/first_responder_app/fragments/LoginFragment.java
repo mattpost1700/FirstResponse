@@ -66,22 +66,28 @@ public class LoginFragment extends Fragment {
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
         binding.loginSubmit.setOnClickListener(v -> {
+            if (listOfUser.size() == 0){
+                binding.logMsg.setText(R.string.emtpyDbMsg);
+                binding.logMsg.setVisibility(View.VISIBLE);
+            }
             mViewModel.setUsername(binding.loginUsername.getText().toString());
             mViewModel.setPassword(binding.loginPassword.getText().toString());
             if (checkUsernameExists(mViewModel.getUsername())){
                  if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())){
                      NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
                      Navigation.findNavController(binding.getRoot()).navigate(action);
-                     Log.e( "testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
+                     Log.d( "testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
                  }
                  else {
-                     //TODO: make a pop up for erro msg
-                     Log.e("testing", "login failed: wrong username/password");
+                     binding.logMsg.setText(R.string.loginFailMsg);
+                     binding.logMsg.setVisibility(View.VISIBLE);
+                     Log.d("testing", "login failed: wrong username/password");
                  }
             }
             else {
-                //TODO: make a pop up for erro msg
-                Log.e("testing", "login failed: wrong username/password");
+                binding.logMsg.setText(R.string.loginFailMsg);
+                binding.logMsg.setVisibility(View.VISIBLE);
+                Log.d("testing", "login failed: wrong username/password");
             }
         });
 
@@ -103,11 +109,6 @@ public class LoginFragment extends Fragment {
                     UsersDataModel usersDataModel = userDoc.toObject(UsersDataModel.class);
 
                     listOfUser.add(usersDataModel);
-                }
-
-                if (listOfUser.size() == 0) {
-                    //TODO: is this even possible?
-
                 }
             } else {
                 Log.d(TAG, "db get failed in Login page " + usersTask.getException());
