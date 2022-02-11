@@ -4,6 +4,7 @@ package com.example.first_responder_app.viewModels;
 public class LoginViewModel extends BaseViewModel {
     private String mUsername;
     private String mPassword;
+    private String logMsg;
 
     //getter for username
     public String getUsername() {
@@ -24,6 +25,8 @@ public class LoginViewModel extends BaseViewModel {
     public void setPassword(String mPassword) {
         this.mPassword = mPassword;
     }
+
+
 
     public LoginViewModel() {
         super();
