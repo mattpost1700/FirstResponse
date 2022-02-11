@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.LoginViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
@@ -33,6 +34,14 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
+        //lock drawer on login page
+        DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
+        if(drawerLocker != null){
+            drawerLocker.setDrawerLocked(true);
+        }
+
+
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
         FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         NavHostFragment navHostFragment =
@@ -49,6 +58,16 @@ public class LoginFragment extends Fragment {
             Log.e( "testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword());
         });
         return binding.getRoot();
+    }
+
+    @Override
+    public void onDestroyView() {
+        //unlock drawer when leaving login page
+        DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
+        if(drawerLocker != null){
+            drawerLocker.setDrawerLocked(false);
+        }
+        super.onDestroyView();
     }
 
     @Override

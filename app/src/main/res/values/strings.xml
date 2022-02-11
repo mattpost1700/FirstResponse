@@ -5,7 +5,13 @@
     <string name="home_responding">Responding</string>
     <string name="sign_up">Sign up</string>
     <string name="announcement">Announcement</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="home">Home</string>
+    <string name="responding">Responding</string>
     <string name="events">Events</string>
+    <string name="chat">Chat</string>
+    <string name="announcements">Announcements</string>
 
     <!-- Strings related to login -->
 

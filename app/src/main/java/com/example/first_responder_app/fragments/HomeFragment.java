@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
@@ -59,6 +60,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
@@ -68,16 +70,6 @@ public class HomeFragment extends Fragment {
         //also if you have any other code relates to onCreateView just add it from here
         binding.cardView.setOnClickListener(v -> {
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-        });
-
-        binding.homeIncidents.setOnClickListener(v -> {
-            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentGroupFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-        });
-
-        binding.homeResponding.setOnClickListener(v -> {
-            NavDirections action = HomeFragmentDirections.actionHomeFragmentToRespondingFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
