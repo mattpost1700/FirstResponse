@@ -81,6 +81,8 @@ public class LoginFragment extends Fragment {
             }
             mViewModel.setUsername(binding.loginUsername.getText().toString());
             mViewModel.setPassword(binding.loginPassword.getText().toString());
+            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
             if (checkUsernameExists(mViewModel.getUsername())){
                  if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())){
                      NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();

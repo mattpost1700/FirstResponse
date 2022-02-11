@@ -31,6 +31,8 @@ public class UsersDataModel {
 
     public void setDocumentId(String documentId) { this.documentId = documentId; }
 
+    public void setRank(String rank) { this.rank = rank; }
+
     public String getDocumentId() { return documentId; }
 
     public String getAddress() { return address; }

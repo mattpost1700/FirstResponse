@@ -12,12 +12,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.first_responder_app.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
@@ -26,19 +30,13 @@ import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 import static android.content.ContentValues.TAG;
 
@@ -51,19 +49,22 @@ public class HomeFragment extends Fragment {
 
     private List<RanksDataModel> listOfRanks;
     private List<IncidentDataModel> listOfIncidentDataModel;
-    private List<UsersDataModel> respondersDataModel;
+    private List<UsersDataModel> respondersList;
+
+    private RespondersRecyclerViewAdapter respondersRecyclerViewAdapter;
+    private RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener;
+    private View bindingView;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        bindingView = binding.getRoot();
+
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
         //switch to Home fragment upon clicking it
@@ -74,14 +75,31 @@ public class HomeFragment extends Fragment {
         });
 
         listOfIncidentDataModel = new ArrayList<>();
-        respondersDataModel = new ArrayList<>();
+        respondersList = new ArrayList<>();
         listOfRanks = new ArrayList<>();
 
         populateIncidents();
         populateResponders();
         saveRanksCollection();
 
-        return binding.getRoot();
+        responderClickListener = (view, position) -> {
+            Log.d(TAG, "clicked (from listener)!");
+            String debugString = "Responder " + position + " was clicked (" + respondersRecyclerViewAdapter.getItem(position).getFirst_name() + ")";
+
+        };
+
+        // RecyclerViews
+        RecyclerView recyclerView = bindingView.findViewById(R.id.responders_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(bindingView.getContext()));
+        respondersRecyclerViewAdapter = new RespondersRecyclerViewAdapter(bindingView.getContext(), respondersList);
+        respondersRecyclerViewAdapter.setResponderClickListener(responderClickListener);
+        recyclerView.setAdapter(respondersRecyclerViewAdapter);
+
+        // TEST CODE
+        respondersList.add(new UsersDataModel("address", "fName1", "lName1", "password", 111, "RankID", "username", true));
+        respondersList.add(new UsersDataModel("address", "fName2", "lName2", "password", 111, "RankID", "username", true));
+
+        return bindingView;
     }
 
     @Override
@@ -153,10 +171,10 @@ public class HomeFragment extends Fragment {
             if(userTask.isSuccessful()) {
 
                 for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-                    respondersDataModel.add(userDoc.toObject(UsersDataModel.class));
+                    respondersList.add(userDoc.toObject(UsersDataModel.class));
                 }
 
-                if (respondersDataModel.size() == 0) {
+                if (respondersList.size() == 0) {
                     //TODO: make the responding section of the home page blank
 
                 } else {
@@ -167,4 +185,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
+//    @Override
+//    public void onResponderItemClick(View view, int position) {
+//        Log.d(TAG, "clicked!");
+//        Toast.makeText(bindingView.getContext(), "You clicked " + respondersRecyclerViewAdapter.getItem(position).toString() + " on row number " + position, Toast.LENGTH_SHORT).show();
+//    }
 }
