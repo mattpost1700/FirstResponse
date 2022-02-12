@@ -18,6 +18,7 @@
     <string name="emtpyDbMsg">user entry from db is emtpy</string>
     <string name="chat">Chat</string>
     <string name="announcements">Announcements</string>
+    <string name="user_avatar">User Avatar</string>
 
     <!-- Strings related to login -->
 

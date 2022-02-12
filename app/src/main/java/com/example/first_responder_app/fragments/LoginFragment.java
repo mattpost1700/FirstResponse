@@ -18,8 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -81,8 +83,6 @@ public class LoginFragment extends Fragment {
             }
             mViewModel.setUsername(binding.loginUsername.getText().toString());
             mViewModel.setPassword(binding.loginPassword.getText().toString());
-            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
             if (checkUsernameExists(mViewModel.getUsername())){
                  if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())){
                      NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
@@ -152,6 +152,10 @@ public class LoginFragment extends Fragment {
         for (int i = 0; i < listOfUser.size(); i++){
             if (listOfUser.get(i).getUsername().equals(username)){
                 if (listOfUser.get(i).getPw().equals(pw)){
+                    ActiveUser activeUser = ((ActiveUser)getActivity());
+                    if(activeUser != null){
+                        activeUser.setActive(listOfUser.get(i));
+                    }
                     return true;
                 }
             }

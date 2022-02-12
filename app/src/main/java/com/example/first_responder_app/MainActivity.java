@@ -18,21 +18,26 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.fragments.HomeFragmentDirections;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.ActionCodeMultiFactorInfo;
 
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements DrawerLocker {
+public class MainActivity extends AppCompatActivity implements DrawerLocker, ActiveUser {
     ActionBarDrawerToggle toggle;
     Toolbar toolbar;
     DrawerLayout drawer;
     Drawable icon;
+    UsersDataModel activeUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +97,18 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker {
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             toolbar.setNavigationIcon(icon);
         }
+    }
+
+    @Override
+    public void setActive(UsersDataModel user) {
+        this.activeUser = user;
+        TextView username = findViewById(R.id.nav_username);
+        username.setText(user.getUsername());
+    }
+
+    @Override
+    public UsersDataModel getActive() {
+        return activeUser;
     }
 }
 
