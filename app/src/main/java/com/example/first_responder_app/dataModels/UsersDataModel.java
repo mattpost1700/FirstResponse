@@ -2,6 +2,7 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.firestore.DocumentId;
 
+// TODO: This msg is given "No setter/field for phone found on class com.example.first_responder_app.dataModels.UsersDataModel"
 public class UsersDataModel {
 
     @DocumentId
