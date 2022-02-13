@@ -18,8 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
@@ -29,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.LoginViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
@@ -52,6 +55,14 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
+        //lock drawer on login page
+        DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
+        if(drawerLocker != null){
+            drawerLocker.setDrawerLocked(true);
+        }
+
+
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
         FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         NavHostFragment navHostFragment =
@@ -98,6 +109,16 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
+    public void onDestroyView() {
+        //unlock drawer when leaving login page
+        DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
+        if(drawerLocker != null){
+            drawerLocker.setDrawerLocked(false);
+        }
+        super.onDestroyView();
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
@@ -129,10 +150,14 @@ public class LoginFragment extends Fragment {
     }
 
     //check if password matches the record in db
-    private boolean checkPwMatch(String username, String pw) {
-        for (int i = 0; i < listOfUser.size(); i++) {
-            if (listOfUser.get(i).getUsername().equals(username)) {
-                if (listOfUser.get(i).getPw().equals(pw)) {
+    private boolean checkPwMatch(String username, String pw){
+        for (int i = 0; i < listOfUser.size(); i++){
+            if (listOfUser.get(i).getUsername().equals(username)){
+                if (listOfUser.get(i).getPw().equals(pw)){
+                    ActiveUser activeUser = ((ActiveUser)getActivity());
+                    if(activeUser != null){
+                        activeUser.setActive(listOfUser.get(i));
+                    }
                     return true;
                 }
             }

@@ -28,6 +28,7 @@ import com.example.first_responder_app.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
@@ -79,16 +80,6 @@ public class HomeFragment extends Fragment {
         pullToRefresh.setOnRefreshListener(() -> {
             refreshData(); // your code
             pullToRefresh.setRefreshing(false);
-        });
-
-        binding.homeIncidents.setOnClickListener(v -> {
-            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentGroupFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-        });
-
-        binding.homeResponding.setOnClickListener(v -> {
-            NavDirections action = HomeFragmentDirections.actionHomeFragmentToRespondingFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
         listOfIncidentDataModel = new ArrayList<>();
