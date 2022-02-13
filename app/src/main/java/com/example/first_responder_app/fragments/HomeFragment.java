@@ -101,13 +101,13 @@ public class HomeFragment extends Fragment {
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from responder listener)!");
-            // TODO: Do something when clicking on the responder
-            // TODO: For some reason this doesn't work \/ \/ \/
             Toast.makeText(getActivity(), "Responder \"" + respondersList.get(position).getFirst_name() + "\" was clicked!", Toast.LENGTH_SHORT).show();
+            // TODO: Do something when clicking on the responder
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from incident listener)!");
+            Toast.makeText(getActivity(), "Incident \"" + listOfIncidentDataModel.get(position).getLocation() + "\" was clicked!", Toast.LENGTH_SHORT).show();
             // TODO: Do something when clicking on the event
         };
 
