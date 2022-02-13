@@ -30,8 +30,11 @@ import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +53,7 @@ public class HomeFragment extends Fragment {
     private List<UsersDataModel> respondersList;
 
     private RespondersRecyclerViewAdapter respondersRecyclerViewAdapter;
-    private RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener;
     private IncidentRecyclerViewAdapter incidentRecyclerViewAdapter;
-    private IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener;
     private View bindingView;
 
     public static HomeFragment newInstance() {
@@ -94,13 +95,11 @@ public class HomeFragment extends Fragment {
         populateResponders();
         saveRanksCollection();
 
-        responderClickListener = (view, position) -> {
+        RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from responder listener)!");
-            String debugString = "Responder " + position + " was clicked (" + respondersRecyclerViewAdapter.getItem(position).getFirst_name() + ")";
-
         };
 
-        incidentClickListener = (view, position) -> {
+        IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from incident listener)!");
         };
 
@@ -117,10 +116,9 @@ public class HomeFragment extends Fragment {
         respondersRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondersRecyclerView.setAdapter(respondersRecyclerViewAdapter);
 
-
-        // TEST CODE
-        respondersList.add(new UsersDataModel("address", "fName1", "lName1", "password", 111, "RankID", "username", true));
-        respondersList.add(new UsersDataModel("address", "fName2", "lName2", "password", 111, "RankID", "username", true));
+        // Start event listeners
+        addIncidentEventListener();
+        addResponderEventListener();
 
         return bindingView;
     }
@@ -131,11 +129,41 @@ public class HomeFragment extends Fragment {
         populateResponders();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-        // TODO: Use the ViewModel
+    private void addIncidentEventListener() {
+        db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+            if(error != null) {
+                Log.w(TAG, "Listening failed for firestore incident collection");
+            }
+            else {
+                ArrayList<IncidentDataModel> temp = new ArrayList<>();
+                for (QueryDocumentSnapshot incidentDoc : value) {
+                    IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
+                    temp.add(incidentDataModel);
+                }
+
+                listOfIncidentDataModel.clear();
+                listOfIncidentDataModel.addAll(temp);
+                incidentRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void addResponderEventListener() {
+        db.collection("users").whereEqualTo("is_responding", true).addSnapshotListener((value, error) -> {
+            if(error != null) {
+                Log.w(TAG, "Listening failed for firestore users collection");
+            }
+            else {
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot userDoc : value) {
+                    temp.add(userDoc.toObject(UsersDataModel.class));
+                }
+
+                respondersList.clear();
+                respondersList.addAll(temp);
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     /**
@@ -151,7 +179,6 @@ public class HomeFragment extends Fragment {
                 Log.d(TAG, "Error getting documents: ", rankTask.getException());
             }
         });
-
     }
 
     /**
@@ -177,25 +204,13 @@ public class HomeFragment extends Fragment {
                     temp.add(incidentDataModel);
                 }
 
-                if (temp.size() == 0) {
-                    //TODO: make the incidents section of the home page blank
-
-                } else {
-                    listOfIncidentDataModel.clear();
-                    listOfIncidentDataModel.addAll(temp);
-                    incidentRecyclerViewAdapter.notifyDataSetChanged();
-                    //TODO: Display incidents in view
-                    //we could sort incidents by time? or type? and choose the ones we want to display
-                    //or if we only want to display one, we should make some sort of db query instead of grabbing all incidents
-                    //for now, I just made the db query simple
-
-                }
+                listOfIncidentDataModel.clear();
+                listOfIncidentDataModel.addAll(temp);
+                incidentRecyclerViewAdapter.notifyDataSetChanged();
             } else {
                 Log.d(TAG, "get failed in HomeFragment with " + incidentTask.getException());
             }
         });
-
-
     }
 
     private void populateResponders() {
@@ -206,22 +221,17 @@ public class HomeFragment extends Fragment {
                     temp.add(userDoc.toObject(UsersDataModel.class));
                 }
 
-                if (temp.size() == 0) {
-                    respondersList.clear();
-                    respondersRecyclerViewAdapter.notifyDataSetChanged();
-                } else {
-                    respondersList.clear();
-                    respondersList.addAll(temp);
-                    respondersRecyclerViewAdapter.notifyDataSetChanged();
-                }
-
+                respondersList.clear();
+                respondersList.addAll(temp);
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
     }
 
-//    @Override
-//    public void onResponderItemClick(View view, int position) {
-//        Log.d(TAG, "clicked!");
-//        Toast.makeText(bindingView.getContext(), "You clicked " + respondersRecyclerViewAdapter.getItem(position).toString() + " on row number " + position, Toast.LENGTH_SHORT).show();
-//    }
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        // TODO: Use the ViewModel
+    }
 }
