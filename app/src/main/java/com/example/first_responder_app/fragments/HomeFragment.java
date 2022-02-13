@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.first_responder_app.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.RespondersRecyclerViewAdapter;
@@ -45,8 +46,10 @@ import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment {
 
-    private HomeViewModel mViewModel;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private HomeViewModel mViewModel;
+    private View bindingView;
 
     private List<RanksDataModel> listOfRanks;
     private List<IncidentDataModel> listOfIncidentDataModel;
@@ -54,7 +57,6 @@ public class HomeFragment extends Fragment {
 
     private RespondersRecyclerViewAdapter respondersRecyclerViewAdapter;
     private IncidentRecyclerViewAdapter incidentRecyclerViewAdapter;
-    private View bindingView;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -97,10 +99,12 @@ public class HomeFragment extends Fragment {
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from responder listener)!");
+            // TODO: Do something when clicking on the responder
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from incident listener)!");
+            // TODO: Do something when clicking on the event
         };
 
         // RecyclerViews
@@ -116,19 +120,26 @@ public class HomeFragment extends Fragment {
         respondersRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondersRecyclerView.setAdapter(respondersRecyclerViewAdapter);
 
-        // Start event listeners
+        // Start event listeners (live data)
         addIncidentEventListener();
         addResponderEventListener();
 
         return bindingView;
     }
 
+    /**
+     * Refreshes the section from a pull down action
+     *
+     * @apiNote The event listeners should make this unnecessary, but is a fail safe
+     */
     private void refreshData() {
-        // do something
         populateIncidents();
         populateResponders();
     }
 
+    /**
+     * Adds an event listener for incidents. Live updates the incidents section
+     */
     private void addIncidentEventListener() {
         db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             if(error != null) {
@@ -148,6 +159,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * Adds an event listener for responders. Live updates the responders section
+     */
     private void addResponderEventListener() {
         db.collection("users").whereEqualTo("is_responding", true).addSnapshotListener((value, error) -> {
             if(error != null) {
@@ -156,6 +170,45 @@ public class HomeFragment extends Fragment {
             else {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : value) {
+                    temp.add(userDoc.toObject(UsersDataModel.class));
+                }
+
+                respondersList.clear();
+                respondersList.addAll(temp);
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    /**
+     * Displays the active incidents
+     */
+    private void populateIncidents() {
+        db.collection("incident").get().addOnCompleteListener(incidentTask -> {
+            if (incidentTask.isSuccessful()) {
+                ArrayList<IncidentDataModel> temp = new ArrayList<>();
+                for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
+                    IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
+                    temp.add(incidentDataModel);
+                }
+
+                listOfIncidentDataModel.clear();
+                listOfIncidentDataModel.addAll(temp);
+                incidentRecyclerViewAdapter.notifyDataSetChanged();
+            } else {
+                Log.d(TAG, "get failed in HomeFragment with " + incidentTask.getException());
+            }
+        });
+    }
+
+    /**
+     * Displays the responding users
+     */
+    private void populateResponders() {
+        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
+            if(userTask.isSuccessful()) {
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
                     temp.add(userDoc.toObject(UsersDataModel.class));
                 }
 
@@ -183,6 +236,7 @@ public class HomeFragment extends Fragment {
 
     /**
      * Gets the requested RankDataModel
+     *
      * @param documentId The auto generated document id
      * @return The rank data model or null is it was not found
      */
@@ -193,39 +247,6 @@ public class HomeFragment extends Fragment {
             }
         }
         return null;
-    }
-
-    private void populateIncidents() {
-        db.collection("incident").get().addOnCompleteListener(incidentTask -> {
-            if (incidentTask.isSuccessful()) {
-                ArrayList<IncidentDataModel> temp = new ArrayList<>();
-                for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
-                    IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
-                    temp.add(incidentDataModel);
-                }
-
-                listOfIncidentDataModel.clear();
-                listOfIncidentDataModel.addAll(temp);
-                incidentRecyclerViewAdapter.notifyDataSetChanged();
-            } else {
-                Log.d(TAG, "get failed in HomeFragment with " + incidentTask.getException());
-            }
-        });
-    }
-
-    private void populateResponders() {
-        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
-            if(userTask.isSuccessful()) {
-                ArrayList<UsersDataModel> temp = new ArrayList<>();
-                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
-                }
-
-                respondersList.clear();
-                respondersList.addAll(temp);
-                respondersRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
     }
 
     @Override
