@@ -14,13 +14,14 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
+import com.example.first_responder_app.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
@@ -29,8 +30,6 @@ import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
-import com.google.android.material.snackbar.BaseTransientBottomBar;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -52,6 +51,8 @@ public class HomeFragment extends Fragment {
 
     private RespondersRecyclerViewAdapter respondersRecyclerViewAdapter;
     private RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener;
+    private IncidentRecyclerViewAdapter incidentRecyclerViewAdapter;
+    private IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener;
     private View bindingView;
 
     public static HomeFragment newInstance() {
@@ -68,9 +69,11 @@ public class HomeFragment extends Fragment {
         NavController navController = navHostFragment.getNavController();
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
-        binding.cardView.setOnClickListener(v -> {
-            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+
+        final SwipeRefreshLayout pullToRefresh = bindingView.findViewById(R.id.homeSwipeRefreshLayout);
+        pullToRefresh.setOnRefreshListener(() -> {
+            refreshData(); // your code
+            pullToRefresh.setRefreshing(false);
         });
 
         binding.homeIncidents.setOnClickListener(v -> {
@@ -92,23 +95,40 @@ public class HomeFragment extends Fragment {
         saveRanksCollection();
 
         responderClickListener = (view, position) -> {
-            Log.d(TAG, "clicked (from listener)!");
+            Log.d(TAG, "clicked (from responder listener)!");
             String debugString = "Responder " + position + " was clicked (" + respondersRecyclerViewAdapter.getItem(position).getFirst_name() + ")";
 
         };
 
+        incidentClickListener = (view, position) -> {
+            Log.d(TAG, "clicked (from incident listener)!");
+        };
+
         // RecyclerViews
-        RecyclerView recyclerView = bindingView.findViewById(R.id.responders_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(bindingView.getContext()));
+        RecyclerView incidentRecyclerView = bindingView.findViewById(R.id.incidents_recycler_view);
+        incidentRecyclerView.setLayoutManager(new LinearLayoutManager(bindingView.getContext()));
+        incidentRecyclerViewAdapter = new IncidentRecyclerViewAdapter(bindingView.getContext(), listOfIncidentDataModel);
+        incidentRecyclerViewAdapter.setIncidentClickListener(incidentClickListener);
+        incidentRecyclerView.setAdapter(incidentRecyclerViewAdapter);
+
+        RecyclerView respondersRecyclerView = bindingView.findViewById(R.id.responders_recycler_view);
+        respondersRecyclerView.setLayoutManager(new LinearLayoutManager(bindingView.getContext()));
         respondersRecyclerViewAdapter = new RespondersRecyclerViewAdapter(bindingView.getContext(), respondersList);
         respondersRecyclerViewAdapter.setResponderClickListener(responderClickListener);
-        recyclerView.setAdapter(respondersRecyclerViewAdapter);
+        respondersRecyclerView.setAdapter(respondersRecyclerViewAdapter);
+
 
         // TEST CODE
         respondersList.add(new UsersDataModel("address", "fName1", "lName1", "password", 111, "RankID", "username", true));
         respondersList.add(new UsersDataModel("address", "fName2", "lName2", "password", 111, "RankID", "username", true));
 
         return bindingView;
+    }
+
+    private void refreshData() {
+        // do something
+        populateIncidents();
+        populateResponders();
     }
 
     @Override
@@ -151,16 +171,19 @@ public class HomeFragment extends Fragment {
     private void populateIncidents() {
         db.collection("incident").get().addOnCompleteListener(incidentTask -> {
             if (incidentTask.isSuccessful()) {
+                ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
                     IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
-
-                    listOfIncidentDataModel.add(incidentDataModel);
+                    temp.add(incidentDataModel);
                 }
 
-                if (listOfIncidentDataModel.size() == 0) {
+                if (temp.size() == 0) {
                     //TODO: make the incidents section of the home page blank
 
                 } else {
+                    listOfIncidentDataModel.clear();
+                    listOfIncidentDataModel.addAll(temp);
+                    incidentRecyclerViewAdapter.notifyDataSetChanged();
                     //TODO: Display incidents in view
                     //we could sort incidents by time? or type? and choose the ones we want to display
                     //or if we only want to display one, we should make some sort of db query instead of grabbing all incidents
@@ -178,16 +201,18 @@ public class HomeFragment extends Fragment {
     private void populateResponders() {
         db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
             if(userTask.isSuccessful()) {
-
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-                    respondersList.add(userDoc.toObject(UsersDataModel.class));
+                    temp.add(userDoc.toObject(UsersDataModel.class));
                 }
 
-                if (respondersList.size() == 0) {
-                    //TODO: make the responding section of the home page blank
-
+                if (temp.size() == 0) {
+                    respondersList.clear();
+                    respondersRecyclerViewAdapter.notifyDataSetChanged();
                 } else {
-                    //TODO: Display responders in view
+                    respondersList.clear();
+                    respondersList.addAll(temp);
+                    respondersRecyclerViewAdapter.notifyDataSetChanged();
                 }
 
             }
