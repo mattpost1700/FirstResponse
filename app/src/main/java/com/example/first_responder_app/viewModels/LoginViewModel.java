@@ -4,7 +4,7 @@ package com.example.first_responder_app.viewModels;
 public class LoginViewModel extends BaseViewModel {
     private String mUsername;
     private String mPassword;
-    private String logMsg;
+
 
     //getter for username
     public String getUsername() {

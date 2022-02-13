@@ -32,11 +32,11 @@
             android:layout_marginTop="4dp"
             android:text="Description: "
             android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="@+id/editTextTextPersonName2"
-            app:layout_constraintTop_toBottomOf="@+id/editTextTextPersonName2" />
+            app:layout_constraintStart_toStartOf="@+id/newAnnounTitle"
+            app:layout_constraintTop_toBottomOf="@+id/newAnnounTitle" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName2"
+            android:id="@+id/newAnnounTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -47,7 +47,7 @@
             app:layout_constraintTop_toBottomOf="@+id/announcement_title_text" />
 
         <EditText
-            android:id="@+id/editTextTextPersonName3"
+            android:id="@+id/newAnnounDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"

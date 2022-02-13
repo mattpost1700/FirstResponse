@@ -66,31 +66,33 @@ public class LoginFragment extends Fragment {
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
         binding.loginSubmit.setOnClickListener(v -> {
-            if (listOfUser.size() == 0){
-                binding.logMsg.setText(R.string.emtpyDbMsg);
-                binding.logMsg.setVisibility(View.VISIBLE);
+            if (listOfUser.size() == 0) {
+                binding.loginLog.setText(R.string.emtpyDbMsg);
+                binding.loginLog.setVisibility(View.VISIBLE);
             }
             mViewModel.setUsername(binding.loginUsername.getText().toString());
             mViewModel.setPassword(binding.loginPassword.getText().toString());
-            if (checkUsernameExists(mViewModel.getUsername())){
-                 if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())){
-                     NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-                     Navigation.findNavController(binding.getRoot()).navigate(action);
-                     Log.d( "testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
-                 }
-                 else {
-                     binding.logMsg.setText(R.string.loginFailMsg);
-                     binding.logMsg.setVisibility(View.VISIBLE);
-                     Log.d("testing", "login failed: wrong username/password");
-                 }
-            }
-            else {
-                binding.logMsg.setText(R.string.loginFailMsg);
-                binding.logMsg.setVisibility(View.VISIBLE);
+            if (checkUsernameExists(mViewModel.getUsername())) {
+                if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
+                    NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+                    Navigation.findNavController(binding.getRoot()).navigate(action);
+                    Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
+                } else {
+                    binding.loginLog.setText(R.string.loginFailMsg);
+                    binding.loginLog.setVisibility(View.VISIBLE);
+                    Log.d("testing", "login failed: wrong username/password");
+                }
+            } else {
+                binding.loginLog.setText(R.string.loginFailMsg);
+                binding.loginLog.setVisibility(View.VISIBLE);
                 Log.d("testing", "login failed: wrong username/password");
             }
         });
 
+        binding.bypassBtn.setOnClickListener(v -> {
+            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
 
         return binding.getRoot();
     }
@@ -102,7 +104,7 @@ public class LoginFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    private void populateUserList(){
+    private void populateUserList() {
         db.collection("users").get().addOnCompleteListener(usersTask -> {
             if (usersTask.isSuccessful()) {
                 for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
@@ -117,9 +119,9 @@ public class LoginFragment extends Fragment {
     }
 
     //check if username is valid
-    private boolean checkUsernameExists(String username){
-        for (int i = 0; i < listOfUser.size(); i++){
-            if (listOfUser.get(i).getUsername().equals(username)){
+    private boolean checkUsernameExists(String username) {
+        for (int i = 0; i < listOfUser.size(); i++) {
+            if (listOfUser.get(i).getUsername().equals(username)) {
                 return true;
             }
         }
@@ -127,10 +129,10 @@ public class LoginFragment extends Fragment {
     }
 
     //check if password matches the record in db
-    private boolean checkPwMatch(String username, String pw){
-        for (int i = 0; i < listOfUser.size(); i++){
-            if (listOfUser.get(i).getUsername().equals(username)){
-                if (listOfUser.get(i).getPw().equals(pw)){
+    private boolean checkPwMatch(String username, String pw) {
+        for (int i = 0; i < listOfUser.size(); i++) {
+            if (listOfUser.get(i).getUsername().equals(username)) {
+                if (listOfUser.get(i).getPw().equals(pw)) {
                     return true;
                 }
             }
