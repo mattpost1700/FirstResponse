@@ -3,6 +3,7 @@ package com.example.first_responder_app.fragments;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -51,7 +52,8 @@ public class HomeFragment extends Fragment {
     private HomeViewModel mViewModel;
     private View bindingView;
 
-    private List<RanksDataModel> listOfRanks;
+    // TODO: Change to map
+    public static List<RanksDataModel> listOfRanks;
     private List<IncidentDataModel> listOfIncidentDataModel;
     private List<UsersDataModel> respondersList;
 
@@ -100,6 +102,8 @@ public class HomeFragment extends Fragment {
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from responder listener)!");
             // TODO: Do something when clicking on the responder
+            // TODO: For some reason this doesn't work \/ \/ \/
+            Toast.makeText(getActivity(), "Responder \"" + respondersList.get(position).getFirst_name() + "\" was clicked!", Toast.LENGTH_SHORT).show();
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
@@ -240,7 +244,7 @@ public class HomeFragment extends Fragment {
      * @param documentId The auto generated document id
      * @return The rank data model or null is it was not found
      */
-    public RanksDataModel getRank(String documentId) {
+    public static RanksDataModel getRank(String documentId) {
         for(RanksDataModel rankDM : listOfRanks) {
             if(documentId.equals(rankDM.getDocumentId())) {
                 return rankDM;
