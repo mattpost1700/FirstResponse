@@ -13,7 +13,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:padding="15dp"
+            android:background="@drawable/responder_row_background">
 
             <TextView
                 android:id="@+id/responders_name_text_view"
