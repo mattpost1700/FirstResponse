@@ -126,5 +126,9 @@
         android:id="@+id/reportFragment"
         android:name="com.example.first_responder_app.fragments.ReportFragment"
         android:label="report_fragment"
-        tools:layout="@layout/report_fragment" />
+        tools:layout="@layout/report_fragment" >
+        <action
+            android:id="@+id/action_reportFragment_to_incidentGroupFragment"
+            app:destination="@id/incidentGroupFragment" />
+    </fragment>
 </navigation>

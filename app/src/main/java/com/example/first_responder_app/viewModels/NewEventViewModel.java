@@ -29,29 +29,6 @@ import static android.content.ContentValues.TAG;
 import static android.provider.Settings.System.getString;
 
 public class NewEventViewModel extends BaseViewModel {
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    String newEventTitle = null;
 
-
-    public String addEvent(String location, String description, String title) {
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("description", description);
-        data.put("location", location);
-        data.put("participants", new ArrayList<String>());
-        data.put("title", title);
-
-        newEventTitle = null;
-
-        //TODO: make more general
-        db.collection("events")
-                .add(data)
-                .addOnSuccessListener(documentReference -> {
-                    Log.d(TAG, "DocumentSnapshot written with ID: " + documentReference.getId());
-                    newEventTitle = title;
-                })
-                .addOnFailureListener(e -> Log.w(TAG, "Error adding document", e));
-        return title;
-    }
 
 }

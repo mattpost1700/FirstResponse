@@ -31,6 +31,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.databinding.FragmentEventNewBinding;
 import com.example.first_responder_app.databinding.FragmentIncidentBinding;
 import com.example.first_responder_app.viewModels.NewEventViewModel;
@@ -63,6 +64,7 @@ import android.view.ViewGroup;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,22 +88,25 @@ public class NewEventFragment extends Fragment {
         //also if you have any other code relates to onCreateView just add it from here
 
         mViewModel = new ViewModelProvider(this).get(NewEventViewModel.class);
+        FirestoreDatabase firestoreDatabase = new FirestoreDatabase();
         binding.eventCreateConfirm.setOnClickListener(v -> {
             //TODO: validate input if needed
 
-
             NavDirections action = NewEventFragmentDirections.actionNewEventFragmentToEventGroupFragment();
 
-            String title = mViewModel.addEvent("US-East", binding.editTextTextPersonName3.getText().toString(), binding.editTextTextPersonName2.getText().toString());
-            if (title != null) {
+            String title = binding.newEventTitle.getText().toString();
+            String description = binding.newEventDescription.getText().toString();
+            try {
+                firestoreDatabase.addEvent("US-East", title, description, new ArrayList<String>());
                 try {
-                    notifyNewEvent(title, binding.editTextTextPersonName2.getText().toString());
+                    notifyNewEvent(title);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 Navigation.findNavController(binding.getRoot()).navigate(action);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
 
         });
 
@@ -118,14 +123,14 @@ public class NewEventFragment extends Fragment {
 
     }
 
-    //TODO: make more general
-    public void notifyNewEvent(String title, String description) throws JSONException {
+    //TODO: make more generic
+    public void notifyNewEvent(String title) throws JSONException {
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url ="https://fcm.googleapis.com/fcm/send";
 
         JSONObject notif = new JSONObject();
-        notif.put("title", title);
-        notif.put("body", description);
+        notif.put("title", "New Event");
+        notif.put("body", title);
         JSONObject json = new JSONObject();
         json.put("to", "/topics/events");
         json.put("restricted_package_name", "com.example.first_responder_app");
