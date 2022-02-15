@@ -134,7 +134,7 @@ public class HomeFragment extends Fragment {
 
         // Start event listeners (live data)
         addIncidentEventListener();
-        //addResponderEventListener();
+        addResponderEventListener();
 
         return bindingView;
     }
@@ -146,7 +146,7 @@ public class HomeFragment extends Fragment {
      */
     private void refreshData() {
         populateIncidents();
-        //populateResponders();
+        populateResponders();
     }
 
     /**
@@ -213,7 +213,18 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    public void populateResponders() {
+        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
+            if(userTask.isSuccessful()) {
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
+                    temp.add(userDoc.toObject(UsersDataModel.class));
+                }
 
+                Log.d("TAG", "populateResponders: ");
+            }
+        });
+    }
 
     /**
      * Saves the ranks collection for quick lookup.
