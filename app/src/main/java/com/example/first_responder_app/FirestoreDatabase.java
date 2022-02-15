@@ -20,6 +20,10 @@ public class FirestoreDatabase {
         return instance;
     }
 
+    public FirebaseFirestore getDb(){
+        return db;
+    }
+
     public void addEvent(String location, String title, String description, ArrayList<String> participants) {
         EventsDataModel newEvent = new EventsDataModel(title, description, location, participants);
 
