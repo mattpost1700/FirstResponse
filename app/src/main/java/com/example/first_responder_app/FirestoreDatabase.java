@@ -13,11 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FirestoreDatabase {
-    private static FirebaseFirestore instance = FirebaseFirestore.getInstance();
+    private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
-    public FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public static FirebaseFirestore getInstance(){
+    public static FirestoreDatabase getInstance(){
         return instance;
     }
 
@@ -25,7 +24,7 @@ public class FirestoreDatabase {
         EventsDataModel newEvent = new EventsDataModel(title, description, location, participants);
 
 
-        instance.collection("events")
+        db.collection("events")
                 .add(newEvent)
                 .addOnSuccessListener(documentReference -> Log.d("new event page", "new event has been successfully created in the DB"))
                 .addOnFailureListener(e -> Log.d("new event page", "failed to create new event"));
@@ -36,7 +35,7 @@ public class FirestoreDatabase {
         AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(title, description);
 
 
-        instance.collection("announcements")
+        db.collection("announcements")
                 .add(newAnnoun)
                 .addOnSuccessListener(documentReference -> Log.d("new announcement page", "new announcement has been successfully created in the DB"))
                 .addOnFailureListener(e ->Log.d("new announcement page", "failed to create new announcement"));
