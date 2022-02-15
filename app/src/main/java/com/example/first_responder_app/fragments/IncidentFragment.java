@@ -1,11 +1,19 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,10 +22,14 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.example.first_responder_app.dataModels.IncidentTypesDataModel;
+import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentIncidentBinding;
@@ -27,6 +39,15 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
@@ -34,6 +55,12 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     final int ACCESS_LOCATION = 101;
+
+    String address;
+    LocationManager mLocationManager;
+    List<Address> addresses;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
 
     private IncidentViewModel mViewModel;
 
@@ -63,8 +90,94 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         mMapView.getMapAsync(this);
 
+
+
         return binding.getRoot();
+
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getParentFragmentManager().setFragmentResultListener("requestKey", this, new FragmentResultListener() {
+            @Override
+            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
+                // We use a String here, but any type that can be put in a Bundle is supported
+                String addr = bundle.getString("address");
+                address = addr;
+                String type = bundle.getString("type");
+                String time = bundle.getString("time");
+
+                db.collection("incident_types").whereEqualTo("type_name", type).get().addOnCompleteListener(typeTask -> {
+                    if (typeTask.isSuccessful()) {
+                        ArrayList<IncidentTypesDataModel> types = new ArrayList<>();
+                        for (QueryDocumentSnapshot typeDoc : typeTask.getResult()) {
+                            Log.d("TEST", "onFragmentResult: ");
+                            types.add(typeDoc.toObject(IncidentTypesDataModel.class));
+                        }
+                        String s = "";
+                        if(types.size() > 0){
+                            s = types.get(0).getType_name();
+                        }
+                        ((TextView)getActivity().findViewById(R.id.incident_type)).setText("Type of Call: " + s);
+
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", typeTask.getException());
+                    }
+                });
+
+
+
+                String units = bundle.getString("units");
+                units = units.substring(1, units.length() - 1);
+                int responding = bundle.getInt("responding");
+
+
+                //Update text views
+                ((TextView)getActivity().findViewById(R.id.incident_address)).setText(addr);
+                ((TextView)getActivity().findViewById(R.id.incident_responding)).setText("Responding: " + responding);
+                ((TextView)getActivity().findViewById(R.id.incident_received_time)).setText("Received Time: " + time);
+                ((TextView)getActivity().findViewById(R.id.incident_units)).setText("Units: " + units);
+
+
+                //Get coordinates from address
+                Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                try {
+                    addresses = geocoder.getFromLocationName(address, 1);
+                } catch (IOException e) {
+                    Log.w("Invalid", "Invalid address");;
+                    return;
+                }
+
+
+                //calculate distance to incident
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
+                    return;
+                }
+
+
+                //setup location listener
+                mLocationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500,
+                        500, mLocationListener);
+
+
+
+
+            }
+        });
+    }
+
+
+
+
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+
+        }
+    };
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -108,16 +221,26 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap map) {
-        LatLng loc = new LatLng(40.205525, -76.746433);
-        map.addMarker(new MarkerOptions().position(loc).title("Penn State Harrisburg"));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 12.0f));
-        map.setTrafficEnabled(true);
 
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
-            return;
+
+        if(addresses.size() > 0) {
+            Address address = addresses.get(0);
+            double longitude = address.getLongitude();
+            double latitude = address.getLatitude();
+
+
+            LatLng loc = new LatLng(latitude, longitude);
+            map.addMarker(new MarkerOptions().position(loc).title("Incident Location"));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 12.0f));
+            map.setTrafficEnabled(true);
+
+
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
+                return;
+            }
+            map.setMyLocationEnabled(true);
         }
-        map.setMyLocationEnabled(true);
     }
 
 

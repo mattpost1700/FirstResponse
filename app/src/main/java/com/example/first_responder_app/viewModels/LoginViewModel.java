@@ -5,6 +5,7 @@ public class LoginViewModel extends BaseViewModel {
     private String mUsername;
     private String mPassword;
 
+
     //getter for username
     public String getUsername() {
         return mUsername;
@@ -24,6 +25,8 @@ public class LoginViewModel extends BaseViewModel {
     public void setPassword(String mPassword) {
         this.mPassword = mPassword;
     }
+
+
 
     public LoginViewModel() {
         super();
