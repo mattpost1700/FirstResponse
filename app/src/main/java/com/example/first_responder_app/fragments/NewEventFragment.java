@@ -148,7 +148,7 @@ public class NewEventFragment extends Fragment {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "key=AAAAXRhUpDw:APA91bGNcsUkMTOHHy1GFUKetbwMzeSs4HwarK1b0Kpv_MZDpQhZqFjHiKxC6G16xNwLoU8ctBkyHukTE-oBtVW4J1KVnmqowruwvFrbqSpWt9Smht7tHJQogklB9Gm9PuVbezixmUUS");
+                headers.put("Authorization", "key=");
                 return headers;
             }
 
