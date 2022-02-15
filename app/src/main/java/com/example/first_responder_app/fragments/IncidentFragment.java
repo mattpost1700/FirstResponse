@@ -108,19 +108,11 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 String type = bundle.getString("type");
                 String time = bundle.getString("time");
 
-                db.collection("incident_types").whereEqualTo("type_name", type).get().addOnCompleteListener(typeTask -> {
+                db.collection("incident_types").document(type).get().addOnCompleteListener(typeTask -> {
                     if (typeTask.isSuccessful()) {
                         ArrayList<IncidentTypesDataModel> types = new ArrayList<>();
-                        for (QueryDocumentSnapshot typeDoc : typeTask.getResult()) {
-                            Log.d("TEST", "onFragmentResult: ");
-                            types.add(typeDoc.toObject(IncidentTypesDataModel.class));
-                        }
-                        String s = "";
-                        if(types.size() > 0){
-                            s = types.get(0).getType_name();
-                        }
-                        ((TextView)getActivity().findViewById(R.id.incident_type)).setText("Type of Call: " + s);
-
+                       String t = (String)typeTask.getResult().get("type_name");
+                       ((TextView)getActivity().findViewById(R.id.incident_type)).setText("Type of Call: " + t);
                     } else {
                         Log.d(TAG, "Error getting documents: ", typeTask.getException());
                     }
