@@ -5,7 +5,22 @@
     <string name="home_responding">Responding</string>
     <string name="sign_up">Sign up</string>
     <string name="announcement">Announcement</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="home">Home</string>
+    <string name="responding">Responding</string>
     <string name="events">Events</string>
+    <string name="first_responder">First Responder</string>
+    <string name="defaultmsg">defaultMsg</string>
+    <string name="loginFailMsg">login failed: wrong username/password</string>
+    <string name="password">password</string>
+    <string name="username">username</string>
+    <string name="emtpyDbMsg">user entry from db is emtpy</string>
+    <string name="confirm">Confirm</string>
+    <string name="new_announ_log_msg">Empty announcement title/description</string>
+    <string name="chat">Chat</string>
+    <string name="announcements">Announcements</string>
+    <string name="user_avatar">User Avatar</string>
 
     <!-- Strings related to login -->
 

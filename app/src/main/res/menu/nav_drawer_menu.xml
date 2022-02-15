@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/incidentGroupFragment"
+        android:title="@string/incidents" />
+    <item
+        android:id="@+id/respondingFragment"
+        android:title="@string/responding" />
+    <item
+        android:id="@+id/eventGroupFragment"
+        android:title="@string/events" />
+    <item
+        android:id="@+id/chatFragment"
+        android:title="@string/chat" />
+    <item
+        android:id="@+id/announcementFragment"
+        android:title="@string/announcements" />
+</menu>
