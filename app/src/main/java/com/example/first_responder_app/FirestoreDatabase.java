@@ -1,27 +1,31 @@
 package com.example.first_responder_app;
 
+import android.util.Log;
+
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirestoreRegistrar;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
+import java.util.ArrayList;
 
 public class FirestoreDatabase {
+    static FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private static FirestoreDatabase instance = new FirestoreDatabase();
+    /**
+     * Displays the responding users
+     */
+    public static void populateResponders() {
+        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
+            if(userTask.isSuccessful()) {
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
+                    temp.add(userDoc.toObject(UsersDataModel.class));
+                }
 
-    public FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
-    private FirestoreDatabase(){ }
-
-
-    public static FirestoreDatabase getInstance() {
-        return instance;
+                Log.d("TAG", "populateResponders: ");
+            }
+        });
     }
-
-
-    //Implement Database Calls
-
-
-
 
 
 }
