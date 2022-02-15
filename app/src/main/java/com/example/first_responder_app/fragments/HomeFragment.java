@@ -109,6 +109,21 @@ public class HomeFragment extends Fragment {
             Log.d(TAG, "clicked (from incident listener)!");
             Toast.makeText(getActivity(), "Incident \"" + listOfIncidentDataModel.get(position).getLocation() + "\" was clicked!", Toast.LENGTH_SHORT).show();
             // TODO: Do something when clicking on the event
+
+            IncidentDataModel incident = listOfIncidentDataModel.get(position);
+
+            Bundle result = new Bundle();
+            result.putString("address", incident.getLocation());
+            result.putString("type", incident.getIncident_type());
+            result.putString("time", incident.getReceived_time().toDate().toString());
+            result.putString("units", incident.getUnits().toString());
+            result.putInt("responding", incident.getResponding().size());
+            getParentFragmentManager().setFragmentResult("requestKey", result);
+
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
+
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+
         };
 
         // RecyclerViews
@@ -188,7 +203,7 @@ public class HomeFragment extends Fragment {
      * Displays the active incidents
      */
     private void populateIncidents() {
-        db.collection("incident").get().addOnCompleteListener(incidentTask -> {
+        db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
             if (incidentTask.isSuccessful()) {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
@@ -205,10 +220,7 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    /**
-     * Displays the responding users
-     */
-    private void populateResponders() {
+    public void populateResponders() {
         db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
             if(userTask.isSuccessful()) {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
@@ -219,6 +231,10 @@ public class HomeFragment extends Fragment {
                 respondersList.clear();
                 respondersList.addAll(temp);
                 respondersRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+                Log.d("TAG", "populateResponders: ");
             }
         });
     }

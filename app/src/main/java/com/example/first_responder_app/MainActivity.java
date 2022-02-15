@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
+
     }
 
 
