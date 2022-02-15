@@ -1,7 +1,6 @@
 package com.example.first_responder_app.fragments;
 
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.app.Activity;
@@ -9,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -23,13 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
@@ -83,40 +81,34 @@ public class HomeFragment extends Fragment {
             pullToRefresh.setRefreshing(false);
         });
 
+        binding.homeIncidents.setOnClickListener(v -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentGroupFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
+        binding.homeResponding.setOnClickListener(v -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToRespondingFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
         listOfIncidentDataModel = new ArrayList<>();
         respondersList = new ArrayList<>();
         listOfRanks = new ArrayList<>();
 
         populateIncidents();
-        FirestoreDatabase.populateResponders();
+        populateResponders();
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from responder listener)!");
             Toast.makeText(getActivity(), "Responder \"" + respondersList.get(position).getFirst_name() + "\" was clicked!", Toast.LENGTH_SHORT).show();
             // TODO: Do something when clicking on the responder
-
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from incident listener)!");
-            //Toast.makeText(getActivity(), "Incident \"" + listOfIncidentDataModel.get(position).getLocation() + "\" was clicked!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Incident \"" + listOfIncidentDataModel.get(position).getLocation() + "\" was clicked!", Toast.LENGTH_SHORT).show();
             // TODO: Do something when clicking on the event
-
-            IncidentDataModel incident = listOfIncidentDataModel.get(position);
-
-            Bundle result = new Bundle();
-            result.putString("address", incident.getLocation());
-            result.putString("type", incident.getIncident_type());
-            result.putString("time", incident.getReceived_time().toDate().toString());
-            result.putString("units", incident.getUnits().toString());
-            result.putInt("responding", incident.getResponding().size());
-            getParentFragmentManager().setFragmentResult("requestKey", result);
-
-            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
-
-            Navigation.findNavController(binding.getRoot()).navigate(action);
-
         };
 
         // RecyclerViews
@@ -134,7 +126,7 @@ public class HomeFragment extends Fragment {
 
         // Start event listeners (live data)
         addIncidentEventListener();
-        //addResponderEventListener();
+        addResponderEventListener();
 
         return bindingView;
     }
@@ -146,7 +138,7 @@ public class HomeFragment extends Fragment {
      */
     private void refreshData() {
         populateIncidents();
-        //populateResponders();
+        populateResponders();
     }
 
     /**
@@ -213,7 +205,23 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    /**
+     * Displays the responding users
+     */
+    private void populateResponders() {
+        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
+            if(userTask.isSuccessful()) {
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
+                    temp.add(userDoc.toObject(UsersDataModel.class));
+                }
 
+                respondersList.clear();
+                respondersList.addAll(temp);
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
 
     /**
      * Saves the ranks collection for quick lookup.
