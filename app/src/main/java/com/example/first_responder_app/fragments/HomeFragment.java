@@ -188,7 +188,7 @@ public class HomeFragment extends Fragment {
      * Displays the active incidents
      */
     private void populateIncidents() {
-        db.collection("incident").get().addOnCompleteListener(incidentTask -> {
+        db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
             if (incidentTask.isSuccessful()) {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
