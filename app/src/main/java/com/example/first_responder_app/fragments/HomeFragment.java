@@ -90,7 +90,20 @@ public class HomeFragment extends Fragment {
         respondersList = new ArrayList<>();
         listOfRanks = new ArrayList<>();
 
+        //automatically subscribes everyone who logs in to get notifications for these topics
         FirebaseMessaging.getInstance().subscribeToTopic("events")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    }
+                });
+        FirebaseMessaging.getInstance().subscribeToTopic("announcements")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    }
+                });
+        FirebaseMessaging.getInstance().subscribeToTopic("incidents")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
