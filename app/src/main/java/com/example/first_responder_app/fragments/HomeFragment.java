@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,6 +85,13 @@ public class HomeFragment extends Fragment {
         listOfIncidentDataModel = new ArrayList<>();
         respondersDataModel = new ArrayList<>();
         listOfRanks = new ArrayList<>();
+
+        FirebaseMessaging.getInstance().subscribeToTopic("events")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    }
+                });
 
         populateIncidents();
         populateResponders();
