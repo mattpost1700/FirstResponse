@@ -21,6 +21,10 @@
     <string name="chat">Chat</string>
     <string name="announcements">Announcements</string>
     <string name="user_avatar">User Avatar</string>
+    <string name="incident">Incident</string>
+    <string name="scene">Scene</string>
+    <string name="unavailable">unavailable</string>
+    <string name="station">Station</string>
 
     <!-- Strings related to login -->
 
