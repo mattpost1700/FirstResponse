@@ -24,7 +24,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Incident"
+            android:text="@string/incident"
             android:textSize="28sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -61,7 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:layout_marginTop="15dp"
-                    android:text="Scene"
+                    android:text="@string/scene"
                     android:textSize="11sp" />
 
                 <Button
@@ -70,7 +70,7 @@
                     android:layout_height="fill_parent"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="15dp"
-                    android:text="unavailable"
+                    android:text="@string/unavailable"
                     android:textSize="11sp" />
 
                 <Button
@@ -79,17 +79,9 @@
                     android:layout_height="fill_parent"
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="15dp"
-                    android:text="Station"
+                    android:text="@string/station"
                     android:textSize="11sp" />
 
-                <Button
-                    android:id="@+id/button2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="15dp"
-                    android:text="delayed"
-                    android:textSize="11sp" />
             </LinearLayout>
         </HorizontalScrollView>
 
@@ -135,10 +127,9 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/textView8"
+            android:id="@+id/incident_eta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ETA: 10min"
             app:layout_constraintBottom_toTopOf="@+id/mapView"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="5dp"/>

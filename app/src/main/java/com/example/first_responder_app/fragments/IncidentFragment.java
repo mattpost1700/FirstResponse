@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.dataModels.IncidentTypesDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
@@ -92,6 +93,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
 
 
+
         return binding.getRoot();
 
     }
@@ -137,7 +139,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 try {
                     addresses = geocoder.getFromLocationName(address, 1);
                 } catch (IOException e) {
-                    Log.w("Invalid", "Invalid address");;
+                    Log.w("Invalid", "Invalid address");
                     return;
                 }
 
@@ -148,11 +150,11 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                     return;
                 }
 
-
                 //setup location listener
                 mLocationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1500,
+                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000,
                         500, mLocationListener);
+
 
 
 
@@ -167,6 +169,19 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location location) {
+            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+            LatLng destination = new LatLng(0,0);
+            if(addresses.size() > 0){
+                Address a = addresses.get(0);
+                destination = new LatLng(a.getLatitude(), a.getLongitude());
+            }
+
+            ETA eta = new ETA();
+            eta.setListener(s -> {
+                Log.d(TAG, "onCreateView: " + s);
+                ((TextView)getActivity().findViewById(R.id.incident_eta)).setText("ETA: " + s);
+            });
+            eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins="  + loc.latitude + "%2C" + loc.longitude);
 
         }
     };

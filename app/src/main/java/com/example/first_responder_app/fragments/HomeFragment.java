@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.RespondersRecyclerViewAdapter;
@@ -43,10 +44,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 //TODO, haven't implement anything
 
@@ -158,6 +164,11 @@ public class HomeFragment extends Fragment {
         // Start event listeners (live data)
         addIncidentEventListener();
         addResponderEventListener();
+
+
+
+
+
 
         return bindingView;
     }
