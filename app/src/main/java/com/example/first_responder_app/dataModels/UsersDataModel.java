@@ -1,5 +1,6 @@
 package com.example.first_responder_app.dataModels;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
 // TODO: This msg is given "No setter/field for phone found on class com.example.first_responder_app.dataModels.UsersDataModel"
@@ -15,9 +16,9 @@ public class UsersDataModel {
     private int phone_number;
     private String rank;
     private String username;
-    private boolean is_responding;
+    private Timestamp responding_time;
 
-    public UsersDataModel(String address, String first_name, String last_name, String password, int phone_number, String rank, String username, boolean is_responding) {
+    public UsersDataModel(String address, String first_name, String last_name, String password, int phone_number, String rank, String username, Timestamp responding_time) {
         this.address = address;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -25,7 +26,7 @@ public class UsersDataModel {
         this.phone_number = phone_number;
         this.rank = rank;
         this.username = username;
-        this.is_responding = is_responding;
+        this.responding_time = responding_time;
     }
 
     public UsersDataModel() { }
@@ -50,7 +51,9 @@ public class UsersDataModel {
 
     public String getUsername() { return username; }
 
-    public boolean isIs_responding() { return is_responding; }
+    public Timestamp getResponding_time() {
+        return responding_time;
+    }
 
     public String getPw() { return password; }
 }
