@@ -67,7 +67,6 @@ public class LoginFragment extends Fragment {
         FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
 
         //get user info for comparison
@@ -122,7 +121,6 @@ public class LoginFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
-        // TODO: Use the ViewModel
     }
 
     private void populateUserList() {

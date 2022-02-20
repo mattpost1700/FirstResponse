@@ -77,7 +77,6 @@ public class NewEventFragment extends Fragment {
             }
         });
 
-
         return binding.getRoot();
     }
 
@@ -86,9 +85,6 @@ public class NewEventFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(NewEventViewModel.class);
 
-
-
     }
-
 
 }

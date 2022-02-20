@@ -51,7 +51,6 @@ public class AnnouncementFragment extends Fragment {
         FragmentAnnouncementBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_announcement, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
 
         listOfAnnouncements = new ArrayList<>();
@@ -92,7 +91,6 @@ public class AnnouncementFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(AnnouncementViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }

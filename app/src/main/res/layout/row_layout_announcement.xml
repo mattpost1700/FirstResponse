@@ -19,7 +19,7 @@
             android:animateLayoutChanges="true">
 
             <TextView
-                android:id="@+id/itemTitle"
+                android:id="@+id/rowlayout_announcement_announTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="30sp"
@@ -28,7 +28,7 @@
                 tools:text="Title"/>
 
             <TextView
-                android:id="@+id/itemDes"
+                android:id="@+id/rowlayout_announcement_announDes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -36,7 +36,7 @@
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/itemTitle"
+                app:layout_constraintTop_toBottomOf="@+id/rowlayout_announcement_announTitle"
                 tools:text="content--------------------------------------------------------------"
                 app:layout_constraintVertical_bias="0.106" />
 

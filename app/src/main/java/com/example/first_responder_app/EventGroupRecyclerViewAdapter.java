@@ -9,36 +9,32 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
+import com.example.first_responder_app.dataModels.EventsDataModel;
 
 import java.util.List;
 
-public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<AnnouncementRecyclerViewAdapter.ViewHolder>{
+public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGroupRecyclerViewAdapter.ViewHolder>{
 
-    private List<AnnouncementsDataModel> mData;
+    private List<EventsDataModel> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    // data is passed into the constructor
-    public AnnouncementRecyclerViewAdapter(Context context, List<AnnouncementsDataModel> data) {
+    public EventGroupRecyclerViewAdapter(Context context, List<EventsDataModel> data){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
 
-    // inflates the row layout from xml when needed
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.row_layout_announcement, parent, false);
+        View view = mInflater.inflate(R.layout.row_layout_eventgroup, parent, false);
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        AnnouncementsDataModel announ = mData.get(position);
-        holder.title.setText(announ.getTitle());
-        holder.des.setText(announ.getDescription());
+        EventsDataModel events = mData.get(position);
+        holder.title.setText(events.getTitle());
     }
 
     // total number of rows
@@ -51,28 +47,20 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
-        TextView des;
 
         ViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.rowlayout_announcement_announTitle);
-            des = itemView.findViewById(R.id.rowlayout_announcement_announDes);
+            title = itemView.findViewById(R.id.rowlayout_eventGroup_title);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
-            if (des.getVisibility()== View.GONE){
-                des.setVisibility(View.VISIBLE);
-            } else {
-                des.setVisibility(View.GONE);
-            }
         }
     }
 
-    // convenience method for getting data at click position
-    public AnnouncementsDataModel getItem(int id) {
+    public EventsDataModel getItem(int id) {
         return mData.get(id);
     }
 
