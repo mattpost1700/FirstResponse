@@ -6,7 +6,9 @@ import android.util.Log;
 
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.dataModels.EventsDataModel;
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,5 +46,6 @@ public class FirestoreDatabase {
                 .addOnSuccessListener(documentReference -> Log.d("new announcement page", "new announcement has been successfully created in the DB"))
                 .addOnFailureListener(e ->Log.d("new announcement page", "failed to create new announcement"));
     }
+
 
 }

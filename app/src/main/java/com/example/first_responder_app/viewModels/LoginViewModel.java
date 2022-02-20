@@ -25,9 +25,7 @@ public class LoginViewModel extends BaseViewModel {
     public void setPassword(String mPassword) {
         this.mPassword = mPassword;
     }
-
-
-
+    
     public LoginViewModel() {
         super();
     }
