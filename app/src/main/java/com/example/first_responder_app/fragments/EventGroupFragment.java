@@ -61,21 +61,20 @@ public class EventGroupFragment extends Fragment{
         listOfEvents = new ArrayList<>();
         populateEventList();
 
-        /*
-        //TODO: doesn't work
+
         EventGroupRecyclerViewAdapter.ItemClickListener eventClickListener = ((view, position) -> {
 
             NavDirections action = EventGroupFragmentDirections.actionEventGroupFragmentToEventFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
-         */
+
 
         RecyclerView eventRecyclerView = binding.eventgroupRecycler;
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         eventGroupRecyclerViewAdapter = new EventGroupRecyclerViewAdapter(getContext(), listOfEvents);
 
-        //eventGroupRecyclerViewAdapter.setClickListener(eventClickListener);
+        eventGroupRecyclerViewAdapter.setClickListener(eventClickListener);
 
         eventRecyclerView.setAdapter(eventGroupRecyclerViewAdapter);
 

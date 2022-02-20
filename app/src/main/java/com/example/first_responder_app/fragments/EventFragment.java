@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.databinding.FragmentEventBinding;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.R;
@@ -34,7 +35,7 @@ public class EventFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
+        FragmentEventBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         // TODO: navCont created for side bar(still need to be implemented)
