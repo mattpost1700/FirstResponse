@@ -23,8 +23,9 @@
     <string name="user_avatar">User Avatar</string>
     <string name="incident">Incident</string>
     <string name="scene">Scene</string>
-    <string name="unavailable">unavailable</string>
+    <string name="unavailable">Unavailable</string>
     <string name="station">Station</string>
+    <string name="eta_loading">ETA: -</string>
 
     <!-- Strings related to login -->
 

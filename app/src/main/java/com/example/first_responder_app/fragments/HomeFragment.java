@@ -135,11 +135,18 @@ public class HomeFragment extends Fragment {
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
             Bundle result = new Bundle();
+            result.putString("id", incident.getDocumentId());
             result.putString("address", incident.getLocation());
             result.putString("type", incident.getIncident_type());
             result.putString("time", incident.getReceived_time().toDate().toString());
             result.putString("units", incident.getUnits().toString());
             result.putInt("responding", incident.getResponding().size());
+
+            String status = null;
+            if(incident.getStatus() != null) {
+                status = incident.getStatus().toString();
+            }
+            result.putString("status", status);
             getParentFragmentManager().setFragmentResult("requestKey", result);
 
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
