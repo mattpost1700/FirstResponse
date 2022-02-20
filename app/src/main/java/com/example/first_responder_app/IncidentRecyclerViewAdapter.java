@@ -51,8 +51,6 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
         return incidentList.size();
     }
 
-
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView incidentAddressTextView;
         TextView incidentTimeTextView;
@@ -69,8 +67,6 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
             if (incidentClickListener != null) incidentClickListener.onIncidentItemClick(view, getAdapterPosition());
         }
     }
-
-
 
     public IncidentDataModel getItem(int idx) {
         return incidentList.get(idx);

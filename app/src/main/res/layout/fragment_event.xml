@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/event"
+            android:id="@+id/event_eventTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -26,34 +26,34 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/event_location"
+            android:id="@+id/event_event_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="Location: fire department tv room"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event"
-            app:layout_constraintTop_toBottomOf="@+id/event" />
+            app:layout_constraintStart_toStartOf="@+id/event_eventTitle"
+            app:layout_constraintTop_toBottomOf="@+id/event_eventTitle" />
 
         <TextView
-            android:id="@+id/event_description"
+            android:id="@+id/event_event_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Description: movie night at 8:00 on 6/6"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_location"
-            app:layout_constraintTop_toBottomOf="@+id/event_location" />
+            app:layout_constraintStart_toStartOf="@+id/event_event_location"
+            app:layout_constraintTop_toBottomOf="@+id/event_event_location" />
 
         <TextView
-            android:id="@+id/event_participants"
+            android:id="@+id/event_event_participants"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Participants: "
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_description"
-            app:layout_constraintTop_toBottomOf="@+id/event_description" />
+            app:layout_constraintStart_toStartOf="@+id/event_event_description"
+            app:layout_constraintTop_toBottomOf="@+id/event_event_description" />
 
         <Button
             android:id="@+id/sign_up"
@@ -66,7 +66,7 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/event_event_participantsNum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -76,11 +76,12 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/event_rv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            app:layout_constraintStart_toStartOf="@+id/event_participants"
-            app:layout_constraintTop_toBottomOf="@+id/event_participants"
+            app:layout_constraintStart_toStartOf="@+id/event_event_participants"
+            app:layout_constraintTop_toBottomOf="@+id/event_event_participants"
             tools:itemCount="2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

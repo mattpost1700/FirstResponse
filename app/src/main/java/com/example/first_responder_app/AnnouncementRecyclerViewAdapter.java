@@ -64,6 +64,11 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (des.getVisibility()== View.GONE){
+                des.setVisibility(View.VISIBLE);
+            } else {
+                des.setVisibility(View.GONE);
+            }
         }
     }
 

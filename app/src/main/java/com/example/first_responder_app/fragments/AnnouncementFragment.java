@@ -14,7 +14,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,9 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.first_responder_app.AnnouncementRecyclerViewAdapter;
-import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
-import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.databinding.FragmentAnnouncementBinding;
 import com.example.first_responder_app.viewModels.AnnouncementViewModel;
 import com.example.first_responder_app.R;
@@ -40,8 +37,8 @@ public class AnnouncementFragment extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private AnnouncementViewModel mViewModel;
-    private AnnouncementRecyclerViewAdapter adapter;
-    private List<AnnouncementsDataModel> listOfAnnoun;
+    private AnnouncementRecyclerViewAdapter announcementAdapter;
+    private List<AnnouncementsDataModel> listOfAnnouncements;
 
     public static AnnouncementFragment newInstance() {
         return new AnnouncementFragment();
@@ -57,13 +54,13 @@ public class AnnouncementFragment extends Fragment {
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
 
-        listOfAnnoun = new ArrayList<>();
+        listOfAnnouncements = new ArrayList<>();
         populateAnnounList();
 
-        RecyclerView rv = binding.rvAnnoun;
-        rv.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new AnnouncementRecyclerViewAdapter(getContext(), listOfAnnoun);
-        rv.setAdapter(adapter);
+        RecyclerView announcementRecyclerView = binding.rvAnnoun;
+        announcementRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        announcementAdapter = new AnnouncementRecyclerViewAdapter(getContext(), listOfAnnouncements);
+        announcementRecyclerView.setAdapter(announcementAdapter);
 
         binding.newAnnouncementButton.setOnClickListener(v -> {
 
@@ -82,9 +79,9 @@ public class AnnouncementFragment extends Fragment {
                     AnnouncementsDataModel announcementDataModel = announcementDoc.toObject(AnnouncementsDataModel.class);
                     temp.add(announcementDataModel);
                 }
-                listOfAnnoun.clear();
-                listOfAnnoun.addAll(temp);
-                adapter.notifyDataSetChanged();
+                listOfAnnouncements.clear();
+                listOfAnnouncements.addAll(temp);
+                announcementAdapter.notifyDataSetChanged();
             } else {
                 Log.d(TAG, "db get failed in announcement page " + announTask.getException());
             }

@@ -25,6 +25,7 @@
     <string name="scene">Scene</string>
     <string name="unavailable">unavailable</string>
     <string name="station">Station</string>
+    <string name="event_title_description_is_empty">Event Title/ Description is empty</string>
 
     <!-- Strings related to login -->
 
