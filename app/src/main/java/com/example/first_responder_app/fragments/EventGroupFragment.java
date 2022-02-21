@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-
 import com.example.first_responder_app.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.EventsDataModel;
@@ -36,7 +35,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class EventGroupFragment extends Fragment{
 

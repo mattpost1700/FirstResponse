@@ -22,11 +22,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.first_responder_app.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.EventRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.databinding.FragmentEventBinding;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.R;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -64,12 +66,14 @@ public class EventFragment extends Fragment {
         binding.eventEventLocation.setText(eventInfo.getLocation());
         binding.eventEventParticipantsNum.setText("current number of participants: " + eventInfo.getParticipantsSize());
 
+
         RecyclerView eventRecyclerView = binding.eventEventRecycler;
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         eventRecyclerViewAdapter = new EventRecyclerViewAdapter(getContext(), eventInfo.getParticipants());
         eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
 
         binding.signUp.setOnClickListener(v -> {
+            Toast.makeText(getActivity(), "Event sign up successful", Toast.LENGTH_SHORT).show();
             NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
