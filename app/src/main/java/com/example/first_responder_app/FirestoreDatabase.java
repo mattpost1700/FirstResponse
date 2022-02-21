@@ -60,10 +60,6 @@ public class FirestoreDatabase {
      * @param available Whether the user is available or not
      */
     public void responding(String user_id, String incident_id, String status, boolean available){
-        if(available){
-            db.collection("users").document(user_id).update("is_responding", true);
-        }
-
         db.collection("incident").document(incident_id).get().addOnCompleteListener((typeTask) -> {
             if (typeTask.isSuccessful()) {
                 IncidentDataModel incidentDataModel = typeTask.getResult().toObject(IncidentDataModel.class);
@@ -75,33 +71,77 @@ public class FirestoreDatabase {
                     statusList = new HashMap<>();
                 }
 
-                if(!statusList.containsKey(user_id)){
-                    statusList.put(user_id, status);
+                if(statusList.get(user_id) != null && statusList.get(user_id).equals(status)){
+                    removeStatus(incident_id, statusList, incidentDataModel.getResponding(), user_id, available);
+                }else {
+                    updateStatus(incident_id, statusList, user_id, status, incidentDataModel.getResponding(), available);
                 }
-
-                List<String> responding = new ArrayList<>();
-                if(available) {
-                    //update incident responding list
-                    responding = incidentDataModel.getResponding();
-                    if (!responding.contains(user_id)) {
-                        responding.add(user_id);
-                    }
-                }
-
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("status", statusList);
-
-                if(available) updates.put("responding", responding);
-                db.collection("incident").document(incident_id).update(updates);
-
-
-
             } else {
                 Log.d(TAG, "Error getting documents: ", typeTask.getException());
             }
         });
     }
 
+    /**
+     * Update the status of a user
+     *
+     * @param incident_id The id of the incident
+     * @param statusList The status Map
+     * @param user_id The id of the user
+     * @param status The active user status
+     * @param responding The list of responding users
+     * @param available If the user is available
+     */
+    private void updateStatus(String incident_id, Map<String, String> statusList, String user_id, String status, List<String> responding, boolean available){
 
+        //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
+        boolean previouslyResponding = statusList.containsKey(user_id) && !statusList.get(user_id).toString().equals("Unavailable");
+
+        statusList.put(user_id, status);
+
+        if (available) {
+            //update incident responding list
+            if (!responding.contains(user_id)) {
+                responding.add(user_id);
+            }
+        } else {
+            responding.remove(user_id);
+        }
+
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", statusList);
+
+        updates.put("responding", responding);
+        db.collection("incident").document(incident_id).update(updates);
+        if(available)
+            db.collection("users").document(user_id).update("is_responding", true);
+        else if (previouslyResponding)
+            db.collection("users").document(user_id).update("is_responding", false);
+
+    }
+
+    /**
+     * Remove the status of a user
+     *
+     * @param incident_id The id of the incident
+     * @param statusList The status Map
+     * @param responding The list of responding users
+     * @param user_id The id of the user
+     * @param available If the user is available
+     */
+    private void removeStatus(String incident_id, Map<String, String> statusList, List<String> responding, String user_id, boolean available){
+        responding.remove(user_id);
+        statusList.remove(user_id);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("status", statusList);
+
+        updates.put("responding", responding);
+        db.collection("incident").document(incident_id).update(updates);
+
+        if(available)
+            db.collection("users").document(user_id).update("is_responding", false);
+    }
 
 }

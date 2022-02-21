@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.FirestoreDatabase;
@@ -85,6 +86,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     Activity activity;
     Context context;
     String active_id;
+    IncidentDataModel incidentDataModel;
 
     private IncidentViewModel mViewModel;
 
@@ -114,6 +116,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         mMapView.getMapAsync(this);
 
 
+
         return binding.getRoot();
 
     }
@@ -123,6 +126,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         activity = getActivity();
         context = getContext();
+
         getParentFragmentManager().setFragmentResultListener("requestKey", this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
@@ -143,7 +147,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 Map<String, String> status = stringToHashMap(statusString);
 
                 //Get active user id
-                ActiveUser activeUser = (ActiveUser)getActivity();
+                ActiveUser activeUser = (ActiveUser)activity;
                 String active = "";
                 if(activeUser != null){
                     UsersDataModel user = activeUser.getActive();
@@ -157,33 +161,31 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 }
 
 
-                //Add id to responding button wrapper to access in MainActivity
-                getActivity().findViewById(R.id.incident_button_layout).setTag(id);
-
                 //Find the type of the incident
                 FirestoreDatabase.getInstance().getDb().collection("incident_types").document(type).get().addOnCompleteListener(typeTask -> {
                     if (typeTask.isSuccessful()) {
                         ArrayList<IncidentTypesDataModel> types = new ArrayList<>();
                        String t = (String)typeTask.getResult().get("type_name");
-                       ((TextView)getActivity().findViewById(R.id.incident_type)).setText("Type of Call: " + t);
+                       ((TextView)activity.findViewById(R.id.incident_type)).setText("Type of Call: " + t);
                     } else {
                         Log.d(TAG, "Error getting documents: ", typeTask.getException());
                     }
                 });
 
+                setRespondingButtonClickListener();
 
                 //Get the Address object of the incident
                 incidentAddress = addrToCoords(addr);
 
 
                 //Ask for permissions if needed
-                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
+                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
                     return;
                 }
 
                 //setup location listener
-                mLocationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+                mLocationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
                 mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000,
                         500, mLocationListener);
 
@@ -202,29 +204,31 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                         }
 
                         if (snapshot != null && snapshot.exists()) {
-                            IncidentDataModel incident = snapshot.toObject(IncidentDataModel.class);
+                            incidentDataModel = snapshot.toObject(IncidentDataModel.class);
 
-                            String addr = incident.getLocation();
-                            Integer responding = incident.getResponding().size();
-                            String time = incident.getReceived_time().toDate().toString();
-                            String units = incident.getUnits().toString();
+                            String addr = incidentDataModel.getLocation();
+                            Integer responding = incidentDataModel.getResponding().size();
+                            String time = incidentDataModel.getReceived_time().toDate().toString();
+                            String units = incidentDataModel.getUnits().toString();
                             units = units.replace("[", "");
                             units = units.replace("]", "");
 
                             setTextViews(addr, responding, time, units);
 
-                            Map<String, String> etas = incident.getEta();
+                            Map<String, String> etas = incidentDataModel.getEta();
                             if(etas != null) {
                                 String eta = etas.get(active_id);
                                 setEtaText(eta);
                             }
 
-                            Map<String, String> statuses = incident.getStatus();
+                            Map<String, String> statuses = incidentDataModel.getStatus();
                             if(statuses != null){
                                 String status = statuses.get(active_id);
                                 setActiveButton(status);
                             }
 
+                            //Get the Address object of the incident
+                            incidentAddress = addrToCoords(addr);
 
                         } else {
                             System.out.print("Current data: null");
@@ -296,23 +300,27 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      */
     public void setTextViews(String addr, Integer responding, String time, String units){
         if(activity != null) {
-            if (addr != null)
-                ((TextView) activity.findViewById(R.id.incident_address)).setText(addr);
-
-            if (responding != null)
-                ((TextView) activity.findViewById(R.id.incident_responding)).setText("Responding: " + responding);
-
-            if (time != null)
-                ((TextView) activity.findViewById(R.id.incident_received_time)).setText("Received Time: " + time);
-
-            if (units != null)
-                ((TextView) activity.findViewById(R.id.incident_units)).setText("Units: " + units);
+            if (addr != null) {
+                TextView addrText = ((TextView) activity.findViewById(R.id.incident_address));
+                if(addrText != null) addrText.setText(addr);
+            }
+            if (responding != null) {
+                TextView respText = ((TextView) activity.findViewById(R.id.incident_responding));
+                if(respText != null) respText.setText("Responding: " + responding);
+            }
+            if (time != null) {
+                TextView recText = ((TextView) activity.findViewById(R.id.incident_received_time));
+                if(recText != null) recText.setText("Received Time: " + time);
+            }
+            if (units != null) {
+                TextView unitText = ((TextView) activity.findViewById(R.id.incident_units));
+                if(unitText != null) unitText.setText("Units: " + units);
+            }
         }
     }
 
 
     public void setEtaText(String text){
-        Activity activity = getActivity();
         TextView etaText = null;
         if(activity != null) {
             etaText = ((TextView)activity.findViewById(R.id.incident_eta));
@@ -332,7 +340,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      */
     public Address addrToCoords(String addr){
         //Get coordinates from address
-        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        Geocoder geocoder = new Geocoder(activity, Locale.getDefault());
         List<Address> addresses;
         try {
             addresses = geocoder.getFromLocationName(addr, 1);
@@ -347,6 +355,57 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+
+    public void setRespondingButtonClickListener(){
+        if(activity != null){
+            LinearLayout buttons = activity.findViewById(R.id.incident_button_layout);
+            int size = buttons.getChildCount();
+            for(int i = 0; i < size; i++){
+                buttons.getChildAt(i).setOnClickListener(this::respondingButtonClicked);
+            }
+        }
+    }
+
+    /**
+     * When responding button is clicked update active users responding status
+     *
+     * @param b the button that was clicked
+     */
+    public void respondingButtonClicked(View b){
+        Log.d(TAG, "respondingButtonClicked: " + ((Button)b).getText());
+
+
+        String text = ((Button) b).getText().toString();
+        String id = incidentDataModel.getDocumentId();
+
+        //Get active user id
+        ActiveUser active = (ActiveUser)activity;
+        UsersDataModel activeUser = null;
+        if(active != null){
+            activeUser = active.getActive();
+        }
+
+
+        if(activeUser == null && context != null){
+            Toast.makeText(context, "You must be logged in", Toast.LENGTH_LONG).show();
+        }else if(activeUser != null){
+
+            Map<String, String> status = incidentDataModel.getStatus();
+            boolean alreadyResponding = false;
+            if(status != null) {
+                //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
+                alreadyResponding = status.containsKey(activeUser.getDocumentId()) && !status.get(activeUser.getDocumentId()).equals("Unavailable");
+            }
+
+            if (text.equals("Unavailable")) {
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
+            } else if (activeUser.isIs_responding() && !alreadyResponding && context != null) {
+                Toast.makeText(context, "Responding to Another Incident", Toast.LENGTH_LONG).show();
+            } else {
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);
+            }
+        }
+    }
 
 
     private final LocationListener mLocationListener = new LocationListener() {
@@ -422,8 +481,8 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             map.setTrafficEnabled(true);
 
 
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
+            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
                 return;
             }
             map.setMyLocationEnabled(true);

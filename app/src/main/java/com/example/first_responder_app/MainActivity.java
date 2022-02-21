@@ -154,27 +154,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     }
 
 
-    /**
-     * When responding button is clicked update active users responding status
-     *
-     * @param b the button that was clicked
-     */
-    public void respondingButtonClicked(View b){
-        String text = ((Button) b).getText().toString();
-        String id = (String)((View)b.getParent()).getTag();
 
-        if(activeUser == null){
-            Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
-            return;
-        }
-        if(text.equals("Unavailable")){
-            FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
-        }else if(activeUser.isIs_responding()){
-            Toast.makeText(this, "Already Responding", Toast.LENGTH_LONG).show();
-        }else {
-            FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);
-        }
-    }
 }
 
 
