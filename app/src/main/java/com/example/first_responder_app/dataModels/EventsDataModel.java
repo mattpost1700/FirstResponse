@@ -34,4 +34,6 @@ public class EventsDataModel {
     public String getLocation() { return location; }
 
     public List<String> getParticipants() { return participants; }
+
+    public int getParticipantsSize() { return participants.size(); }
 }

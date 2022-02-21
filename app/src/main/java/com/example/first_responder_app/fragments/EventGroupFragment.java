@@ -23,13 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.first_responder_app.AnnouncementRecyclerViewAdapter;
+
 import com.example.first_responder_app.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.databinding.FragmentEventGroupBinding;
 import com.example.first_responder_app.viewModels.EventGroupViewModel;
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.viewModels.EventViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -40,7 +41,7 @@ import java.util.List;
 public class EventGroupFragment extends Fragment{
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private EventGroupViewModel mViewModel;
+    private EventViewModel mViewModel;
     private List<EventsDataModel> listOfEvents;
     private EventGroupRecyclerViewAdapter eventGroupRecyclerViewAdapter;
 
@@ -62,21 +63,19 @@ public class EventGroupFragment extends Fragment{
         populateEventList();
 
 
-        EventGroupRecyclerViewAdapter.ItemClickListener eventClickListener = ((view, position) -> {
-
+        EventGroupRecyclerViewAdapter.ItemClickListener eventClickListener = ((view, position, data) -> {
+            //passing data to event
+            mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+            mViewModel.setEventDetail(data);
             NavDirections action = EventGroupFragmentDirections.actionEventGroupFragmentToEventFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
-
-
-        RecyclerView eventRecyclerView = binding.eventgroupRecycler;
-        eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        RecyclerView eventGroupRecyclerView = binding.eventgroupRecycler;
+        eventGroupRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         eventGroupRecyclerViewAdapter = new EventGroupRecyclerViewAdapter(getContext(), listOfEvents);
-
         eventGroupRecyclerViewAdapter.setClickListener(eventClickListener);
-
-        eventRecyclerView.setAdapter(eventGroupRecyclerViewAdapter);
+        eventGroupRecyclerView.setAdapter(eventGroupRecyclerViewAdapter);
 
         binding.newEventButton.setOnClickListener(v -> {
             NavDirections action = EventGroupFragmentDirections.actionEventGroupFragmentToNewEventFragment();
@@ -106,8 +105,6 @@ public class EventGroupFragment extends Fragment{
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(EventGroupViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }

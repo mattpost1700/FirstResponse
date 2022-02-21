@@ -1,8 +1,11 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,24 +15,36 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.EventGroupRecyclerViewAdapter;
+import com.example.first_responder_app.EventRecyclerViewAdapter;
+import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.databinding.FragmentEventBinding;
-import com.example.first_responder_app.databinding.FragmentLoginBinding;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.R;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 public class EventFragment extends Fragment {
 
     private EventViewModel mViewModel;
+    private EventsDataModel eventInfo;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private EventRecyclerViewAdapter eventRecyclerViewAdapter;
 
     public static EventFragment newInstance() {
         return new EventFragment();
     }
 
+
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -41,14 +56,30 @@ public class EventFragment extends Fragment {
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
 
+        //getting data from event group
+        mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        eventInfo = mViewModel.getEventDetail();
+        binding.eventEventTitle.setText(eventInfo.getTitle());
+        binding.eventEventDescription.setText(eventInfo.getDescription());
+        binding.eventEventLocation.setText(eventInfo.getLocation());
+        binding.eventEventParticipantsNum.setText("current number of participants: " + eventInfo.getParticipantsSize());
+
+        RecyclerView eventRecyclerView = binding.eventEventRecycler;
+        eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        eventRecyclerViewAdapter = new EventRecyclerViewAdapter(getContext(), eventInfo.getParticipants());
+        eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
+
+        binding.signUp.setOnClickListener(v -> {
+            NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
         return binding.getRoot();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = new ViewModelProvider(this).get(EventViewModel.class);
-        // TODO: Use the ViewModel
     }
 
 }

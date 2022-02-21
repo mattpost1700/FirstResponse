@@ -35,6 +35,7 @@ public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGro
     public void onBindViewHolder(ViewHolder holder, int position) {
         EventsDataModel events = mData.get(position);
         holder.title.setText(events.getTitle());
+        holder.data = events;
     }
 
     // total number of rows
@@ -43,10 +44,10 @@ public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGro
         return mData.size();
     }
 
-
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
+        EventsDataModel data;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -56,13 +57,16 @@ public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGro
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            //passing data to eventGroup
+            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition(), data);
         }
     }
 
     public EventsDataModel getItem(int id) {
         return mData.get(id);
     }
+
+
 
     // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
@@ -71,6 +75,6 @@ public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGro
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(View view, int position);
+        void onItemClick(View view, int position, EventsDataModel data);
     }
 }
