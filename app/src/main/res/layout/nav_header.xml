@@ -7,7 +7,7 @@
 
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/userImage"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_marginStart="15dp"
@@ -23,6 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageView2"
+        app:layout_constraintStart_toEndOf="@+id/userImage"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
