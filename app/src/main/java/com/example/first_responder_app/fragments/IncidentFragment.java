@@ -435,7 +435,6 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         super.onSaveInstanceState(outState);
 
         mLocationManager.removeUpdates(mLocationListener);
-        docRef.delete();
 
         Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
         if (mapViewBundle == null) {
