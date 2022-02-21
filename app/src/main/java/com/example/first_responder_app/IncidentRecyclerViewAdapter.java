@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -50,8 +51,6 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
         return incidentList.size();
     }
 
-
-
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView incidentAddressTextView;
         TextView incidentTimeTextView;
@@ -68,8 +67,6 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
             if (incidentClickListener != null) incidentClickListener.onIncidentItemClick(view, getAdapterPosition());
         }
     }
-
-
 
     public IncidentDataModel getItem(int idx) {
         return incidentList.get(idx);

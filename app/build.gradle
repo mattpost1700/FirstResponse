@@ -32,7 +32,13 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        buildTypes.each {
+            it.buildConfigField 'String', 'api_key', getApiKey()
+        }
     }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -74,4 +80,13 @@ dependencies {
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-messaging:20.1.0'
+
+
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2'
+}
+
+def getApiKey() {
+    def props = new Properties()
+    file("../local.properties").withInputStream { props.load(it) }
+    return "\"" + props.getProperty("API_KEY") + "\""
 }

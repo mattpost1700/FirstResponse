@@ -13,11 +13,15 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.NotificationService;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.databinding.FragmentAnnouncementNewBinding;
 import com.example.first_responder_app.viewModels.NewAnnouncementViewModel;
@@ -27,9 +31,15 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.json.JSONException;
+
+import java.util.ArrayList;
+
 public class NewAnnouncementFragment extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
+    NotificationService _notificationService = new NotificationService();
+    FirestoreDatabase firestoreDatabase = new FirestoreDatabase();
     private NewAnnouncementViewModel mViewModel;
 
     public static NewAnnouncementFragment newInstance() {
@@ -42,33 +52,29 @@ public class NewAnnouncementFragment extends Fragment {
         FragmentAnnouncementNewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_announcement_new, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        // TODO: TEST THE CODE IN THE FUTURE
         NavController navController = navHostFragment.getNavController();
+
         binding.announcementCreateConfirm.setOnClickListener(v -> {
-            mViewModel.setAnnounTitle(binding.newAnnounTitle.toString());
-            mViewModel.setAnnounDes(binding.eventDescriptionText.toString());
-            if (mViewModel.getAnnounDes().equals(null) || mViewModel.getAnnounTitle().equals(null)){
+            mViewModel.setAnnounTitle(binding.newAnnounTitle.getText().toString());
+            mViewModel.setAnnounDes(binding.newAnnounDescription.getText().toString());
+            NavDirections action = NewAnnouncementFragmentDirections.actionNewAnnouncementFragmentToAnnouncementFragment();
+
+            if (TextUtils.isEmpty(mViewModel.getAnnounTitle().toString()) || TextUtils.isEmpty(mViewModel.getAnnounDes().toString())){
                 binding.newAnnounLog.setText(R.string.new_announ_log_msg);
                 binding.newAnnounLog.setVisibility(View.VISIBLE);
             }
             else {
-                AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
-                db.collection("announcements")
-                        .add(newAnnoun)
-                        .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                            @Override
-                            public void onSuccess(DocumentReference documentReference) {
-                                Log.d("new announcement page", "new announcement has been successfully created in the DB");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("new announcement page", "fail to create new announcement");
-                            }
-                        });
-                NavDirections action = NewAnnouncementFragmentDirections.actionNewAnnouncementFragmentToAnnouncementFragment();
-                Navigation.findNavController(binding.getRoot()).navigate(action);
+                try {
+                    firestoreDatabase.addAnnouncement(mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
+                    try {
+                        _notificationService.notifyPostReq(getContext(), "announcements", mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Navigation.findNavController(binding.getRoot()).navigate(action);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         return binding.getRoot();

@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.RespondersRecyclerViewAdapter;
@@ -43,10 +44,15 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 //TODO, haven't implement anything
 
@@ -90,7 +96,20 @@ public class HomeFragment extends Fragment {
         respondersList = new ArrayList<>();
         listOfRanks = new ArrayList<>();
 
+        //automatically subscribes everyone who logs in to get notifications for these topics
         FirebaseMessaging.getInstance().subscribeToTopic("events")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    }
+                });
+        FirebaseMessaging.getInstance().subscribeToTopic("announcements")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                    }
+                });
+        FirebaseMessaging.getInstance().subscribeToTopic("incidents")
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -116,11 +135,18 @@ public class HomeFragment extends Fragment {
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
             Bundle result = new Bundle();
+            result.putString("id", incident.getDocumentId());
             result.putString("address", incident.getLocation());
             result.putString("type", incident.getIncident_type());
             result.putString("time", incident.getReceived_time().toDate().toString());
             result.putString("units", incident.getUnits().toString());
             result.putInt("responding", incident.getResponding().size());
+
+            String status = null;
+            if(incident.getStatus() != null) {
+                status = incident.getStatus().toString();
+            }
+            result.putString("status", status);
             getParentFragmentManager().setFragmentResult("requestKey", result);
 
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
@@ -145,6 +171,11 @@ public class HomeFragment extends Fragment {
         // Start event listeners (live data)
         addIncidentEventListener();
         addResponderEventListener();
+
+
+
+
+
 
         return bindingView;
     }

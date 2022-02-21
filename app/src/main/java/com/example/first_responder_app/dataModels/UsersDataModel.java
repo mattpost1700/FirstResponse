@@ -34,6 +34,8 @@ public class UsersDataModel {
 
     public void setRank(String rank) { this.rank = rank; }
 
+    public void setIs_responding(boolean is_responding) { this.is_responding = is_responding; }
+
     public String getDocumentId() { return documentId; }
 
     public String getAddress() { return address; }

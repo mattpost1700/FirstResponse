@@ -5,6 +5,7 @@ import com.google.firebase.firestore.DocumentId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class IncidentDataModel {
 
@@ -17,17 +18,22 @@ public class IncidentDataModel {
     private boolean incident_complete;
     private String location;
     private String incident_type;
+    private Map<String, String> eta;
+    private Map<String, String> status;
 
     private IncidentTypesDataModel incidentTypesDataModel;
     private List<UsersDataModel> listOfRespondingDataModel;
 
-    public IncidentDataModel(List<String> units, List<String> responding, Timestamp received_time, boolean incident_complete, String location, String incident_type) {
+
+    public IncidentDataModel(List<String> units, List<String> responding, Timestamp received_time, boolean incident_complete, String location, String incident_type, Map<String, String> eta, Map<String, String> status) {
         this.units = units;
         this.responding = responding;
         this.received_time = received_time;
         this.incident_complete = incident_complete;
         this.location = location;
         this.incident_type = incident_type;
+        this.eta = eta;
+        this.status = status;
 
         this.listOfRespondingDataModel = new ArrayList<>();
     }
@@ -40,9 +46,19 @@ public class IncidentDataModel {
 
     public void setIncidentTypesDataModel(IncidentTypesDataModel incidentTypesDataModel) { this.incidentTypesDataModel = incidentTypesDataModel; }
 
-    public IncidentTypesDataModel setIncidentTypesDataModel() { return incidentTypesDataModel; }
+    public void setEta(Map<String, String> eta){ this.eta = eta; }
+
+    public void setStatus(Map<String, String> status){ this.status = status; }
+
+    public void setResponding(List<String> responding){ this.responding = responding; }
+
+    public IncidentTypesDataModel getIncidentTypesDataModel() { return incidentTypesDataModel; }
 
     public List<UsersDataModel> getListOfRespondingDataModel() { return listOfRespondingDataModel; }
+
+    public Map<String, String> getEta(){ return eta; }
+
+    public Map<String, String> getStatus(){ return status; }
 
     public String getDocumentId() { return documentId; }
 

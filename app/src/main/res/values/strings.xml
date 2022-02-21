@@ -21,6 +21,12 @@
     <string name="chat">Chat</string>
     <string name="announcements">Announcements</string>
     <string name="user_avatar">User Avatar</string>
+    <string name="incident">Incident</string>
+    <string name="scene">Scene</string>
+    <string name="unavailable">Unavailable</string>
+    <string name="station">Station</string>
+    <string name="eta_loading">ETA: -</string>
+    <string name="event_title_description_is_empty">Event Title/ Description is empty</string>
 
     <!-- Strings related to login -->
 

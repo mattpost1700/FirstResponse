@@ -33,7 +33,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "n")
                 .setSmallIcon(R.drawable.circle)
-                .setContentTitle("New Event")
+                .setContentTitle("N")
                 //.setContentText(eventTitle)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 //.setContentIntent(pendingIntent)
@@ -45,7 +45,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("n", "eventNotifs", NotificationManager.IMPORTANCE_HIGH);
+            NotificationChannel channel = new NotificationChannel("n", "e", NotificationManager.IMPORTANCE_HIGH);
 
             notificationManager.createNotificationChannel(channel);
         }
