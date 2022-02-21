@@ -87,6 +87,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     Context context;
     String active_id;
     IncidentDataModel incidentDataModel;
+    DocumentReference docRef;
 
     private IncidentViewModel mViewModel;
 
@@ -193,7 +194,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
 
                 //Ensure that the incident data is updated if database is updated
-                DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(id);
+                docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(id);
                 docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
                     @Override
                     public void onEvent(@Nullable DocumentSnapshot snapshot,
@@ -215,11 +216,6 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
                             setTextViews(addr, responding, time, units);
 
-                            Map<String, String> etas = incidentDataModel.getEta();
-                            if(etas != null) {
-                                String eta = etas.get(active_id);
-                                setEtaText(eta);
-                            }
 
                             Map<String, String> statuses = incidentDataModel.getStatus();
                             if(statuses != null){
@@ -437,6 +433,9 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        mLocationManager.removeUpdates(mLocationListener);
+        docRef.delete();
 
         Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
         if (mapViewBundle == null) {
