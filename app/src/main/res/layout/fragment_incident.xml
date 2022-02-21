@@ -52,12 +52,14 @@
             app:layout_constraintTop_toBottomOf="@+id/incident_address">
 
             <LinearLayout
+                android:id="@+id/incident_button_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/button4"
+                    android:onClick="respondingButtonClicked"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:layout_marginTop="15dp"
@@ -66,6 +68,7 @@
 
                 <Button
                     android:id="@+id/button"
+                    android:onClick="respondingButtonClicked"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:layout_marginStart="5dp"
@@ -75,6 +78,7 @@
 
                 <Button
                     android:id="@+id/button3"
+                    android:onClick="respondingButtonClicked"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
                     android:layout_marginStart="5dp"
@@ -130,6 +134,7 @@
             android:id="@+id/incident_eta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/eta_loading"
             app:layout_constraintBottom_toTopOf="@+id/mapView"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="5dp"/>
