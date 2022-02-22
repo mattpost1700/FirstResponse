@@ -2,6 +2,7 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.firestore.DocumentId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventsDataModel {
@@ -34,4 +35,7 @@ public class EventsDataModel {
     public String getLocation() { return location; }
 
     public List<String> getParticipants() { return participants; }
+
+    public int getParticipantsSize() { return participants.size(); }
 }
+

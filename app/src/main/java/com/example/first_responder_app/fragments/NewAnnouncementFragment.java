@@ -13,10 +13,12 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.NotificationService;
@@ -50,17 +52,14 @@ public class NewAnnouncementFragment extends Fragment {
         FragmentAnnouncementNewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_announcement_new, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        // TODO: TEST THE CODE IN THE FUTURE
         NavController navController = navHostFragment.getNavController();
-
-
 
         binding.announcementCreateConfirm.setOnClickListener(v -> {
             mViewModel.setAnnounTitle(binding.newAnnounTitle.getText().toString());
             mViewModel.setAnnounDes(binding.newAnnounDescription.getText().toString());
             NavDirections action = NewAnnouncementFragmentDirections.actionNewAnnouncementFragmentToAnnouncementFragment();
 
-            if (mViewModel.getAnnounDes().equals(null) || mViewModel.getAnnounTitle().equals(null)){
+            if (TextUtils.isEmpty(mViewModel.getAnnounTitle().toString()) || TextUtils.isEmpty(mViewModel.getAnnounDes().toString())){
                 binding.newAnnounLog.setText(R.string.new_announ_log_msg);
                 binding.newAnnounLog.setVisibility(View.VISIBLE);
             }

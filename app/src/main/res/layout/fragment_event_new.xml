@@ -42,6 +42,7 @@
             android:ems="10"
             android:hint="Input title here"
             android:inputType="text"
+            android:minHeight="48dp"
             android:text=""
             app:layout_constraintStart_toStartOf="@+id/event_title_text"
             app:layout_constraintTop_toBottomOf="@+id/event_title_text" />
@@ -54,11 +55,25 @@
             android:ems="10"
             android:hint="Input content here"
             android:inputType="text"
+            android:minHeight="48dp"
             android:text=""
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/event_title_text"
             app:layout_constraintTop_toBottomOf="@+id/event_description_text" />
+
+        <TextView
+            android:id="@+id/new_event_log"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/event_title_description_is_empty"
+            android:textColor="#FF0000"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/event_create_confirm"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.768"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/event_create_confirm"

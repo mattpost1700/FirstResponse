@@ -13,6 +13,7 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,20 +58,24 @@ public class NewEventFragment extends Fragment {
 
             String title = binding.newEventTitle.getText().toString();
             String description = binding.newEventDescription.getText().toString();
-            try {
-                firestoreDatabase.addEvent("US-East", title, description, new ArrayList<String>());
+            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description)){
+                binding.newEventLog.setText(R.string.event_title_description_is_empty);
+                binding.newEventLog.setVisibility(View.VISIBLE);
+            }
+            else {
                 try {
-                    _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
-                } catch (JSONException e) {
+                    firestoreDatabase.addEvent("US-East", title, description, new ArrayList<String>());
+                    try {
+                        _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    Navigation.findNavController(binding.getRoot()).navigate(action);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-                Navigation.findNavController(binding.getRoot()).navigate(action);
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-
         });
-
 
         return binding.getRoot();
     }
@@ -80,9 +85,6 @@ public class NewEventFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(NewEventViewModel.class);
 
-
-
     }
-
 
 }

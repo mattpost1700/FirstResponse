@@ -44,7 +44,6 @@ public class ETA extends AsyncTask<String, Void, String> {
             try {
                 Response response = client.newCall(request).execute();
                 String body = response.body().string();
-                Log.d(TAG, "doInBackground: " + body);
                 JSONObject obj = new JSONObject(body);
                 JSONArray arr = obj.getJSONArray("rows");
                 arr = arr.getJSONObject(0).getJSONArray("elements");
@@ -53,8 +52,10 @@ public class ETA extends AsyncTask<String, Void, String> {
 
             } catch (IOException ioException) {
                 Log.e("Error", "IOException " + ioException.getMessage());
+                return "Error";
             } catch (JSONException jsonException) {
                 Log.e("Error", "JSONException " + jsonException.getMessage());
+                return "Error";
             }
         }
         return res;
