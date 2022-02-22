@@ -11,7 +11,12 @@ android {
         dataBinding = true
     }
 
+    def apikeyPropertiesFile = rootProject.file("apikey.properties")
+    def apikeyProperties = new Properties()
+    apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
     defaultConfig {
+        buildConfigField("String", "SERVER_KEY", apikeyProperties['SERVER_KEY'])
         applicationId "com.example.first_responder_app"
         minSdkVersion 27
         targetSdkVersion 31

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService {
+    String serverKey = BuildConfig.SERVER_KEY;
 
     public void notifyPostReq(Context context, String topic, String notifTitle, String notifBody) throws JSONException {
         RequestQueue queue = Volley.newRequestQueue(context);
@@ -50,7 +51,8 @@ public class NotificationService {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Authorization", "key=");
+                String key = "key=" + serverKey;
+                headers.put("Authorization", key);
                 return headers;
             }
 

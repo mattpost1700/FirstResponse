@@ -42,11 +42,17 @@ public class UsersDataModel {
 
     public String getFirst_name() { return first_name; }
 
+    public void setFirst_name(String first_name) { this.first_name = first_name; }
+
     public String getLast_name() { return last_name; }
+
+    public void setLast_name(String last_name) { this.last_name = last_name; }
 
     public String getPassword() { return password; }
 
     public Long getPhone_number() { return phone_number; }
+
+    public void setPhone_number(Long phone_number) { this.phone_number = phone_number; }
 
     public String getRank() { return rank; }
 
