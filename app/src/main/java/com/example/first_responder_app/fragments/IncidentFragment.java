@@ -4,14 +4,13 @@ import static android.content.ContentValues.TAG;
 
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.TypedArray;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -26,7 +25,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,10 +35,7 @@ import android.widget.Toast;
 
 import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.FirestoreDatabase;
-import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
-import com.example.first_responder_app.dataModels.IncidentTypesDataModel;
-import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
@@ -54,25 +49,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.color.MaterialColors;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.Objects;
 
 public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
@@ -100,11 +84,13 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                              @Nullable Bundle savedInstanceState) {
 
         FragmentIncidentBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_incident, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        Activity a = getActivity();
+        if(a != null) {
+            NavHostFragment navHostFragment =
+                    (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
-        NavController navController = navHostFragment.getNavController();
-
+            if(navHostFragment != null){ NavController navController = navHostFragment.getNavController(); }
+        }
 
 
         Bundle mapViewBundle = null;
@@ -128,115 +114,115 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         activity = getActivity();
         context = getContext();
 
-        getParentFragmentManager().setFragmentResultListener("requestKey", this, new FragmentResultListener() {
-            @Override
-            public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle bundle) {
-                String id = bundle.getString("id");
-                String addr = bundle.getString("address");
-                String type = bundle.getString("type");
-                String time = bundle.getString("time");
-                String statusString = bundle.getString("status");
+        getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
+            String id = bundle.getString("id");
+            String addr = bundle.getString("address");
+            String type = bundle.getString("type");
+            String time = bundle.getString("time");
+            String statusString = bundle.getString("status");
 
-                String units = bundle.getString("units");
-                units = units.replace("[", "");
-                units = units.replace("]", "");
+            String units = bundle.getString("units");
+            units = units.replace("[", "");
+            units = units.replace("]", "");
 
-                int responding = bundle.getInt("responding");
+            int responding = bundle.getInt("responding");
 
-                setTextViews(addr, responding, time, units);
+            setTextViews(addr, responding, time, units);
 
-                Map<String, String> status = stringToHashMap(statusString);
+            Map<String, String> status = stringToHashMap(statusString);
 
-                //Get active user id
-                ActiveUser activeUser = (ActiveUser)activity;
-                String active = "";
-                if(activeUser != null){
-                    UsersDataModel user = activeUser.getActive();
-                    if(user != null) active_id = user.getDocumentId();
+            //Get active user id
+            ActiveUser activeUser = (ActiveUser)activity;
+            if(activeUser != null){
+                UsersDataModel user = activeUser.getActive();
+                if(user != null) active_id = user.getDocumentId();
+            }
+
+
+            //Highlight active button
+            if(status != null && status.containsKey(active_id)){
+                setActiveButton(status.get(active_id));
+            }
+
+
+            //Find the type of the incident
+            FirestoreDatabase.getInstance().getDb().collection("incident_types").document(type).get().addOnCompleteListener(typeTask -> {
+                if (typeTask.isSuccessful()) {
+                   String t = (String)typeTask.getResult().get("type_name");
+                   ((TextView)activity.findViewById(R.id.incident_type2)).setText(t);
+                } else {
+                    Log.d(TAG, "Error getting documents: ", typeTask.getException());
                 }
+            });
+
+            setRespondingButtonClickListener();
+
+            //Get the Address object of the incident
+            incidentAddress = addrToCoords(addr);
 
 
-                //Highlight active button
-                if(status != null && status.containsKey(active_id)){
-                    setActiveButton(status.get(active_id));
-                }
+           setupLocationListener();
 
 
-                //Find the type of the incident
-                FirestoreDatabase.getInstance().getDb().collection("incident_types").document(type).get().addOnCompleteListener(typeTask -> {
-                    if (typeTask.isSuccessful()) {
-                        ArrayList<IncidentTypesDataModel> types = new ArrayList<>();
-                       String t = (String)typeTask.getResult().get("type_name");
-                       ((TextView)activity.findViewById(R.id.incident_type)).setText("Type of Call: " + t);
-                    } else {
-                        Log.d(TAG, "Error getting documents: ", typeTask.getException());
-                    }
-                });
-
-                setRespondingButtonClickListener();
-
-                //Get the Address object of the incident
-                incidentAddress = addrToCoords(addr);
 
 
-                //Ask for permissions if needed
-                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
+            //Ensure that the incident data is updated if database is updated
+            docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(id);
+            docRef.addSnapshotListener((snapshot, e) -> {
+                if (e != null) {
+                    System.err.println("Listen failed: " + e);
                     return;
                 }
 
-                //setup location listener
-                mLocationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000,
-                        500, mLocationListener);
+                if (snapshot != null && snapshot.exists()) {
+                    incidentDataModel = snapshot.toObject(IncidentDataModel.class);
+                    String addr1 = null;
+                    if(incidentDataModel != null) {
+                        addr1 = incidentDataModel.getLocation();
+                        Integer responding1 = incidentDataModel.getResponding().size();
+                        String time1 = incidentDataModel.getReceived_time().toDate().toString();
+                        String units1 = incidentDataModel.getUnits().toString();
+                        units1 = units1.replace("[", "");
+                        units1 = units1.replace("]", "");
+                        setTextViews(addr1, responding1, time1, units1);
 
 
 
-
-                //Ensure that the incident data is updated if database is updated
-                docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(id);
-                docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                        @Nullable FirebaseFirestoreException e) {
-                        if (e != null) {
-                            System.err.println("Listen failed: " + e);
-                            return;
-                        }
-
-                        if (snapshot != null && snapshot.exists()) {
-                            incidentDataModel = snapshot.toObject(IncidentDataModel.class);
-
-                            String addr = incidentDataModel.getLocation();
-                            Integer responding = incidentDataModel.getResponding().size();
-                            String time = incidentDataModel.getReceived_time().toDate().toString();
-                            String units = incidentDataModel.getUnits().toString();
-                            units = units.replace("[", "");
-                            units = units.replace("]", "");
-
-                            setTextViews(addr, responding, time, units);
-
-
-                            Map<String, String> statuses = incidentDataModel.getStatus();
-                            if(statuses != null){
-                                String status = statuses.get(active_id);
-                                setActiveButton(status);
-                            }
-
-                            //Get the Address object of the incident
-                            incidentAddress = addrToCoords(addr);
-
-                        } else {
-                            System.out.print("Current data: null");
+                        Map<String, String> statuses = incidentDataModel.getStatus();
+                        if(statuses != null){
+                            String status1 = statuses.get(active_id);
+                            setActiveButton(status1);
                         }
                     }
-                });
+                    //Get the Address object of the incident
+                    incidentAddress = addrToCoords(addr1);
+
+                } else {
+                    System.out.print("Current data: null");
+                }
+            });
 
 
 
-            }
         });
     }
+
+    /**
+     * Sets up the location listener used to calculate ETA
+     */
+    public void setupLocationListener(){
+        //Ask for permissions if needed
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION);
+            return;
+        }
+
+        //setup location listener
+        mLocationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000,
+                500, mLocationListener);
+    }
+
 
 
     /**
@@ -253,9 +239,9 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         String[] mappings = s.split(", ");
 
         Map<String, String> map = new HashMap<>();
-        for(int i = 0; i < mappings.length; i++){
-            String[] keyVal = mappings[i].split("=");
-            if(keyVal.length > 1){
+        for (String mapping : mappings) {
+            String[] keyVal = mapping.split("=");
+            if (keyVal.length > 1) {
                 map.put(keyVal[0], keyVal[1]);
             }
         }
@@ -269,7 +255,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      * @param s Button text
      */
     public void setActiveButton(String s){
-        if(activity != null) {
+        if(activity != null && activity.findViewById(R.id.incident_button_layout) != null) {
             LinearLayout linearLayout = activity.findViewById(R.id.incident_button_layout);
             int count = linearLayout.getChildCount();
 
@@ -294,6 +280,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      * @param time The time of the incident
      * @param units The units that are responding
      */
+    @SuppressLint("SetTextI18n")
     public void setTextViews(String addr, Integer responding, String time, String units){
         if(activity != null) {
             if (addr != null) {
@@ -301,16 +288,16 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 if(addrText != null) addrText.setText(addr);
             }
             if (responding != null) {
-                TextView respText = ((TextView) activity.findViewById(R.id.incident_responding));
-                if(respText != null) respText.setText("Responding: " + responding);
+                TextView respText = ((TextView) activity.findViewById(R.id.incident_responding2));
+                if(respText != null) respText.setText(responding.toString());
             }
             if (time != null) {
-                TextView recText = ((TextView) activity.findViewById(R.id.incident_received_time));
-                if(recText != null) recText.setText("Received Time: " + time);
+                TextView recText = ((TextView) activity.findViewById(R.id.incident_received_time2));
+                if(recText != null) recText.setText(time);
             }
             if (units != null) {
-                TextView unitText = ((TextView) activity.findViewById(R.id.incident_units));
-                if(unitText != null) unitText.setText("Units: " + units);
+                TextView unitText = ((TextView) activity.findViewById(R.id.incident_units2));
+                if(unitText != null) unitText.setText(units);
             }
         }
     }
@@ -319,10 +306,11 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     public void setEtaText(String text){
         TextView etaText = null;
         if(activity != null) {
-            etaText = ((TextView)activity.findViewById(R.id.incident_eta));
-        }
-        if(etaText != null){
-            etaText.setText("ETA: " + text);
+            etaText = ((TextView)activity.findViewById(R.id.incident_eta2));
+
+            if(etaText != null){
+                etaText.setText(text);
+            }
         }
     }
 
@@ -390,15 +378,17 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             boolean alreadyResponding = false;
             if(status != null) {
                 //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
-                alreadyResponding = status.containsKey(activeUser.getDocumentId()) && !status.get(activeUser.getDocumentId()).equals("Unavailable");
+                alreadyResponding = status.containsKey(activeUser.getDocumentId()) && !Objects.equals(status.get(activeUser.getDocumentId()), "Unavailable");
             }
 
             if (text.equals("Unavailable")) {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
+                setActiveButton(text);
             } else if (activeUser.isIs_responding() && !alreadyResponding && context != null) {
                 Toast.makeText(context, "Responding to Another Incident", Toast.LENGTH_LONG).show();
             } else {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);
+                setActiveButton(text);
             }
         }
     }
@@ -414,9 +404,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             }
 
             ETA eta = new ETA();
-            eta.setListener(s -> {
-                setEtaText(s);
-            });
+            eta.setListener(s -> setEtaText(s));
             eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins="  + loc.latitude + "%2C" + loc.longitude);
 
         }
@@ -431,11 +419,10 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
 
         mLocationManager.removeUpdates(mLocationListener);
-        docRef.delete();
 
         Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
         if (mapViewBundle == null) {
@@ -466,7 +453,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
+    public void onMapReady(@NonNull GoogleMap map) {
 
 
         if(incidentAddress != null) {

@@ -25,8 +25,13 @@
     <string name="scene">Scene</string>
     <string name="unavailable">Unavailable</string>
     <string name="station">Station</string>
-    <string name="eta_loading">ETA: -</string>
+    <string name="eta_label">ETA:&#160;</string>
     <string name="event_title_description_is_empty">Event Title/ Description is empty</string>
+    <string name="type_of_call">Type of Call:&#160;</string>
+    <string name="responding_label">Responding:&#160;</string>
+    <string name="received_label">Received Time:&#160;</string>
+    <string name="units_label">Units:&#160;</string>
+    <string name="hyphen">-</string>
 
     <!-- Strings related to login -->
 
