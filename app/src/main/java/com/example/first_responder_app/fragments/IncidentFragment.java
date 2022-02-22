@@ -35,6 +35,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.MainActivity;
@@ -395,7 +396,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
             if (text.equals("Unavailable")) {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
-            } else if (activeUser.isIs_responding() && !alreadyResponding && context != null) {
+            } else if (AppUtil.timeIsWithin(activeUser.getResponding_time(), 30) && !alreadyResponding && context != null) {
                 Toast.makeText(context, "Responding to Another Incident", Toast.LENGTH_LONG).show();
             } else {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);

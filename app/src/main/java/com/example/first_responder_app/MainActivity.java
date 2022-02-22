@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     activeUser = snapshot.toObject(UsersDataModel.class);
 
 
-                    if(activeUser != null && activeUser.isIs_responding()){
+                    if(activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), 30)){
                         setActiveUserRespondingAddr();
                     }else{
                         stopETA();
