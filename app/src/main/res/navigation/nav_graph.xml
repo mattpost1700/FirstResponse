@@ -93,10 +93,6 @@
         <action
             android:id="@+id/action_eventFragment_to_eventGroupFragment"
             app:destination="@id/eventGroupFragment" />
-        <!-- take out -->
-        <action
-            android:id="@+id/action_eventFragment_to_userFragment"
-            app:destination="@id/userFragment" />
     </fragment>
     <fragment
         android:id="@+id/newEventFragment"
