@@ -31,6 +31,7 @@ import com.example.first_responder_app.R;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ public class EventFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private List<UsersDataModel> participants;
+    private boolean isAnyParticipants;
 
     public static EventFragment newInstance() {
         return new EventFragment();
@@ -67,7 +69,10 @@ public class EventFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         eventInfo = mViewModel.getEventDetail();
 
-        populateParticipantList();
+        if (eventInfo.getParticipants().size() != 0){
+            isAnyParticipants = true;
+            populateParticipantList();
+        }
 
         //setting event info to corresponding text
         binding.eventEventTitle.setText(eventInfo.getTitle());
@@ -78,7 +83,7 @@ public class EventFragment extends Fragment {
         //recycler binding
         RecyclerView eventRecyclerView = binding.eventEventRecycler;
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        eventRecyclerViewAdapter = new EventRecyclerViewAdapter(getContext(), participants);
+        eventRecyclerViewAdapter = new EventRecyclerViewAdapter(getContext(), participants, isAnyParticipants);
         eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
 
         binding.signUp.setOnClickListener(v -> {

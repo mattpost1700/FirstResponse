@@ -1,5 +1,6 @@
 package com.example.first_responder_app;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,10 +19,12 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     private List<UsersDataModel> mData;
     private LayoutInflater mInflater;
     private EventRecyclerViewAdapter.ItemClickListener mClickListener;
+    private boolean isAnyParticipants;
 
-    public EventRecyclerViewAdapter(Context context, List<UsersDataModel> data){
+    public EventRecyclerViewAdapter(Context context, List<UsersDataModel> data, boolean isAnyParticipants){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.isAnyParticipants = isAnyParticipants;
     }
 
     @NonNull
@@ -31,10 +34,16 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         return new EventRecyclerViewAdapter.ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(EventRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.participantName.setText(mData.get(position).getFull_name());
-        holder.participantID = mData.get(position).getDocumentId();
+    public void onBindViewHolder(@NonNull EventRecyclerViewAdapter.ViewHolder holder, int position) {
+        if (isAnyParticipants) {
+            holder.participantName.setText(mData.get(position).getFull_name());
+            holder.participantID = mData.get(position).getDocumentId();
+        }
+        else {
+            holder.participantName.setText("No participant for now");
+        }
     }
 
     // total number of rows
