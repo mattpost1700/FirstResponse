@@ -66,9 +66,9 @@ public class EventFragment extends Fragment {
         FragmentEventBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
 
+        //initialize vars as well as fetching userID
         participants = new ArrayList<>();
         ActiveUser activeUser = (ActiveUser)getActivity();
         UsersDataModel user = activeUser.getActive();
@@ -85,25 +85,17 @@ public class EventFragment extends Fragment {
             binding.signUp.setText("Sign up");
         }
 
+        //populate participant info from db
         if (eventInfo.getParticipants().size() != 0){
             isAnyParticipants = true;
-            for (int i = 0; i < eventInfo.getParticipantsSize(); i++){
-                if(eventInfo.getParticipantsSize() - (i * 10) >= 10){
-                    populateParticipantList(i * 10, i * 10 + 10);
-                }
-                else {
-                    if (eventInfo.getParticipantsSize() >= 10) {
-                        populateParticipantList((eventInfo.getParticipantsSize() - i - 1), eventInfo.getParticipantsSize());
-                        break;
-                    }
-                    else{
-                        populateParticipantList(i, eventInfo.getParticipantsSize());
-                        break;
-                    }
-                }
+            int upper = Math.floorDiv(eventInfo.getParticipantsSize(),10);
+            for (int i = 0; i < upper; i++){
+                populateParticipantList(i*10, i*10+10);
             }
+            populateParticipantList(
+                    (eventInfo.getParticipantsSize() - eventInfo.getParticipantsSize()%10)
+                    , eventInfo.getParticipantsSize());
         }
-
 
         //setting event info to corresponding text
         binding.eventEventTitle.setText(eventInfo.getTitle());
