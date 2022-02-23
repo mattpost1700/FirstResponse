@@ -77,7 +77,6 @@ public class EventFragment extends Fragment {
         //getting data from event group
         mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         eventInfo = mViewModel.getEventDetail();
-
         isParticipating = eventInfo.getParticipants().contains(user.getDocumentId());
         if (isParticipating){
             binding.signUp.setText("Withdraw");
@@ -90,14 +89,21 @@ public class EventFragment extends Fragment {
             isAnyParticipants = true;
             for (int i = 0; i < eventInfo.getParticipantsSize(); i++){
                 if(eventInfo.getParticipantsSize() - (i * 10) >= 10){
-                    populateParticipantList(i * 10, i + 10);
+                    populateParticipantList(i * 10, i * 10 + 10);
                 }
                 else {
-                    populateParticipantList((eventInfo.getParticipantsSize()-i-1), eventInfo.getParticipantsSize());
-                    break;
+                    if (eventInfo.getParticipantsSize() >= 10) {
+                        populateParticipantList((eventInfo.getParticipantsSize() - i - 1), eventInfo.getParticipantsSize());
+                        break;
+                    }
+                    else{
+                        populateParticipantList(i, eventInfo.getParticipantsSize());
+                        break;
+                    }
                 }
             }
         }
+
 
         //setting event info to corresponding text
         binding.eventEventTitle.setText(eventInfo.getTitle());
