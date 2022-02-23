@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             View headerView = navView.getHeaderView(0);
             headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
                 if(activeUser != null) {
-                    navController.navigate(R.id.editUserFragment);
+                    navController.navigate(R.id.userFragment);
                     closeNavDrawer();
                 }else{
                     Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
