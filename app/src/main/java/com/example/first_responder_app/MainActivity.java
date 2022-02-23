@@ -17,9 +17,11 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -28,9 +30,12 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +48,7 @@ import com.example.first_responder_app.fragments.HomeFragmentDirections;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.internal.NavigationMenuView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.ActionCodeMultiFactorInfo;
 import com.google.firebase.firestore.DocumentReference;
@@ -67,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     LocationManager mLocationManager;
     Address incidentAddr;
     IncidentDataModel respIncident;
+    NavController navController;
 
     final int ACCESS_LOCATION = 101;
 
@@ -74,6 +81,10 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+
 
         //setup toolbar
         toolbar = findViewById(R.id.toolbar);
@@ -91,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         NavHostFragment navHostFragment =
                 (NavHostFragment) this.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
-        NavController navController = null;
+        navController = null;
         if(navHostFragment != null) {
             navController = navHostFragment.getNavController();
         }
@@ -105,12 +116,26 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
             NavigationView navView = findViewById(R.id.navView);
             NavigationUI.setupWithNavController(navView, navController);
+
+
+            //Setup Nav Drawer user click event
+            View headerView = navView.getHeaderView(0);
+            headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
+                if(activeUser != null) {
+                    navController.navigate(R.id.editUserFragment);
+                    closeNavDrawer();
+                }else{
+                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
+                }
+            });
         }
+
 
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
 
     }
+
 
 
     @Override
@@ -130,6 +155,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             toolbar.setNavigationIcon(icon);
         }
+    }
+
+    public void closeNavDrawer(){
+        DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
+        drawerLayout.closeDrawers();
     }
 
 
