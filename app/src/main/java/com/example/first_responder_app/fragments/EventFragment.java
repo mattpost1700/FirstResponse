@@ -88,7 +88,15 @@ public class EventFragment extends Fragment {
 
         if (eventInfo.getParticipants().size() != 0){
             isAnyParticipants = true;
-            populateParticipantList();
+            for (int i = 0; i < eventInfo.getParticipantsSize(); i++){
+                if(eventInfo.getParticipantsSize() - (i * 10) >= 10){
+                    populateParticipantList(i * 10, i + 10);
+                }
+                else {
+                    populateParticipantList((eventInfo.getParticipantsSize()-i-1), eventInfo.getParticipantsSize());
+                    break;
+                }
+            }
         }
 
         //setting event info to corresponding text
@@ -129,9 +137,9 @@ public class EventFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
     }
 
-    private void populateParticipantList() {
+    private void populateParticipantList(int startIdx, int endIdx) {
         db.collection("users")
-                .whereIn(FieldPath.documentId(), eventInfo.getParticipants())
+                .whereIn(FieldPath.documentId(), eventInfo.getParticipants().subList(startIdx, endIdx))
                 .get().addOnCompleteListener(participantTask -> {
                     if (participantTask.isSuccessful()){
                         List<UsersDataModel> tempList = new ArrayList<>();
@@ -139,7 +147,6 @@ public class EventFragment extends Fragment {
                             UsersDataModel userData = userDoc.toObject(UsersDataModel.class);
                             tempList.add(userData);
                         }
-                        participants.clear();
                         participants.addAll(tempList);
                         eventRecyclerViewAdapter.notifyDataSetChanged();
                     } else{
