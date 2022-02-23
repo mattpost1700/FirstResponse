@@ -175,29 +175,25 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
         //Ensure that the active user data is updated if database is updated
         DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("users").document(user.getDocumentId());
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    System.err.println("Listen failed: " + e);
-                    return;
+        docRef.addSnapshotListener((snapshot, e) -> {
+            if (e != null) {
+                System.err.println("Listen failed: " + e);
+                return;
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                activeUser = snapshot.toObject(UsersDataModel.class);
+
+
+                if(activeUser != null && activeUser.isIs_responding()){
+                    setActiveUserRespondingAddr();
+                }else{
+                    stopETA();
                 }
 
-                if (snapshot != null && snapshot.exists()) {
-                    activeUser = snapshot.toObject(UsersDataModel.class);
 
-
-                    if(activeUser != null && activeUser.isIs_responding()){
-                        setActiveUserRespondingAddr();
-                    }else{
-                        stopETA();
-                    }
-
-
-                } else {
-                    System.out.print("Current data: null");
-                }
+            } else {
+                System.out.print("Current data: null");
             }
         });
 
@@ -269,21 +265,22 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             return;
         }
 
-        if(mLocationManager != null)
-            mLocationManager.removeUpdates(mLocationListener);
-
-        //setup location listener
-        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000,
-                500, mLocationListener);
+       if(mLocationManager == null) {
+           //setup location listener
+           mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+           mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 15000,
+                   500, mLocationListener);
+       }
     }
 
     /**
      * Stop updating ETA
      */
     public void stopETA(){
-        if(mLocationManager != null)
+        if(mLocationManager != null) {
             mLocationManager.removeUpdates(mLocationListener);
+            mLocationManager = null;
+        }
     }
 
 
@@ -302,9 +299,26 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     FirestoreDatabase.getInstance().updateETA(respIncident.getDocumentId(), activeUser.getDocumentId(), respIncident.getEta(), s);
             });
             eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins="  + loc.latitude + "%2C" + loc.longitude);
+        }
+
+        @Override
+        public void onProviderEnabled(@NonNull String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(@NonNull String provider) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
 
         }
     };
+
+
+
 
 }
 
