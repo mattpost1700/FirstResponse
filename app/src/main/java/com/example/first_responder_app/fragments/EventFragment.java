@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.first_responder_app.EventRecyclerViewAdapter;
 import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventBinding;
@@ -69,23 +70,21 @@ public class EventFragment extends Fragment {
         NavController navController = navHostFragment.getNavController();
 
         participants = new ArrayList<>();
+        ActiveUser activeUser = (ActiveUser)getActivity();
+        UsersDataModel user = activeUser.getActive();
+        userID = user.getDocumentId();
 
-        getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
-            userID = bundle.getString("id");
-        });
+        //getting data from event group
+        mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
+        eventInfo = mViewModel.getEventDetail();
 
-        isParticipating = eventInfo.getParticipants().contains(userID);
+        isParticipating = eventInfo.getParticipants().contains(user.getDocumentId());
         if (isParticipating){
             binding.signUp.setText("Withdraw");
         }
         else{
             binding.signUp.setText("Sign up");
         }
-
-        //getting data from event group
-        mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
-        eventInfo = mViewModel.getEventDetail();
-
 
         if (eventInfo.getParticipants().size() != 0){
             isAnyParticipants = true;

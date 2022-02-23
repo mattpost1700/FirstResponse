@@ -26,7 +26,9 @@ import android.widget.Toast;
 import com.example.first_responder_app.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.EventsDataModel;
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventGroupBinding;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.EventGroupViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.viewModels.EventViewModel;
@@ -42,6 +44,7 @@ public class EventGroupFragment extends Fragment{
     private EventViewModel mViewModel;
     private List<EventsDataModel> listOfEvents;
     private EventGroupRecyclerViewAdapter eventGroupRecyclerViewAdapter;
+    private String userID;
 
     public static EventGroupFragment newInstance() {
         return new EventGroupFragment();
