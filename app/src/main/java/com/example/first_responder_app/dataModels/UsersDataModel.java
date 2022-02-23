@@ -60,5 +60,7 @@ public class UsersDataModel {
 
     public boolean isIs_responding() { return is_responding; }
 
+    public String getFull_name(){ return getFirst_name() + " " + getLast_name();}
+
     public String getPw() { return password; }
 }

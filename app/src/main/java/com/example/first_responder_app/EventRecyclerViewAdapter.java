@@ -10,14 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.first_responder_app.dataModels.UsersDataModel;
+
 import java.util.List;
 
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder>{
-    private List<String> mData;
+    private List<UsersDataModel> mData;
     private LayoutInflater mInflater;
     private EventRecyclerViewAdapter.ItemClickListener mClickListener;
 
-    public EventRecyclerViewAdapter(Context context, List<String> data){
+    public EventRecyclerViewAdapter(Context context, List<UsersDataModel> data){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -31,7 +33,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     @Override
     public void onBindViewHolder(EventRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.participant.setText(mData.get(position));
+        holder.participantName.setText(mData.get(position).getFull_name());
+        holder.participantID = mData.get(position).getDocumentId();
     }
 
     // total number of rows
@@ -42,11 +45,12 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView participant;
+        TextView participantName;
+        String participantID;
 
         ViewHolder(View itemView) {
             super(itemView);
-            participant = itemView.findViewById(R.id.rowlayout_event_participants);
+            participantName = itemView.findViewById(R.id.rowlayout_event_participants);
             itemView.setOnClickListener(this);
         }
 
