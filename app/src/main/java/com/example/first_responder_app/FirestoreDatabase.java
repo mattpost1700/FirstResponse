@@ -66,6 +66,12 @@ public class FirestoreDatabase {
                 .addOnFailureListener(e ->Log.d("new announcement page", "failed to create new announcement"));
     }
 
+    public void updateEvent(EventsDataModel updatedEvent){
+        db.collection("events")
+                .document(updatedEvent.getDocumentId())
+                .set(updatedEvent);
+    }
+
     /**
      * Update the database to show the active user is responding
      *

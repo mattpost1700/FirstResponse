@@ -23,9 +23,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.first_responder_app.EventRecyclerViewAdapter;
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventBinding;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.R;
 import com.google.firebase.firestore.FieldPath;
@@ -35,6 +37,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 public class EventFragment extends Fragment {
@@ -45,6 +48,8 @@ public class EventFragment extends Fragment {
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private List<UsersDataModel> participants;
     private boolean isAnyParticipants;
+    private boolean isParticipating;
+    private String userID;
 
     public static EventFragment newInstance() {
         return new EventFragment();
@@ -65,9 +70,22 @@ public class EventFragment extends Fragment {
 
         participants = new ArrayList<>();
 
+        getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
+            userID = bundle.getString("id");
+        });
+
+        isParticipating = eventInfo.getParticipants().contains(userID);
+        if (isParticipating){
+            binding.signUp.setText("Withdraw");
+        }
+        else{
+            binding.signUp.setText("Sign up");
+        }
+
         //getting data from event group
         mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         eventInfo = mViewModel.getEventDetail();
+
 
         if (eventInfo.getParticipants().size() != 0){
             isAnyParticipants = true;
@@ -87,9 +105,22 @@ public class EventFragment extends Fragment {
         eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
 
         binding.signUp.setOnClickListener(v -> {
-            Toast.makeText(getActivity(), "Event sign up successful", Toast.LENGTH_SHORT).show();
-            NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+            if (isParticipating){
+                eventInfo.getParticipants().remove(userID);
+                FirestoreDatabase dbtemp = new FirestoreDatabase();
+                dbtemp.updateEvent(eventInfo);
+                Toast.makeText(getActivity(), "Successful on withdrawing event registration", Toast.LENGTH_SHORT).show();
+                NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
+                Navigation.findNavController(binding.getRoot()).navigate(action);
+            }
+            else {
+                eventInfo.getParticipants().add(userID);
+                FirestoreDatabase dbtemp = new FirestoreDatabase();
+                dbtemp.updateEvent(eventInfo);
+                Toast.makeText(getActivity(), "Successful on accepting event registration", Toast.LENGTH_SHORT).show();
+                NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
+                Navigation.findNavController(binding.getRoot()).navigate(action);
+            }
         });
         return binding.getRoot();
     }
