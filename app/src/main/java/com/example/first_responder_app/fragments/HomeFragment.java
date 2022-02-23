@@ -37,6 +37,8 @@ import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.internal.NavigationMenuView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -150,7 +152,6 @@ public class HomeFragment extends Fragment {
             getParentFragmentManager().setFragmentResult("requestKey", result);
 
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
-
             Navigation.findNavController(binding.getRoot()).navigate(action);
 
         };
@@ -171,6 +172,7 @@ public class HomeFragment extends Fragment {
         // Start event listeners (live data)
         addIncidentEventListener();
         addResponderEventListener();
+
 
 
 
