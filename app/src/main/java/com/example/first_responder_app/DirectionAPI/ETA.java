@@ -28,6 +28,7 @@ public class ETA extends AsyncTask<String, Void, String> {
     public void setListener(ETAResult listener){
         this.listener = listener;
     }
+    public void removeListener(){ this.listener = null; }
 
     @Override
     protected String doInBackground(String... strings) {

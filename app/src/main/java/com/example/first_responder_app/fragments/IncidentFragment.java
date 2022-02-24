@@ -74,6 +74,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     String active_id;
     IncidentDataModel incidentDataModel;
     DocumentReference docRef;
+    ETA eta;
 
     private IncidentViewModel mViewModel;
 
@@ -106,8 +107,8 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
 
 
-        return binding.getRoot();
 
+        return binding.getRoot();
     }
 
     @Override
@@ -407,7 +408,9 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 destination = new LatLng(incidentAddress.getLatitude(), incidentAddress.getLongitude());
             }
 
-            ETA eta = new ETA();
+
+
+            eta = new ETA();
             eta.setListener(s -> setEtaText(s));
             eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins="  + loc.latitude + "%2C" + loc.longitude);
 
@@ -436,12 +439,21 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         // TODO: Use the ViewModel
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        mLocationManager.removeUpdates(mLocationListener);
+
+        if(eta != null){
+            Log.d(TAG, "onLocationChanged: REMOVE LISTENER");
+            eta.removeListener();
+        }
+    }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        mLocationManager.removeUpdates(mLocationListener);
 
         Bundle mapViewBundle = outState.getBundle(MAPVIEW_BUNDLE_KEY);
         if (mapViewBundle == null) {
