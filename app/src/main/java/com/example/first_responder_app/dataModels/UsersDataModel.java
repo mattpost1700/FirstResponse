@@ -58,6 +58,8 @@ public class UsersDataModel {
 
     public String getUsername() { return username; }
 
+    public void setUsername(String username) { this.username = username; }
+
     public boolean isIs_responding() { return is_responding; }
 
     public String getFull_name(){ return getFirst_name() + " " + getLast_name();}

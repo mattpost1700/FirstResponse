@@ -4,7 +4,6 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -35,6 +34,7 @@ import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
+import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.internal.NavigationMenuView;
@@ -136,21 +136,9 @@ public class HomeFragment extends Fragment {
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
-            Bundle result = new Bundle();
-            result.putString("id", incident.getDocumentId());
-            result.putString("address", incident.getLocation());
-            result.putString("type", incident.getIncident_type());
-            result.putString("time", incident.getReceived_time().toDate().toString());
-            result.putString("units", incident.getUnits().toString());
-            result.putInt("responding", incident.getResponding().size());
 
-            String status = null;
-            if(incident.getStatus() != null) {
-                status = incident.getStatus().toString();
-            }
-            result.putString("status", status);
-            getParentFragmentManager().setFragmentResult("requestKey", result);
-
+            IncidentViewModel incidentViewModel = new ViewModelProvider(requireActivity()).get(IncidentViewModel.class);
+            incidentViewModel.setIncidentDataModel(incident);
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
 
