@@ -1,14 +1,19 @@
 package com.example.first_responder_app.fragments;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+import static android.content.ContentValues.TAG;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -17,44 +22,22 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.example.first_responder_app.DirectionAPI.ETA;
-import com.example.first_responder_app.FirestoreDatabase;
-import com.example.first_responder_app.IncidentRecyclerViewAdapter;
-import com.example.first_responder_app.RespondersRecyclerViewAdapter;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.interfaces.DrawerLocker;
-import com.example.first_responder_app.viewModels.HomeViewModel;
-import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
-
+import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
+import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
+import com.example.first_responder_app.viewModels.HomeViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.internal.NavigationMenuView;
-import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.ContentValues.TAG;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 //TODO, haven't implement anything
 
