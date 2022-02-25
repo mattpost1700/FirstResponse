@@ -95,8 +95,22 @@ public class FirestoreDatabase {
                 Log.d(TAG, "Error getting documents: ", typeTask.getException());
             }
         });
-    }
 
+        db.collection("incident").whereArrayContains("responding", user_id).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+            if(error != null) {
+                Log.w(TAG, "Listening failed for firestore incident collection");
+            }
+            else {
+
+                if(value.isEmpty()){
+                    db.collection("users").document(user_id).update("is_responding", false);
+                }else{
+                    db.collection("users").document(user_id).update("is_responding", true);
+                }
+
+            }
+        });
+    }
     /**
      * Update the status of a user
      *
@@ -138,11 +152,6 @@ public class FirestoreDatabase {
         updates.put("eta", eta);
         updates.put("responding", responding);
         db.collection("incident").document(incident_id).update(updates);
-        if(available)
-            db.collection("users").document(user_id).update("is_responding", true);
-        else if (previouslyResponding)
-            db.collection("users").document(user_id).update("is_responding", false);
-
     }
 
     /**
@@ -165,8 +174,6 @@ public class FirestoreDatabase {
         updates.put("eta", eta);
         db.collection("incident").document(incident_id).update(updates);
 
-        if(available)
-            db.collection("users").document(user_id).update("is_responding", false);
     }
 
     /**

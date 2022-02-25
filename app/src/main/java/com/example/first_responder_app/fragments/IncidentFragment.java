@@ -243,7 +243,6 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             for (int i = 0; i < count; i++) {
                 Button b = (Button) linearLayout.getChildAt(i);
                 if (s != null && s.equals((String)b.getText()) && context != null) {
-                    Log.d(TAG, "setActiveButton: " + s + "why is this being called");
                     b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorSecondary, context.getResources().getColor(R.color.teal_700)));
                 }else if(context != null){
                     b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorPrimary, context.getResources().getColor(R.color.purple_200)));
@@ -366,19 +365,12 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             Toast.makeText(context, "You must be logged in", Toast.LENGTH_LONG).show();
         }else if(activeUser != null){
 
-            Map<String, String> status = incidentDataModel.getStatus();
-            boolean alreadyResponding = false;
-            if(status != null) {
-                //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
-                alreadyResponding = status.containsKey(activeUser.getDocumentId()) && !Objects.equals(status.get(activeUser.getDocumentId()), "Unavailable");
-            }
 
+            //TODO: remove hardcoded string
             if (text.equals("Unavailable")) {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
                 setActiveButton(text);
-            } else if (activeUser.isIs_responding() && !alreadyResponding && context != null) {
-                Toast.makeText(context, "Responding to Another Incident", Toast.LENGTH_LONG).show();
-            } else {
+            }else {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);
                 setActiveButton(text);
             }

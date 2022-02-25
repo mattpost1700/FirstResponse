@@ -32,6 +32,7 @@ public class ETA extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... strings) {
+        Log.d(TAG, "onpost: " + strings[0] + " " + this);
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
 
@@ -64,6 +65,7 @@ public class ETA extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String s) {
+        Log.d(TAG, "onPostExecute: " + s);
         super.onPostExecute(s);
         if(listener != null){
             listener.resultCallback(s);
