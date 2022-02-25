@@ -2,7 +2,9 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.firestore.DocumentId;
 
-public class RanksDataModel {
+import java.io.Serializable;
+
+public class RanksDataModel implements Serializable {
 
     @DocumentId
     private String documentId;

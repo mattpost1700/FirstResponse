@@ -3,11 +3,12 @@ package com.example.first_responder_app.dataModels;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class IncidentDataModel {
+public class IncidentDataModel implements Serializable {
 
     @DocumentId
     private String documentId;

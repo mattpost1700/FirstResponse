@@ -2,7 +2,9 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.firestore.DocumentId;
 
-public class IncidentTypesDataModel {
+import java.io.Serializable;
+
+public class IncidentTypesDataModel implements Serializable {
 
     @DocumentId
     private String documentId;
