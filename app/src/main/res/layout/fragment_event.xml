@@ -77,11 +77,14 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/event_eventRecycler"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="4dp"
-            app:layout_constraintEnd_toEndOf="@+id/event_event_participantsNum"
+            app:layout_constraintBottom_toTopOf="@+id/sign_up"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/event_event_participants_fixed"
+            app:layout_constraintVertical_bias="0.0"
             tools:itemCount="2" />
 
         <TextView

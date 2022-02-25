@@ -41,6 +41,12 @@
         <action
             android:id="@+id/action_homeFragment_to_editUserFragment"
             app:destination="@id/editUserFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_preferencesFragment"
+            app:destination="@id/preferencesFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_userFragment"
+            app:destination="@id/userFragment" />
     </fragment>
 
     <fragment
@@ -118,10 +124,23 @@
         android:label="chat_fragment"
         tools:layout="@layout/chat_fragment" />
     <fragment
+        android:id="@+id/userFragment"
+        android:name="com.example.first_responder_app.fragments.UserFragment"
+        android:label="user_fragment"
+        tools:layout="@layout/fragment_edit_user">
+        <action
+            android:id="@+id/action_userFragment_to_editUserFragment"
+            app:destination="@id/editUserFragment" />
+    </fragment>
+    <fragment
         android:id="@+id/editUserFragment"
         android:name="com.example.first_responder_app.fragments.EditUserFragment"
         android:label="edit_user_fragment"
-        tools:layout="@layout/edit_user_fragment" />
+        tools:layout="@layout/fragment_user">
+        <action
+            android:id="@+id/action_editUserFragment_to_userFragment"
+            app:destination="@id/userFragment" />
+    </fragment>
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.example.first_responder_app.fragments.ReportFragment"
@@ -131,4 +150,9 @@
             android:id="@+id/action_reportFragment_to_incidentGroupFragment"
             app:destination="@id/incidentGroupFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/preferencesFragment"
+        android:name="com.example.first_responder_app.fragments.PreferencesFragment"
+        android:label="preferences_fragment"
+        tools:layout="@layout/preferences_fragment" />
 </navigation>

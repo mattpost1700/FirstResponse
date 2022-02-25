@@ -33,6 +33,14 @@
             android:id="@+id/incident_responding"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/responding_label"
+            app:layout_constraintBaseline_toBaselineOf="@+id/textView"
+            app:layout_constraintEnd_toStartOf="@+id/incident_responding2" />
+
+        <TextView
+            android:id="@+id/incident_responding2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBaseline_toBaselineOf="@+id/textView"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -94,15 +102,33 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:text="@string/type_of_call"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
+
+        <TextView
+            android:id="@+id/incident_type2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            app:layout_constraintStart_toEndOf="@+id/incident_type"
             app:layout_constraintTop_toBottomOf="@+id/horizontalScrollView" />
 
         <TextView
             android:id="@+id/incident_received_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/received_label"
             android:layout_marginTop="5dp"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/incident_type" />
+
+        <TextView
+            android:id="@+id/incident_received_time2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toEndOf="@+id/incident_received_time"
             app:layout_constraintTop_toBottomOf="@+id/incident_type" />
 
         <TextView
@@ -110,7 +136,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
+            android:text="@string/units_label"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/incident_received_time" />
+
+        <TextView
+            android:id="@+id/incident_units2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            app:layout_constraintStart_toEndOf="@+id/incident_units"
             app:layout_constraintTop_toBottomOf="@+id/incident_received_time" />
 
         <TextView
@@ -134,10 +169,19 @@
             android:id="@+id/incident_eta"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/eta_loading"
+            android:layout_marginBottom="5dp"
+            android:text="@string/eta_label"
             app:layout_constraintBottom_toTopOf="@+id/mapView"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="5dp"/>
+            app:layout_constraintEnd_toStartOf="@+id/incident_eta2"/>
+
+        <TextView
+            android:id="@+id/incident_eta2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="@string/hyphen"
+            app:layout_constraintBottom_toTopOf="@+id/mapView"
+            app:layout_constraintEnd_toEndOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

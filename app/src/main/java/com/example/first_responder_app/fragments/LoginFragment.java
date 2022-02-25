@@ -71,6 +71,7 @@ public class LoginFragment extends Fragment {
 
         //get user info for comparison
         listOfUser = new ArrayList<>();
+        //TODO: change it to query single entry instead of entire user list
         populateUserList();
 
         //switch to Home fragment upon clicking it

@@ -2,9 +2,20 @@ package com.example.first_responder_app;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Context;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+
+import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.interfaces.ActiveUser;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
@@ -14,11 +25,14 @@ import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class FirestoreDatabase {
 
@@ -59,6 +73,12 @@ public class FirestoreDatabase {
                 .add(newAnnoun)
                 .addOnSuccessListener(documentReference -> Log.d("new announcement page", "new announcement has been successfully created in the DB"))
                 .addOnFailureListener(e ->Log.d("new announcement page", "failed to create new announcement"));
+    }
+
+    public void updateEvent(EventsDataModel updatedEvent){
+        db.collection("events")
+                .document(updatedEvent.getDocumentId())
+                .set(updatedEvent);
     }
 
     /**
@@ -178,5 +198,84 @@ public class FirestoreDatabase {
         currentETAs.put(user_id, eta);
 
         db.collection("incident").document(incident_id).update("eta", currentETAs);
+    }
+
+    /**
+     * Update a user's data
+     *
+     * @param firstName The user's first name
+     * @param lastName The user's last name
+     * @param phone The user's prone number (as a String)
+     * @param rank The user's rank (document ID, not rank name)
+     * @param address The user's address
+     * @param id The document id of the user being updated
+     * @param context The context
+     */
+    public void editUser(String firstName, String lastName, String rank, String phone, String address, String id, Context context) {
+        Long phoneNum = parsePhone(phone);
+
+        db.collection("users").document(id)
+                .update("first_name", firstName,
+                        "last_name", lastName,
+                        "address", address,
+                        "phone_number", phoneNum,
+                        "rank", rank)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("DB", "User successfully updated");
+
+                        ActiveUser activeUser = (ActiveUser)context;
+                        if (activeUser != null) {
+                            UsersDataModel user = activeUser.getActive();
+                            if (user != null && (user.getDocumentId().equals(id))) {
+                                user.setRank(rank);
+                                user.setFirst_name(firstName);
+                                user.setLast_name(lastName);
+                                user.setPhone_number(phoneNum);
+
+                                activeUser.setActive(user);
+                            }
+                        }
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("DB", "Error updating user " + id, e);
+                    }
+                });
+
+
+    }
+
+    private Long parsePhone(String phone) {
+        phone = phone.replaceAll("\\D+","");
+        return Long.valueOf(phone);
+    }
+
+    /**
+     * Validate name
+     * Returns true when input is valid
+     *
+     * @param name The user's first, last, or full name
+     */
+    public boolean validateName(String name) {
+        Pattern allowedNamePatterns = Pattern.compile("^\\p{L}+[\\p{L}\\p{Z}\\p{P}]{0,}");
+
+        return allowedNamePatterns.matcher(name).matches();
+    }
+
+    /**
+     * Validate phone number (before it's parsed to long)
+     * Returns true when input is valid
+     *
+     * @param phone The phone number
+     */
+    public boolean validatePhone(String phone) {
+        Pattern allowedPhonePatterns = Pattern.compile("^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$");
+
+        return allowedPhonePatterns.matcher(phone).matches();
     }
 }

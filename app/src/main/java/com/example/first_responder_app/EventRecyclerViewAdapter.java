@@ -1,5 +1,6 @@
 package com.example.first_responder_app;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,16 +11,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.first_responder_app.dataModels.UsersDataModel;
+
 import java.util.List;
 
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder>{
-    private List<String> mData;
+    private List<UsersDataModel> mData;
     private LayoutInflater mInflater;
     private EventRecyclerViewAdapter.ItemClickListener mClickListener;
+    private boolean isAnyParticipants;
 
-    public EventRecyclerViewAdapter(Context context, List<String> data){
+    public EventRecyclerViewAdapter(Context context, List<UsersDataModel> data, boolean isAnyParticipants){
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.isAnyParticipants = isAnyParticipants;
     }
 
     @NonNull
@@ -29,9 +34,16 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         return new EventRecyclerViewAdapter.ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(EventRecyclerViewAdapter.ViewHolder holder, int position) {
-        holder.participant.setText(mData.get(position));
+    public void onBindViewHolder(@NonNull EventRecyclerViewAdapter.ViewHolder holder, int position) {
+        if (isAnyParticipants) {
+            holder.participantName.setText(mData.get(position).getFull_name());
+            holder.participantID = mData.get(position).getDocumentId();
+        }
+        else {
+            holder.participantName.setText("No participant for now");
+        }
     }
 
     // total number of rows
@@ -42,11 +54,12 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView participant;
+        TextView participantName;
+        String participantID;
 
         ViewHolder(View itemView) {
             super(itemView);
-            participant = itemView.findViewById(R.id.rowlayout_event_participants);
+            participantName = itemView.findViewById(R.id.rowlayout_event_participants);
             itemView.setOnClickListener(this);
         }
 
