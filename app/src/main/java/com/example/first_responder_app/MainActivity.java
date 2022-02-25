@@ -311,6 +311,13 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
        }
     }
 
+    /**
+     * Checks if permissions were granted or not.
+     * If so continue program where it left off.
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {

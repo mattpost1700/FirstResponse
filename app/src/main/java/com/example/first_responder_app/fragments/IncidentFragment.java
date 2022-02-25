@@ -133,20 +133,14 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    /**
+     * Setup the incident data and display it
+     *
+     * @param incident The incident to be displayed
+     */
     public void initializeIncident(IncidentDataModel incident){
 
-        String id = incident.getDocumentId();
-        String addr = incident.getLocation();
-        int responding = incident.getResponding().size();
-        String time = incident.getReceived_time().toDate().toString();
-        String type = incident.getIncident_type();
-
-        String units = incident.getUnits().toString();
-        units = units.replace("[", "");
-        units = units.replace("]", "");
-
-
-        setTextViews(addr, responding, time, units);
+        setTextViews(incident);
 
         Map<String, String> status = incident.getStatus();
 
@@ -165,7 +159,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
 
         //Find the type of the incident
-        FirestoreDatabase.getInstance().getDb().collection("incident_types").document(type).get().addOnCompleteListener(typeTask -> {
+        FirestoreDatabase.getInstance().getDb().collection("incident_types").document(incident.getIncident_type()).get().addOnCompleteListener(typeTask -> {
             if (typeTask.isSuccessful()) {
                 String t = (String)typeTask.getResult().get("type_name");
                 ((TextView)bindingView.findViewById(R.id.incident_type2)).setText(t);
@@ -177,16 +171,14 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         setRespondingButtonClickListener();
 
         //Get the Address object of the incident
-        incidentAddress = addrToCoords(addr);
+        incidentAddress = addrToCoords(incident.getLocation());
 
 
         setupLocationListener();
 
 
-
-
         //Ensure that the incident data is updated if database is updated
-        docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(id);
+        docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
         docRef.addSnapshotListener((snapshot, e) -> {
             if (e != null) {
                 System.err.println("Listen failed: " + e);
@@ -195,26 +187,20 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
             if (snapshot != null && snapshot.exists()) {
                 incidentDataModel = snapshot.toObject(IncidentDataModel.class);
-                String addr1 = null;
-                if(incidentDataModel != null) {
-                    addr1 = incidentDataModel.getLocation();
-                    Integer responding1 = incidentDataModel.getResponding().size();
-                    String time1 = incidentDataModel.getReceived_time().toDate().toString();
-                    String units1 = incidentDataModel.getUnits().toString();
-                    units1 = units1.replace("[", "");
-                    units1 = units1.replace("]", "");
-                    setTextViews(addr1, responding1, time1, units1);
 
+                    if (incidentDataModel != null){
+                        setTextViews(incidentDataModel);
 
 
                     Map<String, String> statuses = incidentDataModel.getStatus();
-                    if(statuses != null){
+                    if (statuses != null) {
                         String status1 = statuses.get(active_id);
                         setActiveButton(status1);
                     }
-                }
-                //Get the Address object of the incident
-                incidentAddress = addrToCoords(addr1);
+
+                    //Get the Address object of the incident
+                    incidentAddress = addrToCoords(incidentDataModel.getLocation());
+                    }
 
             } else {
                 System.out.print("Current data: null");
@@ -243,29 +229,6 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-    /**
-     * Converts a string into a Map
-     *
-     * @param s String to convert to a Map
-     * @return the converted Map
-     */
-    public Map<String, String> stringToHashMap(String s){
-        if(s==null) return null;
-
-        s = s.replace("{", "");
-        s = s.replace("}", "");
-        String[] mappings = s.split(", ");
-
-        Map<String, String> map = new HashMap<>();
-        for (String mapping : mappings) {
-            String[] keyVal = mapping.split("=");
-            if (keyVal.length > 1) {
-                map.put(keyVal[0], keyVal[1]);
-            }
-        }
-
-        return map;
-    }
 
     /**
      * Set the active button
@@ -293,13 +256,20 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      * Update the text views of the fragment
      * Set value to null if you don't want to update
      *
-     * @param addr The address of the incident
-     * @param responding The number of people responding
-     * @param time The time of the incident
-     * @param units The units that are responding
+     * @param incidentDataModel The incident to use to update the text views
+     *
      */
     @SuppressLint("SetTextI18n")
-    public void setTextViews(String addr, Integer responding, String time, String units){
+    public void setTextViews(IncidentDataModel incidentDataModel){
+        if(incidentDataModel == null) return;
+
+        String addr = incidentDataModel.getLocation();
+        Integer responding = incidentDataModel.getResponding().size();
+        String time = incidentDataModel.getReceived_time().toDate().toString();
+        String units = incidentDataModel.getUnits().toString();
+        units = units.replace("[", "");
+        units = units.replace("]", "");
+
         if(bindingView != null) {
             if (addr != null) {
                 TextView addrText = ((TextView) bindingView.findViewById(R.id.incident_address));
@@ -320,7 +290,10 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
+    /**
+     * Update the ETA text view of the IncidentFragment
+     * @param text The text used to update the text view
+     */
     public void setEtaText(String text){
         TextView etaText = null;
         if(bindingView != null) {
@@ -423,7 +396,6 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             }
 
 
-            Log.d(TAG, "CALL ETA INCIDENT");
             eta = new ETA();
             eta.setListener(s -> setEtaText(s));
             eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins="  + loc.latitude + "%2C" + loc.longitude);
