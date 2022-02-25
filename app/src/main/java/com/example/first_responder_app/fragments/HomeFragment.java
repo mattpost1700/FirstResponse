@@ -247,6 +247,7 @@ public class HomeFragment extends Fragment {
                     temp.add(userDoc.toObject(UsersDataModel.class));
                 }
 
+                // TODO: Should refresh
                 Log.d("TAG", "populateResponders: ");
             }
         });
