@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     Drawable icon;
     UsersDataModel activeUser;
     LocationManager mLocationManager;
-    Address incidentAddr;
-    IncidentDataModel respIncident;
+    List<Address> incidentAddr;
+    List<IncidentDataModel> respIncident;
     NavController navController;
 
     final int ACCESS_LOCATION_FRAGMENT = 101;
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
 
     public void setActiveUserRespondingAddr(){
-        FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).addSnapshotListener((value, error) -> {
+        FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore incident collection");
             }
@@ -243,12 +243,17 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
                     temp.add(incidentDataModel);
                 }
-                if(temp.size() > 0) {
-                    respIncident = temp.get(0);
-                    String addr = respIncident.getLocation();
-                    incidentAddr = addrToCoords(addr);
-                    updateETA();
+
+                respIncident = new ArrayList<>();
+                incidentAddr = new ArrayList<>();
+
+                for(int i = 0; i < temp.size(); i++){
+                    respIncident.add(temp.get(i));
+                    String addr = temp.get(i).getLocation();
+                    incidentAddr.add(addrToCoords(addr));
                 }
+
+                updateETA();
 
             }
         });
@@ -366,19 +371,22 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             @Override
             public void onLocationChanged(final Location location) {
                 LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-                LatLng destination = new LatLng(0, 0);
-                if (incidentAddr != null) {
-                    destination = new LatLng(incidentAddr.getLatitude(), incidentAddr.getLongitude());
+
+                for(int i = 0; i < respIncident.size(); i++) {
+                    LatLng destination = new LatLng(0, 0);
+
+                    if (incidentAddr.get(i) != null) {
+                        destination = new LatLng(incidentAddr.get(i).getLatitude(), incidentAddr.get(i).getLongitude());
+                    }
+
+                    int idx = i;
+                    ETA eta = new ETA();
+                    eta.setListener(s -> {
+                        if (respIncident != null)
+                            FirestoreDatabase.getInstance().updateETA(respIncident.get(idx).getDocumentId(), activeUser.getDocumentId(), respIncident.get(idx).getEta(), s);
+                    });
+                    eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins=" + loc.latitude + "%2C" + loc.longitude);
                 }
-
-                Log.d(TAG, "CALL ETA MAIN");
-
-                ETA eta = new ETA();
-                eta.setListener(s -> {
-                    if (respIncident != null)
-                        FirestoreDatabase.getInstance().updateETA(respIncident.getDocumentId(), activeUser.getDocumentId(), respIncident.getEta(), s);
-                });
-                eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins=" + loc.latitude + "%2C" + loc.longitude);
             }
 
             @Override
