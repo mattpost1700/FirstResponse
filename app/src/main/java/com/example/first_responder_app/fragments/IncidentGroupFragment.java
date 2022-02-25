@@ -27,10 +27,12 @@ import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.IncidentGroupViewModel;
 import com.example.first_responder_app.R;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.zip.Inflater;
 
@@ -57,22 +59,7 @@ public class IncidentGroupFragment extends Fragment {
 
         final SwipeRefreshLayout pullToRefresh = thisView.findViewById(R.id.incidentGroupSwipeRefreshLayout);
         pullToRefresh.setOnRefreshListener(() -> {
-            db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
-                if (incidentTask.isSuccessful()) {
-                    ArrayList<IncidentDataModel> temp = new ArrayList<>();
-                    for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
-                        IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
-                        temp.add(incidentDataModel);
-                    }
-
-                    listOfIncidentDataModel.clear();
-                    listOfIncidentDataModel.addAll(temp);
-                    incidentRecyclerViewAdapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "get failed in HomeFragment with " + incidentTask.getException());
-                }
-            });
-
+            refreshData();
             pullToRefresh.setRefreshing(false);
         });
 
@@ -94,9 +81,11 @@ public class IncidentGroupFragment extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         };
 
-        RecyclerView incidentRecyclerView = thisView.findViewById(R.id.incidents_group_recycler_view);
-        incidentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        incidentRecyclerViewAdapter = new IncidentRecyclerViewAdapter(getContext(), listOfIncidentDataModel);
+        listOfIncidentDataModel.add(new IncidentDataModel());
+
+        RecyclerView incidentRecyclerView = binding.incidentsRecyclerView;
+        incidentRecyclerView.setLayoutManager(new LinearLayoutManager(thisView.getContext()));
+        incidentRecyclerViewAdapter = new IncidentRecyclerViewAdapter(thisView.getContext(), listOfIncidentDataModel);
         incidentRecyclerViewAdapter.setIncidentClickListener(incidentClickListener);
         incidentRecyclerView.setAdapter(incidentRecyclerViewAdapter);
 
@@ -105,10 +94,12 @@ public class IncidentGroupFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_incident_group, container, false);
     }
 
+
+
     private void addIncidentEventListener() {
         db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             if(error != null) {
-                Log.w(TAG, "Listening failed for firestore incident collection");
+                Log.w(TAG, "Listening failed for firestore incident collection", error);
             }
             else {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
@@ -120,6 +111,24 @@ public class IncidentGroupFragment extends Fragment {
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
                 incidentRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void refreshData() {
+        db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+            if (incidentTask.isSuccessful()) {
+                ArrayList<IncidentDataModel> temp = new ArrayList<>();
+                for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
+                    IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
+                    temp.add(incidentDataModel);
+                }
+
+                listOfIncidentDataModel.clear();
+                listOfIncidentDataModel.addAll(temp);
+                incidentRecyclerViewAdapter.notifyDataSetChanged();
+            } else {
+                Log.w(TAG, "onCreateView: get failed in HomeFragment with", incidentTask.getException());
             }
         });
     }
