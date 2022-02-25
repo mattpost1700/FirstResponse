@@ -57,24 +57,26 @@ public class IncidentGroupFragment extends Fragment {
         });
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
-            Log.d(TAG, "clicked (from incident listener)!");
-
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
             Bundle result = new Bundle();
+            result.putString("id", incident.getDocumentId());
             result.putString("address", incident.getLocation());
             result.putString("type", incident.getIncident_type());
             result.putString("time", incident.getReceived_time().toDate().toString());
             result.putString("units", incident.getUnits().toString());
             result.putInt("responding", incident.getResponding().size());
+
+            String status = null;
+            if(incident.getStatus() != null) {
+                status = incident.getStatus().toString();
+            }
+            result.putString("status", status);
             getParentFragmentManager().setFragmentResult("requestKey", result);
 
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
-
             Navigation.findNavController(binding.getRoot()).navigate(action);
         };
-
-        //listOfIncidentDataModel.add(new IncidentDataModel());
 
         // Recycler view
         RecyclerView incidentRecyclerView = binding.incidentsGroupRecyclerView;
