@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.recyclerViews;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 
 import java.util.List;

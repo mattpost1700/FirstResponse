@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.first_responder_app.R;
-import com.example.first_responder_app.UserProfileViewModel;
+import com.example.first_responder_app.viewModels.UserProfileViewModel;
 import com.example.first_responder_app.databinding.FragmentUserBinding;
 
 public class UserProfileFragment extends Fragment {

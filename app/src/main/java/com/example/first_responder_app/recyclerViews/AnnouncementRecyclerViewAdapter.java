@@ -1,4 +1,4 @@
-package com.example.first_responder_app;
+package com.example.first_responder_app.recyclerViews;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,33 +9,37 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.first_responder_app.dataModels.EventsDataModel;
+import com.example.first_responder_app.R;
+import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 
 import java.util.List;
 
-public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGroupRecyclerViewAdapter.ViewHolder>{
+public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<AnnouncementRecyclerViewAdapter.ViewHolder>{
 
-    private List<EventsDataModel> mData;
+    private List<AnnouncementsDataModel> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public EventGroupRecyclerViewAdapter(Context context, List<EventsDataModel> data){
+    // data is passed into the constructor
+    public AnnouncementRecyclerViewAdapter(Context context, List<AnnouncementsDataModel> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
 
+    // inflates the row layout from xml when needed
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.row_layout_eventgroup, parent, false);
+        View view = mInflater.inflate(R.layout.row_layout_announcement, parent, false);
         return new ViewHolder(view);
     }
 
+    // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        EventsDataModel events = mData.get(position);
-        holder.title.setText(events.getTitle());
-        holder.data = events;
+        AnnouncementsDataModel announ = mData.get(position);
+        holder.title.setText(announ.getTitle());
+        holder.des.setText(announ.getDescription());
     }
 
     // total number of rows
@@ -44,29 +48,34 @@ public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGro
         return mData.size();
     }
 
+
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
-        EventsDataModel data;
+        TextView des;
 
         ViewHolder(View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.rowlayout_eventGroup_title);
+            title = itemView.findViewById(R.id.rowlayout_announcement_announTitle);
+            des = itemView.findViewById(R.id.rowlayout_announcement_announDes);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            //passing data to eventGroup
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition(), data);
+            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (des.getVisibility()== View.GONE){
+                des.setVisibility(View.VISIBLE);
+            } else {
+                des.setVisibility(View.GONE);
+            }
         }
     }
 
-    public EventsDataModel getItem(int id) {
+    // convenience method for getting data at click position
+    public AnnouncementsDataModel getItem(int id) {
         return mData.get(id);
     }
-
-
 
     // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
@@ -75,6 +84,6 @@ public class EventGroupRecyclerViewAdapter extends RecyclerView.Adapter<EventGro
 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
-        void onItemClick(View view, int position, EventsDataModel data);
+        void onItemClick(View view, int position);
     }
 }

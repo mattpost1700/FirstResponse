@@ -22,7 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.first_responder_app.AnnouncementRecyclerViewAdapter;
+import com.example.first_responder_app.recyclerViews.AnnouncementRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.databinding.FragmentAnnouncementBinding;
 import com.example.first_responder_app.viewModels.AnnouncementViewModel;

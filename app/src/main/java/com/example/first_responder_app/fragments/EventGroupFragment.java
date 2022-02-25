@@ -21,15 +21,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.first_responder_app.EventGroupRecyclerViewAdapter;
-import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.recyclerViews.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.dataModels.EventsDataModel;
-import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventGroupBinding;
-import com.example.first_responder_app.interfaces.ActiveUser;
-import com.example.first_responder_app.viewModels.EventGroupViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
