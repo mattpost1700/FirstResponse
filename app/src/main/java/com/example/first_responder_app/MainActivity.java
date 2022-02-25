@@ -3,24 +3,18 @@ package com.example.first_responder_app;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -29,39 +23,26 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.databinding.FragmentHomeBinding;
-import com.example.first_responder_app.fragments.HomeFragmentDirections;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.internal.NavigationMenuView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.ActionCodeMultiFactorInfo;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.auth.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements DrawerLocker, ActiveUser {
     ActionBarDrawerToggle toggle;
@@ -121,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             View headerView = navView.getHeaderView(0);
             headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
                 if(activeUser != null) {
-                    navController.navigate(R.id.userFragment);
+                    navController.navigate(R.id.editUserFragment);
                     closeNavDrawer();
                 }else{
                     Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
@@ -129,10 +110,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             });
         }
 
-
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
-
     }
 
 
@@ -185,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 activeUser = snapshot.toObject(UsersDataModel.class);
 
 
-                if(activeUser != null && activeUser.isIs_responding()){
+                if(activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time())){
                     setActiveUserRespondingAddr();
                 }else{
                     stopETA();

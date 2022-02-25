@@ -39,14 +39,14 @@
             android:id="@+id/action_homeFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
         <action
-            android:id="@+id/action_homeFragment_to_editUserFragment"
-            app:destination="@id/editUserFragment" />
-        <action
             android:id="@+id/action_homeFragment_to_preferencesFragment"
             app:destination="@id/preferencesFragment" />
         <action
             android:id="@+id/action_homeFragment_to_userFragment"
             app:destination="@id/userFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_editUserFragment"
+            app:destination="@id/editUserFragment" />
     </fragment>
 
     <fragment
@@ -69,7 +69,11 @@
         android:id="@+id/respondingFragment"
         android:name="com.example.first_responder_app.fragments.RespondingFragment"
         android:label="responding_fragment"
-        tools:layout="@layout/fragment_responding" />
+        tools:layout="@layout/fragment_responding" >
+        <action
+            android:id="@+id/action_respondingFragment_to_userFragment"
+            app:destination="@id/userFragment" />
+    </fragment>
     <fragment
         android:id="@+id/announcementFragment"
         android:name="com.example.first_responder_app.fragments.AnnouncementFragment"
@@ -124,23 +128,22 @@
         android:label="chat_fragment"
         tools:layout="@layout/chat_fragment" />
     <fragment
-        android:id="@+id/userFragment"
-        android:name="com.example.first_responder_app.fragments.UserFragment"
-        android:label="user_fragment"
-        tools:layout="@layout/fragment_edit_user">
-        <action
-            android:id="@+id/action_userFragment_to_editUserFragment"
-            app:destination="@id/editUserFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/editUserFragment"
         android:name="com.example.first_responder_app.fragments.EditUserFragment"
         android:label="edit_user_fragment"
-        tools:layout="@layout/fragment_user">
+        tools:layout="@layout/fragment_edit_user">
+        <action
+            android:id="@+id/action_userFragment_to_editUserFragment"
+            app:destination="@id/userFragment" />
         <action
             android:id="@+id/action_editUserFragment_to_userFragment"
             app:destination="@id/userFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/userFragment"
+        android:name="com.example.first_responder_app.fragments.UserFragment"
+        android:label="user_fragment"
+        tools:layout="@layout/fragment_user"/>
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.example.first_responder_app.fragments.ReportFragment"

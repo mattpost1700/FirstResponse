@@ -19,6 +19,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentUserBinding;
@@ -26,45 +27,53 @@ import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
 public class UserFragment extends Fragment {
 
-    private UserViewModel mViewModel;
     private FirestoreDatabase firestoreDatabase;
     private FirebaseFirestore db;
     private ActiveUser activeUser;
     private UsersDataModel user;
+
+    private UserViewModel mViewModel;
 
     public static UserFragment newInstance() {
         return new UserFragment();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentUserBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_user, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
-        firestoreDatabase = new FirestoreDatabase();
-        db = firestoreDatabase.getDb();
+//        firestoreDatabase = new FirestoreDatabase();
+//        db = firestoreDatabase.getDb();
 
-        activeUser = (ActiveUser)getActivity();
-        if(activeUser != null){
-            user = activeUser.getActive();
+        boolean THIS_IS_CURRENT_USER = false;
+        if(THIS_IS_CURRENT_USER) {
+            binding.userSendMessageFab.setVisibility(View.GONE);
+        } else {
+            binding.userSendMessageFab.setOnClickListener(v -> {
+                Snackbar.make(getView(), "Send msg!", Snackbar.LENGTH_SHORT).show();
+                // TODO: Send message
+            });
         }
 
-        populateUser(binding.userName, binding.userPhone, binding.userAddress, binding.userRank);
+        getParentFragmentManager().setFragmentResultListener("requestKey", this, (requestKey, bundle) -> {
+            UsersDataModel user = (UsersDataModel) bundle.getSerializable("user");
 
-        binding.editButton.setOnClickListener(v -> {
-            NavDirections action = UserFragmentDirections.actionUserFragmentToEditUserFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+            // TODO: GetRank should be in AppUtil or Firestore db
+            binding.userFullNameTv.setText(user.getFull_name());
+            binding.userRankTv.setText(HomeFragment.getRank(user.getRank()) == null ? "Unable to get rank" : HomeFragment.getRank(user.getRank()).getRank_name());
+            binding.userPhoneNumberTv.setText("" + user.getPhone_number());
 
+            // TODO: Add db/storage query
         });
 
         return binding.getRoot();
@@ -76,31 +85,4 @@ public class UserFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         // TODO: Use the ViewModel
     }
-
-    public void populateUser(TextView userName, TextView phone, TextView address, TextView rank) {
-        if(activeUser != null && user != null){
-            db.collection("ranks").document(user.getRank())
-                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                rank.setText((String) document.get("rank_name"));
-                            } else {
-                                Log.d("DB", "No such document");
-                            }
-                        } else {
-                            Log.d("DB", "get failed with ", task.getException());
-                        }
-                    }
-                });
-            String name = user.getFirst_name().trim() + " " + user.getLast_name().trim();
-            userName.setText(name);
-            String phoneNum = Long.toString(user.getPhone_number());
-            phone.setText(phoneNum);
-            address.setText(user.getAddress());
-        }
-    }
-
 }

@@ -10,151 +10,84 @@
             type="com.example.first_responder_app.viewModels.UserViewModel" />
     </data>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ImageView
+            android:id="@+id/user_profile_picture_image_view"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
 
+            app:layout_constraintBottom_toTopOf="@+id/user_profile_info_box"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.478"
+            android:src="@android:drawable/ic_menu_help"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/user_profile_info_box"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
 
-            <HorizontalScrollView
-                android:id="@+id/horizontalScrollView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/imageView"
-                app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginStart="@dimen/margin_from_side"
+            android:layout_marginEnd="@dimen/margin_from_side"
+            android:layout_marginBottom="180dp"
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:orientation="horizontal">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-                    <Button
-                        android:id="@+id/editButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="15dp"
-                        android:text="Edit"
-                        android:textSize="11sp" />
-
-                    <Button
-                        android:id="@+id/button2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="15dp"
-                        android:text="Delete"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </HorizontalScrollView>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/constraintLayout"
-                android:layout_width="match_parent"
-                android:layout_height="400dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                tools:layout_editor_absoluteX="189dp">
-
-                <TextView
-                    android:id="@+id/userName"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    android:hint="Name"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/userRank"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    android:hint="Rank"
-                    android:textSize="20sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userName" />
-
-                <TextView
-                    android:id="@+id/userPhone"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:hint="Phone Number"
-                    android:textSize="20sp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userRank" />
-
-
-                <TextView
-                    android:id="@+id/userAddress"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:hint="Address"
-                    android:textSize="20sp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userPhone" />
-
-
-
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    app:layout_constraintBottom_toBottomOf="parent">
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/floatingActionButton4"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:layout_margin="@dimen/margin_from_side"
-                        android:src="@android:drawable/ic_menu_gallery"
-                        tools:layout_editor_absoluteX="59dp"
-                        tools:layout_editor_absoluteY="302dp" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/floatingActionButton5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:layout_margin="@dimen/margin_from_side"
-                        android:src="@android:drawable/ic_menu_camera"
-                        tools:layout_editor_absoluteX="177dp"
-                        tools:layout_editor_absoluteY="302dp" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/floatingActionButton3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:layout_margin="@dimen/margin_from_side"
-                        android:src="@drawable/ic_send_black_24dp"
-                        tools:layout_editor_absoluteX="300dp"
-                        tools:layout_editor_absoluteY="302dp" />
-
-                </LinearLayout>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <ImageView
-                android:id="@+id/imageView"
+            <TextView
+                android:id="@+id/user_full_name_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:text=""
+
+                android:textSize="25sp"
+
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_margin="@dimen/margin_from_side"
-                tools:src="@tools:sample/avatars" />
+                app:layout_constraintTop_toTopOf="@id/user_profile_info_box" />
+
+            <TextView
+                android:id="@+id/user_rank_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+
+                android:textSize="25sp"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/user_full_name_tv" />
+
+            <TextView
+                android:id="@+id/user_phone_number_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+
+                android:textSize="25sp"
+
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/user_rank_tv" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/user_send_message_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="36dp"
+            android:layout_marginTop="27dp"
+            android:clickable="true"
+
+            android:src="@drawable/ic_send_black_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_info_box" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </layout>

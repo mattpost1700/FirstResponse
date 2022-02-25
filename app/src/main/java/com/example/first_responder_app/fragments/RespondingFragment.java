@@ -62,18 +62,12 @@ public class RespondingFragment extends Fragment {
 
         // onclick
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
-            UsersDataModel user = listOfRespondingDataModel.get(position);
+            Bundle result = new Bundle();
+            result.putSerializable("user", listOfRespondingDataModel.get(position));
+            getParentFragmentManager().setFragmentResult("requestKey", result);
 
-//
-//            Bundle result = new Bundle();
-//
-//            result.putParcelable("user", (Parcelable) user);
-//            getParentFragmentManager().setFragmentResult("requestKey", result);
-//
-//            NavDirections action = HomeFragmentDirections.actionHomeFragmentToUserFragment();
-//            Navigation.findNavController(binding.getRoot()).navigate(action);
-
-            // TODO: Go to user profile. Need to set up nav graph
+            NavDirections action = RespondingFragmentDirections.actionRespondingFragmentToUserFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
         };
 
         // Recycler view

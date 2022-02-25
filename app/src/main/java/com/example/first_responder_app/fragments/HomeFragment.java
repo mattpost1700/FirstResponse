@@ -3,6 +3,7 @@ package com.example.first_responder_app.fragments;
 import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,7 +84,7 @@ public class HomeFragment extends Fragment {
 
         //automatically subscribes everyone who logs in to get notifications for these topics
         FirebaseMessaging.getInstance().subscribeToTopic("events")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                .addOnCompleteListener(new OnCompleteListener<>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                     }
@@ -106,16 +107,16 @@ public class HomeFragment extends Fragment {
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
-            Log.d(TAG, "clicked (from responder listener)!");
-            Toast.makeText(getActivity(), "Responder \"" + respondersList.get(position).getFirst_name() + "\" was clicked!", Toast.LENGTH_SHORT).show();
-            // TODO: Do something when clicking on the responder
+            Bundle result = new Bundle();
+            result.putSerializable("user", respondersList.get(position));
+            getParentFragmentManager().setFragmentResult("requestKey", result);
 
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToUserFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
             Log.d(TAG, "clicked (from incident listener)!");
-            //Toast.makeText(getActivity(), "Incident \"" + listOfIncidentDataModel.get(position).getLocation() + "\" was clicked!", Toast.LENGTH_SHORT).show();
-            // TODO: Do something when clicking on the event
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
@@ -155,12 +156,6 @@ public class HomeFragment extends Fragment {
         // Start event listeners (live data)
         addIncidentEventListener();
         addResponderEventListener();
-
-
-
-
-
-
 
         return bindingView;
     }

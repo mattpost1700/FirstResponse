@@ -5,6 +5,9 @@ import com.google.firebase.Timestamp;
 import java.util.Date;
 
 public class AppUtil {
+    public static final int RESPONDING_TIME_MAX = 30;
+
+    public static boolean timeIsWithin(Timestamp timestamp) { return timeIsWithin(timestamp, RESPONDING_TIME_MAX); }
 
     public static boolean timeIsWithin(Timestamp timestamp, int numberOfMinutes) {
         int numOfSeconds = numberOfMinutes * 60;
