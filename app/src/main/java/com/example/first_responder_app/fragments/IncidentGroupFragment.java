@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -23,24 +22,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.first_responder_app.dataModels.IncidentDataModel;
-import com.example.first_responder_app.databinding.FragmentHomeBinding;
+import com.example.first_responder_app.databinding.FragmentIncidentGroupBinding;
 import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.IncidentGroupViewModel;
 import com.example.first_responder_app.R;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.zip.Inflater;
 
 public class IncidentGroupFragment extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<IncidentDataModel> listOfIncidentDataModel;
-    IncidentRecyclerViewAdapter incidentRecyclerViewAdapter;
+    IncidentRecyclerViewAdapter incidentGroupRecyclerViewAdapter;
 
     private IncidentGroupViewModel mViewModel;
 
@@ -50,14 +46,11 @@ public class IncidentGroupFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
-        View bindingView = binding.getRoot();
-
-        View thisView = inflater.inflate(R.layout.fragment_incident_group, container, false);
+        FragmentIncidentGroupBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_incident_group, container, false);
 
         listOfIncidentDataModel = new ArrayList<>();
 
-        final SwipeRefreshLayout pullToRefresh = thisView.findViewById(R.id.incidentGroupSwipeRefreshLayout);
+        final SwipeRefreshLayout pullToRefresh = binding.incidentGroupSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
             refreshData();
             pullToRefresh.setRefreshing(false);
@@ -81,21 +74,24 @@ public class IncidentGroupFragment extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         };
 
-        listOfIncidentDataModel.add(new IncidentDataModel());
+        //listOfIncidentDataModel.add(new IncidentDataModel());
 
-        RecyclerView incidentRecyclerView = binding.incidentsRecyclerView;
-        incidentRecyclerView.setLayoutManager(new LinearLayoutManager(thisView.getContext()));
-        incidentRecyclerViewAdapter = new IncidentRecyclerViewAdapter(thisView.getContext(), listOfIncidentDataModel);
-        incidentRecyclerViewAdapter.setIncidentClickListener(incidentClickListener);
-        incidentRecyclerView.setAdapter(incidentRecyclerViewAdapter);
+        // Recycler view
+        RecyclerView incidentRecyclerView = binding.incidentsGroupRecyclerView;
+        incidentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        incidentGroupRecyclerViewAdapter = new IncidentRecyclerViewAdapter(getContext(), listOfIncidentDataModel);
+        incidentGroupRecyclerViewAdapter.setIncidentClickListener(incidentClickListener);
+        incidentRecyclerView.setAdapter(incidentGroupRecyclerViewAdapter);
 
         addIncidentEventListener();
 
-        return inflater.inflate(R.layout.fragment_incident_group, container, false);
+        return binding.getRoot(); // inflater.inflate(R.layout.fragment_incident_group, container, false);
     }
 
 
-
+    /**
+     * Adds an event listener for incidents
+     */
     private void addIncidentEventListener() {
         db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             if(error != null) {
@@ -110,7 +106,7 @@ public class IncidentGroupFragment extends Fragment {
 
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
-                incidentRecyclerViewAdapter.notifyDataSetChanged();
+                incidentGroupRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -126,7 +122,7 @@ public class IncidentGroupFragment extends Fragment {
 
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
-                incidentRecyclerViewAdapter.notifyDataSetChanged();
+                incidentGroupRecyclerViewAdapter.notifyDataSetChanged();
             } else {
                 Log.w(TAG, "onCreateView: get failed in HomeFragment with", incidentTask.getException());
             }
