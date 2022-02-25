@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
@@ -119,8 +120,10 @@ public class FirestoreDatabase {
 
                 if(value.isEmpty()){
                     db.collection("users").document(user_id).update("is_responding", false);
+                    db.collection("users").document(user_id).update("responding_time", null);
                 }else{
                     db.collection("users").document(user_id).update("is_responding", true);
+                    db.collection("users").document(user_id).update("responding_time", Timestamp.now());
                 }
 
             }
