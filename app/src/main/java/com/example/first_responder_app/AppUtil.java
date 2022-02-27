@@ -11,7 +11,8 @@ public class AppUtil {
 
     public static boolean timeIsWithin(Timestamp timestamp, int numberOfMinutes) {
         int numOfSeconds = numberOfMinutes * 60;
-        int now = Timestamp.now().toDate().getSeconds();
+        long now = Timestamp.now().getSeconds();
+
         return timestamp.getSeconds() > (now - numOfSeconds);
     }
 }
