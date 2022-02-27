@@ -1,12 +1,9 @@
 package com.example.first_responder_app.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,21 +11,15 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.first_responder_app.FirestoreDatabase;
-import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentUserBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.UserViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
@@ -70,7 +61,7 @@ public class UserFragment extends Fragment {
 
             // TODO: GetRank should be in AppUtil or Firestore db
             binding.userFullNameTv.setText(user.getFull_name());
-            binding.userRankTv.setText(HomeFragment.getRank(user.getRank()) == null ? "Unable to get rank" : HomeFragment.getRank(user.getRank()).getRank_name());
+            binding.userRankTv.setText(HomeFragment.getRank(user.getRankId()) == null ? "Unable to get rank" : HomeFragment.getRank(user.getRankId()).getRank_name());
             binding.userPhoneNumberTv.setText("" + user.getPhone_number());
 
             // TODO: Add db/storage query

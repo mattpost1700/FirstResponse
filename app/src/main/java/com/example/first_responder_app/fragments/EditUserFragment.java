@@ -36,7 +36,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class EditUserFragment extends Fragment {
@@ -147,7 +146,7 @@ public class EditUserFragment extends Fragment {
                             String initialRankName = null;
                             String initialRankId = null;
                             if (user != null) {
-                                initialRankId = user.getRank();
+                                initialRankId = user.getRankId();
                             }
 
                             for (QueryDocumentSnapshot document : task.getResult()) {

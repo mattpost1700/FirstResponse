@@ -39,7 +39,7 @@ public class RespondersRecyclerViewAdapter extends RecyclerView.Adapter<Responde
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         UsersDataModel responder = responderList.get(position);
         holder.responderNameTextView.setText(responder.getFirst_name() + " " + responder.getLast_name());
-        holder.responderRankTextView.setText(responder.getRank());
+        holder.responderRankTextView.setText(responder.getRankId());
         holder.responderEtaTextView.setText("Temp ETA" + " Mins");
     }
 

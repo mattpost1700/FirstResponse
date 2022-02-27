@@ -15,19 +15,19 @@ public class UsersDataModel implements Serializable {
     private String last_name;
     private String password;
     private Long phone_number;
-    private String rank;
+    private String rankId;
     private String username;
     private Timestamp responding_time;
     private String remote_path_to_profile_picture;
 
 
-    public UsersDataModel(String address, String first_name, String last_name, String password, Long phone_number, String rank, String username, Timestamp responding_time, String remote_path_to_profile_picture) {
+    public UsersDataModel(String address, String first_name, String last_name, String password, Long phone_number, String rankId, String username, Timestamp responding_time, String remote_path_to_profile_picture) {
         this.address = address;
         this.first_name = first_name;
         this.last_name = last_name;
         this.password = password;
         this.phone_number = phone_number;
-        this.rank = rank;
+        this.rankId = rankId;
         this.username = username;
         this.responding_time = responding_time;
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
@@ -49,7 +49,7 @@ public class UsersDataModel implements Serializable {
 
     public void setDocumentId(String documentId) { this.documentId = documentId; }
 
-    public void setRank(String rank) { this.rank = rank; }
+    public void setRankId(String rankId) { this.rankId = rankId; }
 
     public String getDocumentId() { return documentId; }
 
@@ -69,7 +69,7 @@ public class UsersDataModel implements Serializable {
 
     public void setPhone_number(Long phone_number) { this.phone_number = phone_number; }
 
-    public String getRank() { return rank; }
+    public String getRankId() { return rankId; }
 
     public String getUsername() { return username; }
 

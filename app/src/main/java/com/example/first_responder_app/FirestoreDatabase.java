@@ -4,30 +4,18 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.dataModels.EventsDataModel;
-import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.dataModels.IncidentDataModel;
-import com.example.first_responder_app.dataModels.IncidentTypesDataModel;
-import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -239,7 +227,7 @@ public class FirestoreDatabase {
                         if (activeUser != null) {
                             UsersDataModel user = activeUser.getActive();
                             if (user != null && (user.getDocumentId().equals(id))) {
-                                user.setRank(rank);
+                                user.setRankId(rank);
                                 user.setFirst_name(firstName);
                                 user.setLast_name(lastName);
                                 user.setPhone_number(phoneNum);
