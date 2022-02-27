@@ -74,6 +74,4 @@ public class UsersDataModel implements Serializable {
     public String getUsername() { return username; }
 
     public String getFull_name(){ return getFirst_name() + " " + getLast_name();}
-
-    public String getPw() { return password; }
 }

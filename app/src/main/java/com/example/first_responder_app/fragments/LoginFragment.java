@@ -152,7 +152,7 @@ public class LoginFragment extends Fragment {
     private boolean checkPwMatch(String username, String pw){
         for (int i = 0; i < listOfUser.size(); i++){
             if (listOfUser.get(i).getUsername().equals(username)){
-                if (listOfUser.get(i).getPw().equals(pw)){
+                if (listOfUser.get(i).getPassword().equals(pw)){
                     ActiveUser activeUser = ((ActiveUser)getActivity());
                     if(activeUser != null){
                         activeUser.setActive(listOfUser.get(i));
