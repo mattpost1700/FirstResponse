@@ -10,6 +10,7 @@ public class AppUtil {
     public static boolean timeIsWithin(Timestamp timestamp) { return timeIsWithin(timestamp, RESPONDING_TIME_MAX); }
 
     public static boolean timeIsWithin(Timestamp timestamp, int numberOfMinutes) {
+        if(timestamp == null) return false;
         int numOfSeconds = numberOfMinutes * 60;
         long now = Timestamp.now().getSeconds();
 
