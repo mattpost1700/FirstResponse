@@ -76,14 +76,14 @@
             android:id="@+id/new_announ_log"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:layout_marginBottom="8dp"
-            android:text="@string/new_announ_log_msg"
+            android:layout_marginBottom="4dp"
+            android:text="@string/invalid_entry"
             android:textColor="#FF0000"
             android:textSize="20sp"
             android:visibility="invisible"
             app:layout_constraintBottom_toTopOf="@+id/announcement_create_confirm"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.768"
+            app:layout_constraintHorizontal_bias="0.947"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
