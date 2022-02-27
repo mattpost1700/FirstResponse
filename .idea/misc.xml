@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/announcement_row_layout.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/chat_fragment.xml" value="0.17831813576494426" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_announcement.xml" value="0.3619791666666667" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_announcement_new.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_edit_user.xml" value="0.36666666666666664" />
@@ -15,8 +16,13 @@
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_incident_group.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_login.xml" value="0.18854166666666666" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_responding.xml" value="0.21195652173913043" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_user.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/incident_row_layout.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/my_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/nav_header.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/notification.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/preferences_fragment.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/report_fragment.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/responder_row_layout.xml" value="0.19166666666666668" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/row_layout_announcement.xml" value="0.1890625" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/row_layout_event.xml" value="0.36666666666666664" />

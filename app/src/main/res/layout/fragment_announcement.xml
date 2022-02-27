@@ -40,14 +40,13 @@
 
         <Button
             android:id="@+id/new_announcement_button"
-            android:layout_width="91dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="84dp"
             android:text="Create"
             app:layout_constraintBottom_toBottomOf="@+id/home_announcement"
             app:layout_constraintStart_toEndOf="@+id/home_announcement"
-            app:layout_constraintTop_toTopOf="@+id/home_announcement"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toTopOf="@+id/home_announcement" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
