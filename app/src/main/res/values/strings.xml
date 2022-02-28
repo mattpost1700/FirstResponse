@@ -46,8 +46,8 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="confirm">Confirm</string>
     <string name="invalid_entry">Invalid Entry</string>
+    <string name="create">Create</string>
 
     <!-- Strings related to login -->
 </resources>
