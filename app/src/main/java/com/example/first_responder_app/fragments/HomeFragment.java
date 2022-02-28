@@ -267,6 +267,7 @@ public class HomeFragment extends Fragment {
      * @return The rank data model or null is it was not found
      */
     public static RanksDataModel getRank(String documentId) {
+        if(documentId == null) return null;
         for(RanksDataModel rankDM : listOfRanks) {
             if(documentId.equals(rankDM.getDocumentId())) {
                 return rankDM;

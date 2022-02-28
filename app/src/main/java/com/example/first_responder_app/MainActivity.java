@@ -49,6 +49,7 @@ import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.IOException;
@@ -67,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     List<Address> incidentAddr;
     List<IncidentDataModel> respIncident;
     NavController navController;
+    ListenerRegistration incidentListener;
+    ListenerRegistration userListener;
 
     final int ACCESS_LOCATION_FRAGMENT = 101;
     final int ACCESS_LOCATION_MAIN = 102;
@@ -194,15 +197,14 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         TextView username = header.findViewById(R.id.nav_username);
         username.setText(user.getUsername());
 
-
+        if(userListener != null){ userListener.remove(); }
         //Ensure that the active user data is updated if database is updated
         DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("users").document(user.getDocumentId());
-        docRef.addSnapshotListener((snapshot, e) -> {
+        userListener = docRef.addSnapshotListener((snapshot, e) -> {
             if (e != null) {
                 System.err.println("Listen failed: " + e);
                 return;
             }
-
             if (snapshot != null && snapshot.exists()) {
                 activeUser = snapshot.toObject(UsersDataModel.class);
 
@@ -233,7 +235,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
 
     public void setActiveUserRespondingAddr(){
-        FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        if(incidentListener != null){ incidentListener.remove(); }
+        incidentListener = FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore incident collection");
             }
@@ -252,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     String addr = temp.get(i).getLocation();
                     incidentAddr.add(addrToCoords(addr));
                 }
+                Log.d(TAG, "setActiveUserRespondingAddr: " + respIncident.size());
 
                 updateETA();
 
@@ -404,8 +408,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
             }
         };
-
-
 
 }
 
