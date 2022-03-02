@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
@@ -42,6 +43,7 @@ import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -80,6 +82,17 @@ public class HomeFragment extends Fragment {
         NavController navController = navHostFragment.getNavController();
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
+
+        //Setup click listeners for the view all incidents and view all responders buttons
+        binding.viewAllIncidents.setOnClickListener(view -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentGroupFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
+        binding.viewAllResponders.setOnClickListener(view -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToRespondingFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
 
         final SwipeRefreshLayout pullToRefresh = bindingView.findViewById(R.id.homeSwipeRefreshLayout);
         pullToRefresh.setOnRefreshListener(() -> {
@@ -125,7 +138,7 @@ public class HomeFragment extends Fragment {
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
-            Log.d(TAG, "clicked (from incident listener)!");
+            Log.d(TAG, "onCreateView: clicked (from incident listener)!");
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
@@ -146,7 +159,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView respondersRecyclerView = bindingView.findViewById(R.id.responders_recycler_view);
         respondersRecyclerView.setLayoutManager(new LinearLayoutManager(bindingView.getContext()));
-        respondersRecyclerViewAdapter = new RespondersRecyclerViewAdapter(bindingView.getContext(), respondersList);
+        respondersRecyclerViewAdapter = new RespondersRecyclerViewAdapter(bindingView.getContext(), respondersList, listOfIncidentDataModel);
         respondersRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondersRecyclerView.setAdapter(respondersRecyclerViewAdapter);
 
@@ -185,6 +198,7 @@ public class HomeFragment extends Fragment {
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
                 incidentRecyclerViewAdapter.notifyDataSetChanged();
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
     }
@@ -193,14 +207,16 @@ public class HomeFragment extends Fragment {
      * Adds an event listener for responders. Live updates the responders section
      */
     private void addResponderEventListener() {
-        db.collection("users").whereEqualTo("is_responding", true).addSnapshotListener((value, error) -> {
+        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore users collection");
             }
             else {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : value) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
+                    UsersDataModel user = userDoc.toObject(UsersDataModel.class);
+                    if(user.getResponses() != null && user.getResponses().size() > 0)
+                        temp.add(user);
                 }
 
                 respondersList.clear();
@@ -232,17 +248,18 @@ public class HomeFragment extends Fragment {
     }
 
     public void populateResponders() {
-        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
-            if(userTask.isSuccessful()) {
-                ArrayList<UsersDataModel> temp = new ArrayList<>();
-                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
-                }
 
-                // TODO: Should refresh
-                Log.d("TAG", "populateResponders: ");
-            }
-        });
+//        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
+//            if(userTask.isSuccessful()) {
+//                ArrayList<UsersDataModel> temp = new ArrayList<>();
+//                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
+//                    temp.add(userDoc.toObject(UsersDataModel.class));
+//                }
+//
+//                // TODO: Should refresh
+//                Log.d("TAG", "populateResponders: ");
+//            }
+//        });
     }
 
     /**

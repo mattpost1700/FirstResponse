@@ -16,4 +16,14 @@ public class AppUtil {
 
         return timestamp.getSeconds() > (now - numOfSeconds);
     }
+
+    public static Timestamp earliestTime(){
+        long now = Timestamp.now().getSeconds();
+        int numOfSeconds = RESPONDING_TIME_MAX * 60;
+
+        long diff = now - numOfSeconds;
+        Date date = new Date(diff * 1000);
+
+        return new Timestamp(date);
+    }
 }

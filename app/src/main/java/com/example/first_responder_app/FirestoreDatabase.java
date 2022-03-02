@@ -74,48 +74,28 @@ public class FirestoreDatabase {
      * Update the database to show the active user is responding
      *
      * @param user_id The id of the user that is responding
-     * @param incident_id The id of the incident that the user is responding to
+     * @param incident The incident that the user is responding to
      * @param status The response that the user gave
      * @param available Whether the user is available or not
      */
-    public void responding(String user_id, String incident_id, String status, boolean available){
-        db.collection("incident").document(incident_id).get().addOnCompleteListener((typeTask) -> {
-            if (typeTask.isSuccessful()) {
-                IncidentDataModel incidentDataModel = typeTask.getResult().toObject(IncidentDataModel.class);
+    public void responding(String user_id, IncidentDataModel incident, String status, boolean available, List<String> responding){
+        Log.d(TAG, "responding: ");
 
-                //Update status map
-                Map<String, String> statusList = incidentDataModel.getStatus();
+        //Update status map
+        Map<String, String> statusList = incident.getStatus();
+        String incident_id = incident.getDocumentId();
 
-                if (statusList == null) {
-                    statusList = new HashMap<>();
-                }
+        if (statusList == null) {
+            statusList = new HashMap<>();
+        }
 
-                if(statusList.get(user_id) != null && statusList.get(user_id).equals(status)){
-                    removeStatus(incident_id, statusList, incidentDataModel.getEta(),incidentDataModel.getResponding(), user_id, available);
-                }else {
-                    updateStatus(incident_id, statusList, incidentDataModel.getEta(), user_id, status, incidentDataModel.getResponding(), available);
-                }
-            } else {
-                Log.d(TAG, "Error getting documents: ", typeTask.getException());
-            }
-        });
+        if(statusList.get(user_id) != null && statusList.get(user_id).equals(status)){
+            removeStatus(incident_id, statusList, incident.getEta(),incident.getResponding(), user_id, available, responding);
+        }else {
+            updateStatus(incident_id, statusList, incident.getEta(), user_id, status, incident.getResponding(), available, responding);
+        }
 
-        db.collection("incident").whereArrayContains("responding", user_id).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
-            if(error != null) {
-                Log.w(TAG, "Listening failed for firestore incident collection");
-            }
-            else {
-
-                if(value.isEmpty()){
-                    db.collection("users").document(user_id).update("is_responding", false);
-                    db.collection("users").document(user_id).update("responding_time", null);
-                }else{
-                    db.collection("users").document(user_id).update("is_responding", true);
-                    db.collection("users").document(user_id).update("responding_time", Timestamp.now());
-                }
-
-            }
-        });
+        db.collection("users").document(user_id).update("responding_time", Timestamp.now());
     }
     /**
      * Update the status of a user
@@ -127,7 +107,7 @@ public class FirestoreDatabase {
      * @param responding The list of responding users
      * @param available If the user is available
      */
-    private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available){
+    private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available, List<String> responses){
 
         //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
         boolean previouslyResponding = statusList.containsKey(user_id) && !statusList.get(user_id).toString().equals("Unavailable");
@@ -147,9 +127,18 @@ public class FirestoreDatabase {
             if (!responding.contains(user_id)) {
                 responding.add(user_id);
             }
+
+            if(responses == null) responses = new ArrayList<>();
+            responses.remove(incident_id);
+            responses.add(incident_id);
+            db.collection("users").document(user_id).update("responses", responses);
         } else {
             responding.remove(user_id);
             eta.remove(user_id);
+
+            if(responses == null) responses = new ArrayList<>();
+            responses.remove(incident_id);
+            db.collection("users").document(user_id).update("responses", responses);
         }
 
 
@@ -169,7 +158,7 @@ public class FirestoreDatabase {
      * @param user_id The id of the user
      * @param available If the user is available
      */
-    private void removeStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, List<String> responding, String user_id, boolean available){
+    private void removeStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, List<String> responding, String user_id, boolean available, List<String> responses){
         responding.remove(user_id);
         statusList.remove(user_id);
         eta.remove(user_id);
@@ -180,6 +169,9 @@ public class FirestoreDatabase {
         updates.put("eta", eta);
         db.collection("incident").document(incident_id).update(updates);
 
+        if(responses == null) responses = new ArrayList<>();
+        responses.remove(incident_id);
+        db.collection("users").document(user_id).update("responses", responses);
     }
 
     /**

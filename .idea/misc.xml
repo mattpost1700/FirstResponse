@@ -31,14 +31,18 @@
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1435" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/circle.xml" value="0.1435" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/ic_send_black_24dp.xml" value="0.1435" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/incident_row_background.xml" value="0.1415" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/incident_view_all_button.xml" value="0.1335" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/my_message.xml" value="0.1435" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/responder_row_background.xml" value="0.155" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/responder_view_all_button.xml" value="0.1335" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/their_message.xml" value="0.1435" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/user_account.xml" value="0.1515" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/user_icon_background.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/activity_main.xml" value="0.12092391304347826" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/chat_fragment.xml" value="0.14130434782608695" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/edit_user_fragment.xml" value="0.14130434782608695" />
-        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/fragment_announcement.xml" value="0.1" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/fragment_announcement.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/fragment_announcement_new.xml" value="0.14447463768115942" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/fragment_event.xml" value="0.14447463768115942" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/fragment_event_group.xml" value="0.14447463768115942" />
@@ -50,9 +54,11 @@
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/fragment_responding.xml" value="0.1634963768115942" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/incident_fragment.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/incident_list_item.xml" value="0.40502793296089384" />
-        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/incident_row_layout.xml" value="0.4466666666666667" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/incident_row_layout.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/nav_header.xml" value="0.3333333333333333" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/responder_row_layout.xml" value="0.15729166666666666" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/layout/row_layout_announcement.xml" value="0.13125" />
+        <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/menu/appbar_menu.xml" value="0.1796875" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/menu/nav_drawer_menu.xml" value="0.1796875" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_icon.xml" value="0.1" />

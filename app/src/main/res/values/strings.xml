@@ -48,6 +48,8 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="invalid_entry">Invalid Entry</string>
     <string name="create">Create</string>
+    <string name="user_account">User Account</string>
+    <string name="view_all">View All</string>
 
     <!-- Strings related to login -->
 </resources>

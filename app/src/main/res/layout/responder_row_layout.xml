@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:paddingVertical="10dp">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/responder_card_view"
@@ -14,7 +14,8 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="15dp"
+            android:paddingVertical="15dp"
+            android:paddingHorizontal="20dp"
             android:background="@drawable/responder_row_background">
 
             <TextView
@@ -22,7 +23,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
-
+                android:layout_marginStart="5dp"
+                android:textColor="?attr/colorOnSecondary"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
@@ -30,7 +32,9 @@
                 android:id="@+id/responders_rank_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="10sp"
+                android:textColor="?attr/colorOnSecondary"
+                android:layout_marginStart="5dp"
+                android:textSize="11sp"
 
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/responders_name_text_view"/>
@@ -42,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:textSize="15sp"
-                android:textColor="#ff0000"
+                android:textColor="?attr/colorOnSecondary"
 
 
                 app:layout_constraintEnd_toEndOf="parent"

@@ -40,6 +40,7 @@ public class RespondingFragment extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<UsersDataModel> listOfRespondingDataModel;
+    List<IncidentDataModel> listOfIncidentDataModel;
     RespondersRecyclerViewAdapter respondingRecyclerViewAdapter;
 
     private RespondingViewModel mViewModel;
@@ -53,6 +54,7 @@ public class RespondingFragment extends Fragment {
         FragmentRespondingBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_responding, container, false);
 
         listOfRespondingDataModel = new ArrayList<>();
+        listOfIncidentDataModel = new ArrayList<>();
 
         final SwipeRefreshLayout pullToRefresh = binding.respondingSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
@@ -73,11 +75,12 @@ public class RespondingFragment extends Fragment {
         // Recycler view
         RecyclerView respondingRecyclerView = binding.respondingRecyclerView;
         respondingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        respondingRecyclerViewAdapter = new RespondersRecyclerViewAdapter(getContext(), listOfRespondingDataModel);
+        respondingRecyclerViewAdapter = new RespondersRecyclerViewAdapter(getContext(), listOfRespondingDataModel, listOfIncidentDataModel);
         respondingRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondingRecyclerView.setAdapter(respondingRecyclerViewAdapter);
 
         addResponderEventListener();
+        addIncidentEventListener();
 
         return binding.getRoot();
     }
@@ -95,6 +98,24 @@ public class RespondingFragment extends Fragment {
 
                 listOfRespondingDataModel.clear();
                 listOfRespondingDataModel.addAll(temp);
+                respondingRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void addIncidentEventListener(){
+        db.collection("users").whereEqualTo("is_responding", true).addSnapshotListener((value, error) -> {
+            if(error != null) {
+                Log.w(TAG, "Listening failed for firestore users collection");
+            }
+            else {
+                ArrayList<IncidentDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot incidentDoc : value) {
+                    temp.add(incidentDoc.toObject(IncidentDataModel.class));
+                }
+
+                listOfIncidentDataModel.clear();
+                listOfIncidentDataModel.addAll(temp);
                 respondingRecyclerViewAdapter.notifyDataSetChanged();
             }
         });

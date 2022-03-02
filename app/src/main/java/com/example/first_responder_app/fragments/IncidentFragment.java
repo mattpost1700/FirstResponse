@@ -56,6 +56,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.color.MaterialColors;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
 
 
 import java.io.IOException;
@@ -82,6 +83,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     ETA eta;
     String id;
     IncidentDataModel incident;
+    ListenerRegistration listenerRegistration;
 
     private IncidentViewModel mViewModel;
     private View bindingView;
@@ -176,36 +178,37 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         setupLocationListener();
 
+        if(listenerRegistration == null) {
+            //Ensure that the incident data is updated if database is updated
+            docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
+            listenerRegistration = docRef.addSnapshotListener((snapshot, e) -> {
+                if (e != null) {
+                    System.err.println("Listen failed: " + e);
+                    return;
+                }
 
-        //Ensure that the incident data is updated if database is updated
-        docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
-        docRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                System.err.println("Listen failed: " + e);
-                return;
-            }
+                if (snapshot != null && snapshot.exists()) {
+                    incidentDataModel = snapshot.toObject(IncidentDataModel.class);
 
-            if (snapshot != null && snapshot.exists()) {
-                incidentDataModel = snapshot.toObject(IncidentDataModel.class);
-
-                    if (incidentDataModel != null){
+                    if (incidentDataModel != null) {
                         setTextViews(incidentDataModel);
 
 
-                    Map<String, String> statuses = incidentDataModel.getStatus();
-                    if (statuses != null) {
-                        String status1 = statuses.get(active_id);
-                        setActiveButton(status1);
+                        Map<String, String> statuses = incidentDataModel.getStatus();
+                        if (statuses != null) {
+                            String status1 = statuses.get(active_id);
+                            setActiveButton(status1);
+                        }
+
+                        //Get the Address object of the incident
+                        incidentAddress = addrToCoords(incidentDataModel.getLocation());
                     }
 
-                    //Get the Address object of the incident
-                    incidentAddress = addrToCoords(incidentDataModel.getLocation());
-                    }
-
-            } else {
-                System.out.print("Current data: null");
-            }
-        });
+                } else {
+                    System.out.print("Current data: null");
+                }
+            });
+        }
     }
 
 
@@ -243,9 +246,9 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             for (int i = 0; i < count; i++) {
                 Button b = (Button) linearLayout.getChildAt(i);
                 if (s != null && s.equals((String)b.getText()) && context != null) {
-                    b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorSecondary, context.getResources().getColor(R.color.teal_700)));
+                    b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorSecondaryVariant, context.getResources().getColor(R.color.colorSecondary)));
                 }else if(context != null){
-                    b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorPrimary, context.getResources().getColor(R.color.purple_200)));
+                    b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorPrimary, context.getResources().getColor(R.color.colorPrimary)));
                 }
             }
         }
@@ -366,13 +369,14 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         }else if(activeUser != null){
 
 
+
             //TODO: remove hardcoded string
             if (text.equals("Unavailable")) {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, activeUser.getResponses());
                 setActiveButton(text);
 
             }else {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, activeUser.getResponses());
                 setActiveButton(text);
             }
         }

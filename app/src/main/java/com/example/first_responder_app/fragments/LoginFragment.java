@@ -15,8 +15,10 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
@@ -77,6 +79,7 @@ public class LoginFragment extends Fragment {
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
         binding.loginSubmit.setOnClickListener(v -> {
+
             if (listOfUser.size() == 0) {
                 binding.loginLog.setText(R.string.emtpyDbMsg);
                 binding.loginLog.setVisibility(View.VISIBLE);
@@ -125,6 +128,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void populateUserList() {
+
         db.collection("users").get().addOnCompleteListener(usersTask -> {
             if (usersTask.isSuccessful()) {
                 for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {

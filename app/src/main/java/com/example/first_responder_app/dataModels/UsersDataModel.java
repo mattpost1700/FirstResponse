@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UsersDataModel implements Serializable {
 
@@ -19,9 +20,10 @@ public class UsersDataModel implements Serializable {
     private String username;
     private Timestamp responding_time;
     private String remote_path_to_profile_picture;
+    private List<String> responses;
 
 
-    public UsersDataModel(String address, String first_name, String last_name, String password, Long phone_number, String rankId, String username, Timestamp responding_time, String remote_path_to_profile_picture) {
+    public UsersDataModel(String address, String first_name, String last_name, String password, Long phone_number, String rankId, String username, Timestamp responding_time, String remote_path_to_profile_picture, List<String> responses) {
         this.address = address;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -31,6 +33,7 @@ public class UsersDataModel implements Serializable {
         this.username = username;
         this.responding_time = responding_time;
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
+        this.responses = responses;
     }
 
     public UsersDataModel() { }
@@ -47,9 +50,14 @@ public class UsersDataModel implements Serializable {
         return remote_path_to_profile_picture;
     }
 
+
     public void setDocumentId(String documentId) { this.documentId = documentId; }
 
     public void setRankId(String rankId) { this.rankId = rankId; }
+
+    public void setResponses(List<String> responses) { this.responses = responses; }
+
+    public List<String> getResponses() { return responses; }
 
     public String getDocumentId() { return documentId; }
 
