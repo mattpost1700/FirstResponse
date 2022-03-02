@@ -70,6 +70,8 @@ public class AnnouncementFragment extends Fragment {
 
     private void populateAnnounList(){
         db.collection("announcements").get().addOnCompleteListener(announTask -> {
+            Log.d(TAG, "READ DATABASE - ANNOUNCEMENT FRAGMENT");
+
             if (announTask.isSuccessful()) {
                 ArrayList<AnnouncementsDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot announcementDoc : announTask.getResult()){

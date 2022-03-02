@@ -60,6 +60,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -162,6 +163,8 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         //Find the type of the incident
         FirestoreDatabase.getInstance().getDb().collection("incident_types").document(incident.getIncident_type()).get().addOnCompleteListener(typeTask -> {
+            Log.d(TAG, "READ DATABASE - INCIDENT FRAGMENT");
+
             if (typeTask.isSuccessful()) {
                 String t = (String)typeTask.getResult().get("type_name");
                 ((TextView)bindingView.findViewById(R.id.incident_type2)).setText(t);
@@ -182,6 +185,8 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             //Ensure that the incident data is updated if database is updated
             docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
             listenerRegistration = docRef.addSnapshotListener((snapshot, e) -> {
+                Log.d(TAG, "READ DATABASE - INCIDENT FRAGMENT");
+
                 if (e != null) {
                     System.err.println("Listen failed: " + e);
                     return;
@@ -368,15 +373,18 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             Toast.makeText(context, "You must be logged in", Toast.LENGTH_LONG).show();
         }else if(activeUser != null){
 
-
+            List<String> responses = activeUser.getResponses();
+            if(!AppUtil.timeIsWithin(activeUser.getResponding_time())){
+                responses = new ArrayList<>();
+            }
 
             //TODO: remove hardcoded string
             if (text.equals("Unavailable")) {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, activeUser.getResponses());
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, responses);
                 setActiveButton(text);
 
             }else {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, activeUser.getResponses());
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, responses);
                 setActiveButton(text);
             }
         }
@@ -419,6 +427,9 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        if(listenerRegistration != null) listenerRegistration.remove();
+        listenerRegistration = null;
 
         if(mLocationManager != null)mLocationManager.removeUpdates(mLocationListener);
 

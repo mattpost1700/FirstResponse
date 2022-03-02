@@ -236,6 +236,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         if(userListener == null) {
             DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("users").document(user.getDocumentId());
             userListener = docRef.addSnapshotListener((snapshot, e) -> {
+                Log.d(TAG, "READ DATABASE - MAIN ACTIVITY");
+
                 if (e != null) {
                     System.err.println("Listen failed: " + e);
                     return;
@@ -272,6 +274,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public void setActiveUserRespondingAddr(){
         if(incidentListener == null) {
             incidentListener = FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+                Log.d(TAG, "READ DATABASE - MAIN ACTIVITY");
+
                 if (error != null) {
                     Log.w(TAG, "Listening failed for firestore incident collection");
                 } else {

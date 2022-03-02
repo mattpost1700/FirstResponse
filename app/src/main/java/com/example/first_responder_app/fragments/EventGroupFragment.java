@@ -83,6 +83,8 @@ public class EventGroupFragment extends Fragment{
 
     private void populateEventList(){
         db.collection("events").get().addOnCompleteListener(eventTask -> {
+            Log.d(TAG, "READ DATABASE - EVENT GROUP FRAGMENT");
+
             if (eventTask.isSuccessful()) {
                 ArrayList<EventsDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot eventDoc : eventTask.getResult()){

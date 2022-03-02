@@ -130,6 +130,7 @@ public class LoginFragment extends Fragment {
     private void populateUserList() {
 
         db.collection("users").get().addOnCompleteListener(usersTask -> {
+            Log.d(TAG, "READ DATABASE - LOGIN FRAGMENT");
             if (usersTask.isSuccessful()) {
                 for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
                     UsersDataModel usersDataModel = userDoc.toObject(UsersDataModel.class);

@@ -1,5 +1,7 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -140,6 +142,8 @@ public class EditUserFragment extends Fragment {
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        Log.d(TAG, "READ DATABASE - EDIT USER FRAGMENT");
+
                         if (task.isSuccessful()) {
                             Log.d("DB", "task is successful!!");
 

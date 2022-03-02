@@ -27,6 +27,7 @@ import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter
 import com.example.first_responder_app.viewModels.IncidentGroupViewModel;
 import com.example.first_responder_app.R;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ public class IncidentGroupFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<IncidentDataModel> listOfIncidentDataModel;
     IncidentRecyclerViewAdapter incidentGroupRecyclerViewAdapter;
+
+    ListenerRegistration incidentListener;
 
     private IncidentGroupViewModel mViewModel;
 
@@ -95,7 +98,10 @@ public class IncidentGroupFragment extends Fragment {
      * Adds an event listener for incidents
      */
     private void addIncidentEventListener() {
-        db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        if(incidentListener != null) return;
+        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
+
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore incident collection", error);
             }
@@ -115,6 +121,8 @@ public class IncidentGroupFragment extends Fragment {
 
     private void refreshData() {
         db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+            Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
+
             if (incidentTask.isSuccessful()) {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
@@ -138,4 +146,10 @@ public class IncidentGroupFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(incidentListener != null) incidentListener.remove();
+        incidentListener = null;
+    }
 }

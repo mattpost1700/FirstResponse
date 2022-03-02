@@ -45,6 +45,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -68,6 +69,9 @@ public class HomeFragment extends Fragment {
     private RespondersRecyclerViewAdapter respondersRecyclerViewAdapter;
     private IncidentRecyclerViewAdapter incidentRecyclerViewAdapter;
 
+    private ListenerRegistration incidentListener;
+    private ListenerRegistration responderListener;
+    
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -124,8 +128,8 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-        populateIncidents();
-        populateResponders();
+//        populateIncidents();
+//        populateResponders();
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
@@ -184,7 +188,10 @@ public class HomeFragment extends Fragment {
      * Adds an event listener for incidents. Live updates the incidents section
      */
     private void addIncidentEventListener() {
-        db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        if(incidentListener != null) return;
+        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
+
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore incident collection");
             }
@@ -198,7 +205,7 @@ public class HomeFragment extends Fragment {
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
                 incidentRecyclerViewAdapter.notifyDataSetChanged();
-                respondersRecyclerViewAdapter.notifyDataSetChanged();
+                populateResponders();
             }
         });
     }
@@ -207,7 +214,10 @@ public class HomeFragment extends Fragment {
      * Adds an event listener for responders. Live updates the responders section
      */
     private void addResponderEventListener() {
-        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+        if(responderListener != null) return;
+        responderListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addResponderEventListener)");
+
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore users collection");
             }
@@ -215,7 +225,8 @@ public class HomeFragment extends Fragment {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : value) {
                     UsersDataModel user = userDoc.toObject(UsersDataModel.class);
-                    if(user.getResponses() != null && user.getResponses().size() > 0)
+                    List<String> responses = user.getResponses();
+                    if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
                         temp.add(user);
                 }
 
@@ -227,10 +238,30 @@ public class HomeFragment extends Fragment {
     }
 
     /**
+     * Check if a specific incident is active
+     *
+     * @param incident_id The id of the incident
+     *
+     * @return whether or not an incident is active
+     */
+    private boolean isActive(String incident_id){
+        for(int i = 0; i < listOfIncidentDataModel.size(); i++){
+            IncidentDataModel incident = listOfIncidentDataModel.get(i);
+            if(incident.getDocumentId().equals(incident_id)){
+                return !incident.isIncident_complete();
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Displays the active incidents
      */
     private void populateIncidents() {
         db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateIncidents)");
+
             if (incidentTask.isSuccessful()) {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
@@ -249,17 +280,26 @@ public class HomeFragment extends Fragment {
 
     public void populateResponders() {
 
-//        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
-//            if(userTask.isSuccessful()) {
-//                ArrayList<UsersDataModel> temp = new ArrayList<>();
-//                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-//                    temp.add(userDoc.toObject(UsersDataModel.class));
-//                }
-//
-//                // TODO: Should refresh
-//                Log.d("TAG", "populateResponders: ");
-//            }
-//        });
+        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateResponders)");
+
+            if(userTask.isSuccessful()) {
+                ArrayList<UsersDataModel> temp = new ArrayList<>();
+                for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
+                    UsersDataModel user = userDoc.toObject(UsersDataModel.class);
+                    List<String> responses = user.getResponses();
+                    if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
+                        temp.add(user);
+                }
+
+                respondersList.clear();
+                respondersList.addAll(temp);
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
+
+                // TODO: Should refresh
+                Log.d("TAG", "populateResponders: ");
+            }
+        });
     }
 
     /**
@@ -267,6 +307,8 @@ public class HomeFragment extends Fragment {
      */
     private void saveRanksCollection() {
         db.collection("ranks").get().addOnCompleteListener(rankTask -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (saveRanksCollection)");
+
             if (rankTask.isSuccessful()) {
                 for (QueryDocumentSnapshot rankDoc : rankTask.getResult()) {
                     listOfRanks.add(rankDoc.toObject(RanksDataModel.class));
@@ -298,5 +340,16 @@ public class HomeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         // TODO: Use the ViewModel
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        if(incidentListener != null) incidentListener.remove();
+        if(responderListener != null) responderListener.remove();
+        incidentListener = null;
+        responderListener = null;
+
+        super.onDestroyView();
     }
 }

@@ -1,5 +1,7 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -136,7 +138,9 @@ public class EventFragment extends Fragment {
         db.collection("users")
                 .whereIn(FieldPath.documentId(), eventInfo.getParticipants().subList(startIdx, endIdx))
                 .get().addOnCompleteListener(participantTask -> {
-                    if (participantTask.isSuccessful()){
+                Log.d(TAG, "READ DATABASE - EVENT FRAGMENT");
+
+                if (participantTask.isSuccessful()){
                         List<UsersDataModel> tempList = new ArrayList<>();
                         for (QueryDocumentSnapshot userDoc: participantTask.getResult()){
                             UsersDataModel userData = userDoc.toObject(UsersDataModel.class);
