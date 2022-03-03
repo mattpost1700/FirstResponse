@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">first_responder_app</string>
-    <string name="submit">submit</string>
+    <string name="submit">Login</string>
     <string name="incidents">Incidents</string>
     <string name="home_responding">Responding</string>
     <string name="sign_up">Sign up</string>
@@ -12,9 +12,9 @@
     <string name="events">Events</string>
     <string name="first_responder">First Responder</string>
     <string name="defaultmsg">defaultMsg</string>
-    <string name="loginFailMsg">login failed: wrong username/password</string>
-    <string name="password">password</string>
-    <string name="username">username</string>
+    <string name="loginFailMsg">Invalid Username or Password</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
     <string name="emtpyDbMsg">user entry from db is emtpy</string>
     <string name="confirm">Confirm</string>
     <string name="new_announ_log_msg">Empty announcement title/description</string>
@@ -50,6 +50,9 @@
     <string name="create">Create</string>
     <string name="user_account">User Account</string>
     <string name="view_all">View All</string>
+    <string name="no_responders">No Responders</string>
+    <string name="no_active_incidents">No Active Incidents</string>
+    <string name="preferences">Preferences</string>
 
     <!-- Strings related to login -->
 </resources>

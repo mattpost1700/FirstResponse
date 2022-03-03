@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/homeFragment"
-        android:title="@string/home" />
-    <item
-        android:id="@+id/incidentGroupFragment"
-        android:title="@string/incidents" />
-    <item
-        android:id="@+id/respondingFragment"
-        android:title="@string/responding" />
-    <item
-        android:id="@+id/eventGroupFragment"
-        android:title="@string/events" />
-    <item
-        android:id="@+id/chatFragment"
-        android:title="@string/chat" />
-    <item
-        android:id="@+id/announcementFragment"
-        android:title="@string/announcements" />
-    <item
-        android:id="@+id/preferencesFragment"
-        android:title="Preferences"/>
+    <group>
+        <item
+            android:id="@+id/homeFragment"
+            android:icon="@drawable/home_icon"
+            android:title="@string/home" />
+        <item
+            android:id="@+id/eventGroupFragment"
+            android:icon="@drawable/event_icon"
+            android:title="@string/events" />
+        <item
+            android:id="@+id/chatFragment"
+            android:icon="@drawable/chat_icon"
+            android:title="@string/chat" />
+        <item
+            android:id="@+id/announcementFragment"
+            android:icon="@drawable/announcement_icon"
+            android:title="@string/announcements" />
+    </group>
+    <group android:id="@+id/preferences_group">
+        <item
+            android:id="@+id/preferencesFragment"
+            android:icon="@drawable/preferences_icon"
+            android:title="@string/preferences"/>
+    </group>
 
 </menu>

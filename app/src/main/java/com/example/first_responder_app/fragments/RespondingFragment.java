@@ -29,6 +29,7 @@ import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentRespondingBinding;
 import com.example.first_responder_app.databinding.FragmentUserBinding;
 import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
+import com.example.first_responder_app.recyclerViews.RespondersGroupRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.RespondingViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -43,10 +44,12 @@ public class RespondingFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<UsersDataModel> listOfRespondingDataModel;
     List<IncidentDataModel> listOfIncidentDataModel;
-    RespondersRecyclerViewAdapter respondingRecyclerViewAdapter;
+    RespondersGroupRecyclerViewAdapter respondingRecyclerViewAdapter;
 
     ListenerRegistration incidentListener;
     ListenerRegistration respondingListener;
+
+    FragmentRespondingBinding binding;
 
     private RespondingViewModel mViewModel;
 
@@ -56,7 +59,7 @@ public class RespondingFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        FragmentRespondingBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_responding, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_responding, container, false);
 
         listOfRespondingDataModel = new ArrayList<>();
         listOfIncidentDataModel = new ArrayList<>();
@@ -68,7 +71,7 @@ public class RespondingFragment extends Fragment {
         });
 
         // onclick
-        RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
+        RespondersGroupRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
             Bundle result = new Bundle();
             result.putSerializable("user", listOfRespondingDataModel.get(position));
             getParentFragmentManager().setFragmentResult("requestKey", result);
@@ -80,7 +83,7 @@ public class RespondingFragment extends Fragment {
         // Recycler view
         RecyclerView respondingRecyclerView = binding.respondingRecyclerView;
         respondingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        respondingRecyclerViewAdapter = new RespondersRecyclerViewAdapter(getContext(), listOfRespondingDataModel, listOfIncidentDataModel);
+        respondingRecyclerViewAdapter = new RespondersGroupRecyclerViewAdapter(getContext(), listOfRespondingDataModel, listOfIncidentDataModel);
         respondingRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondingRecyclerView.setAdapter(respondingRecyclerViewAdapter);
 
@@ -88,6 +91,20 @@ public class RespondingFragment extends Fragment {
         addIncidentEventListener();
 
         return binding.getRoot();
+    }
+
+    /**
+     * Check if the responder list is empty
+     * If so show the "no responders" text
+     */
+    private void checkRespondersEmpty() {
+        if(listOfRespondingDataModel.size() == 0){
+            binding.respondingRecyclerView.setVisibility(View.GONE);
+            binding.noRespondingResponders.setVisibility(View.VISIBLE);
+        }else{
+            binding.respondingRecyclerView.setVisibility(View.VISIBLE);
+            binding.noRespondingResponders.setVisibility(View.GONE);
+        }
     }
 
     private void addResponderEventListener() {
@@ -109,6 +126,7 @@ public class RespondingFragment extends Fragment {
 
                 listOfRespondingDataModel.clear();
                 listOfRespondingDataModel.addAll(temp);
+                checkRespondersEmpty();
                 respondingRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
@@ -151,6 +169,7 @@ public class RespondingFragment extends Fragment {
 
                 listOfRespondingDataModel.clear();
                 listOfRespondingDataModel.addAll(temp);
+                checkRespondersEmpty();
                 respondingRecyclerViewAdapter.notifyDataSetChanged();
                 Log.d("TAG", "populateResponders: ");
             }

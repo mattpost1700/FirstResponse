@@ -128,8 +128,7 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-//        populateIncidents();
-//        populateResponders();
+
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
@@ -175,11 +174,41 @@ public class HomeFragment extends Fragment {
     }
 
     /**
+     * Check if the responder list is empty
+     * If so show the "no responders" text
+     */
+    private void checkRespondersEmpty() {
+        if(respondersList.size() == 0){
+            bindingView.findViewById(R.id.responders_recycler_view).setVisibility(View.GONE);
+            bindingView.findViewById(R.id.no_responders).setVisibility(View.VISIBLE);
+        }else{
+            bindingView.findViewById(R.id.responders_recycler_view).setVisibility(View.VISIBLE);
+            bindingView.findViewById(R.id.no_responders).setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Check if the incident list is empty
+     * If so show the "no responders" text
+     */
+    private void checkIncidentsEmpty() {
+        if(listOfIncidentDataModel.size() == 0){
+            bindingView.findViewById(R.id.incidents_recycler_view).setVisibility(View.GONE);
+            bindingView.findViewById(R.id.no_active_incidents).setVisibility(View.VISIBLE);
+        }else{
+            bindingView.findViewById(R.id.incidents_recycler_view).setVisibility(View.VISIBLE);
+            bindingView.findViewById(R.id.no_active_incidents).setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Refreshes the section from a pull down action
      *
      * @apiNote The event listeners should make this unnecessary, but is a fail safe
      */
     private void refreshData() {
+        checkRespondersEmpty();
+        checkIncidentsEmpty();
         populateIncidents();
         populateResponders();
     }
@@ -204,6 +233,7 @@ public class HomeFragment extends Fragment {
 
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
+                checkIncidentsEmpty();
                 incidentRecyclerViewAdapter.notifyDataSetChanged();
                 populateResponders();
             }
@@ -232,6 +262,7 @@ public class HomeFragment extends Fragment {
 
                 respondersList.clear();
                 respondersList.addAll(temp);
+                checkRespondersEmpty();
                 respondersRecyclerViewAdapter.notifyDataSetChanged();
             }
         });

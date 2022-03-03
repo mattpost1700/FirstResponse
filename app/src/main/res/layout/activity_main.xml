@@ -46,6 +46,7 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/nav_drawer_menu"
         android:layout_gravity="start"
+        android:background="@drawable/nav_drawer_background"
         />
 
 

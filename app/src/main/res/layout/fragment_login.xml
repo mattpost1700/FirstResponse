@@ -12,15 +12,15 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp">
 
         <EditText
             android:id="@+id/login_username"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="248dp"
             android:autofillHints=""
-            android:ems="10"
             android:hint="@string/username"
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
@@ -30,10 +30,9 @@
 
         <EditText
             android:id="@+id/login_password"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:ems="10"
             android:hint="@string/password"
             android:importantForAutofill="no"
             android:inputType="textPassword"
@@ -44,12 +43,13 @@
 
         <Button
             android:id="@+id/login_submit"
-            android:layout_width="wrap_content"
-            android:layout_height="55dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
+            android:background="@drawable/responder_view_all_button"
             android:text="@string/submit"
-            app:layout_constraintEnd_toEndOf="@+id/login_password"
-            app:layout_constraintStart_toStartOf="@+id/login_password"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_password" />
 
         <TextView
@@ -72,11 +72,11 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:text="@string/first_responder"
+            android:fontFamily="@font/anton_regular"
             android:textSize="30sp"
             app:layout_constraintBottom_toTopOf="@+id/login_username"
-            app:layout_constraintEnd_toEndOf="@+id/login_username"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/login_username" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <Button
             android:id="@+id/bypassBtn"

@@ -63,7 +63,11 @@
         android:id="@+id/incidentGroupFragment"
         android:name="com.example.first_responder_app.fragments.IncidentGroupFragment"
         android:label="incident_group_fragment"
-        tools:layout="@layout/fragment_incident_group" />
+        tools:layout="@layout/fragment_incident_group" >
+        <action
+            android:id="@+id/action_incidentGroupFragment_to_incidentFragment"
+            app:destination="@id/incidentFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/respondingFragment"

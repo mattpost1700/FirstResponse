@@ -15,25 +15,24 @@
         android:id="@+id/respondingSwipeRefreshLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:layout_marginTop="14dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
             android:layout_marginTop="14dp">
 
             <TextView
                 android:id="@+id/responding_label_text_view"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintVertical_weight="0"
                 android:text="@string/responding"
-                android:textSize="28sp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:textSize="35sp"
+                android:fontFamily="@font/anton_regular"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -41,8 +40,25 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/responding_recycler_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                app:layout_constraintVertical_weight="1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/responding_label_text_view" />
+
+            <TextView
+                android:id="@+id/no_responding_responders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_responders"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.16000003" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

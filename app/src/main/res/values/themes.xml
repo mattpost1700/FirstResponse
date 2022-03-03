@@ -9,7 +9,7 @@
         <item name="colorOnPrimary">#fff</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorSecondaryVariant">@color/colorSecondaryDark</item>
+        <item name="colorSecondaryVariant">@color/colorSecondaryLight</item>
         <item name="colorOnSecondary">@color/white</item>
 
         <!-- Status bar color. -->
