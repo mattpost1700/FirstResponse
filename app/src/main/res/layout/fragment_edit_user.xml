@@ -18,131 +18,84 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <SearchView
-                android:id="@+id/member_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_from_side"
-                android:hint="Search for user"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteX="144dp" />
-
-            <HorizontalScrollView
-                android:id="@+id/horizontalScrollView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/member_search">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/add_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_marginTop="15dp"
-                        android:text="Add"
-                        android:textSize="11sp" />
-
-                    <Button
-                        android:id="@+id/button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="15dp"
-                        android:text="Edit"
-                        android:textSize="11sp" />
-
-                    <Button
-                        android:id="@+id/button2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="15dp"
-                        android:text="Delete"
-                        android:textSize="11sp" />
-
-                    <Button
-                        android:id="@+id/saveButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="fill_parent"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="15dp"
-                        android:text="Save"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </HorizontalScrollView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView"
                 tools:layout_editor_absoluteX="189dp">
 
-                <EditText
-                    android:id="@+id/userFirstName"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    android:hint="First Name"
-                    android:textSize="18sp"
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/userLastName"/>
+                    app:layout_constraintTop_toTopOf="parent">
 
-                <EditText
-                    android:id="@+id/userLastName"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    android:hint="Last Name"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userFirstName"
-                    app:layout_constraintBottom_toTopOf="@+id/userRank"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <Spinner
-                    android:id="@+id/userRank"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    android:hint="Rank"
-                    android:textSize="18sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userLastName"
-                    app:layout_constraintBottom_toTopOf="@+id/userPhone"/>
+                        <EditText
+                            android:id="@+id/userFirstName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:layout_marginTop="16dp"
+                            android:autofillHints=""
+                            android:hint="@string/first_name"
+                            android:inputType="text"
+                            android:textSize="18sp" />
 
-                <EditText
-                    android:id="@+id/userPhone"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:hint="Phone Number"
-                    android:textSize="18sp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userRank"
-                    app:layout_constraintBottom_toTopOf="@+id/userAddress"/>
+                        <EditText
+                            android:id="@+id/userLastName"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:autofillHints="name"
+                            android:hint="@string/last_name"
+                            android:inputType="text"
+                            android:textSize="18sp" />
 
+                        <EditText
+                            android:id="@+id/userPhone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_from_side"
+                            android:autofillHints="phone"
+                            android:hint="@string/phone_number"
+                            android:inputType="phone"
+                            android:textSize="18sp" />
 
-                <EditText
-                    android:id="@+id/userAddress"
-                    android:layout_width="200sp"
-                    android:layout_height="40dp"
-                    android:hint="Address"
-                    android:textSize="18sp"
-                    android:layout_margin="@dimen/margin_from_side"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/userPhone" />
+                        <Spinner
+                            android:id="@+id/userRank"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_from_side"
+                            android:contentDescription="@string/rank"
+                            android:minHeight="48dp"
+                            android:textSize="18sp" />
 
+                        <EditText
+                            android:id="@+id/userAddress"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_from_side"
+                            android:autofillHints="postalAddress"
+                            android:hint="@string/address"
+                            android:inputType="textPostalAddress"
+                            android:textSize="18sp" />
 
+                    </LinearLayout>
+                </ScrollView>
 
 
                 <LinearLayout
+                    android:id="@+id/linearLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -153,44 +106,42 @@
                         android:id="@+id/floatingActionButton4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
                         android:layout_margin="@dimen/margin_from_side"
-                        android:src="@android:drawable/ic_menu_gallery"
-                        tools:layout_editor_absoluteX="59dp"
-                        tools:layout_editor_absoluteY="302dp" />
+                        android:clickable="true"
+                        android:contentDescription="@string/choose_profile_image"
+                        android:src="@android:drawable/ic_menu_gallery" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/floatingActionButton5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
                         android:layout_margin="@dimen/margin_from_side"
-                        android:src="@android:drawable/ic_menu_camera"
-                        tools:layout_editor_absoluteX="177dp"
-                        tools:layout_editor_absoluteY="302dp" />
+                        android:clickable="true"
+                        android:contentDescription="@string/take_profile_image"
+                        android:src="@android:drawable/ic_menu_camera" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/floatingActionButton3"
+                        android:id="@+id/save_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
                         android:layout_margin="@dimen/margin_from_side"
-                        android:src="@drawable/ic_send_black_24dp"
-                        tools:layout_editor_absoluteX="300dp"
-                        tools:layout_editor_absoluteY="302dp" />
+                        android:clickable="true"
+                        android:contentDescription="@string/submit_changes"
+                        android:src="@drawable/ic_send_black_24dp" />
 
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_margin="@dimen/margin_from_side"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                android:layout_margin="@dimen/margin_from_side"
-                tools:src="@tools:sample/avatars" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@android:drawable/ic_menu_help"
+                android:contentDescription="@string/user_image" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

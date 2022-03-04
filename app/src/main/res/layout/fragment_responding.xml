@@ -14,8 +14,7 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/respondingSwipeRefreshLayout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="14dp">
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/container_layout"
@@ -41,6 +40,7 @@
                 android:id="@+id/responding_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:requiresFadingEdge="vertical"
                 android:layout_marginStart="20dp"
                 app:layout_constraintVertical_weight="1"
                 app:layout_constraintEnd_toEndOf="parent"

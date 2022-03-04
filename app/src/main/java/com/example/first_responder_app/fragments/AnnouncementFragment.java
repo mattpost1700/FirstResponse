@@ -39,7 +39,7 @@ public class AnnouncementFragment extends Fragment {
     private AnnouncementViewModel mViewModel;
     private AnnouncementRecyclerViewAdapter announcementAdapter;
     private List<AnnouncementsDataModel> listOfAnnouncements;
-
+    FragmentAnnouncementBinding binding;
     public static AnnouncementFragment newInstance() {
         return new AnnouncementFragment();
     }
@@ -47,7 +47,7 @@ public class AnnouncementFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentAnnouncementBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_announcement, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_announcement, container, false);
         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
 
@@ -80,11 +80,27 @@ public class AnnouncementFragment extends Fragment {
                 }
                 listOfAnnouncements.clear();
                 listOfAnnouncements.addAll(temp);
+                checkAnnouncementEmpty();
                 announcementAdapter.notifyDataSetChanged();
             } else {
                 Log.d(TAG, "db get failed in announcement page " + announTask.getException());
             }
         });
+    }
+
+
+    /**
+     * Check if the announcement list is empty
+     * If so show the "no announcements" text
+     */
+    private void checkAnnouncementEmpty() {
+        if(listOfAnnouncements.size() == 0){
+            binding.rvAnnoun.setVisibility(View.GONE);
+            binding.announcementNoneText.setVisibility(View.VISIBLE);
+        }else{
+            binding.rvAnnoun.setVisibility(View.VISIBLE);
+            binding.announcementNoneText.setVisibility(View.GONE);
+        }
     }
 
     @Override

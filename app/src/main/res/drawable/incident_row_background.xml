@@ -4,10 +4,6 @@
 
 
 
-    <size
-        android:height="200dp"
-        android:width="800dp"/>
-
     <corners
         android:bottomLeftRadius="0dp"
         android:topLeftRadius="0dp"

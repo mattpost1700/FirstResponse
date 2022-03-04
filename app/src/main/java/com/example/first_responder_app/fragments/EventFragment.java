@@ -50,7 +50,7 @@ public class EventFragment extends Fragment {
     private boolean isAnyParticipants;
     private boolean isParticipating;
     private String userID;
-
+    FragmentEventBinding binding;
     public static EventFragment newInstance() {
         return new EventFragment();
     }
@@ -62,7 +62,7 @@ public class EventFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentEventBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
@@ -94,13 +94,15 @@ public class EventFragment extends Fragment {
             populateParticipantList(
                     (eventInfo.getParticipantsSize() - eventInfo.getParticipantsSize()%10)
                     , eventInfo.getParticipantsSize());
+        }else{
+            checkParticipantsEmpty();
         }
 
         //setting event info to corresponding text
         binding.eventEventTitle.setText(eventInfo.getTitle());
         binding.eventEventDescription.setText(eventInfo.getDescription());
         binding.eventEventLocation.setText(eventInfo.getLocation());
-        binding.eventEventParticipantsNum.setText("current number of participants: " + eventInfo.getParticipantsSize());
+        binding.eventEventParticipantsNum.setText(eventInfo.getParticipantsSize() + "");
 
         //recycler binding
         RecyclerView eventRecyclerView = binding.eventEventRecycler;
@@ -135,6 +137,7 @@ public class EventFragment extends Fragment {
     }
 
     private void populateParticipantList(int startIdx, int endIdx) {
+        Log.d(TAG, "populateParticipantList: ");
         db.collection("users")
                 .whereIn(FieldPath.documentId(), eventInfo.getParticipants().subList(startIdx, endIdx))
                 .get().addOnCompleteListener(participantTask -> {
@@ -148,10 +151,30 @@ public class EventFragment extends Fragment {
                         }
                         participants.addAll(tempList);
                         eventRecyclerViewAdapter.notifyDataSetChanged();
-                    } else{
+                        checkParticipantsEmpty();
+
+                } else{
                         Log.d("Event: ", "participant data failed to query");
                     }
         });
+
     }
 
+
+
+    /**
+     * Check if the participant list is empty
+     * If so show the "no participants" text
+     */
+    private void checkParticipantsEmpty() {
+        Log.d(TAG, "checkParticipantsEmpty: " + participants.size());
+        if(participants.size() == 0){
+
+            binding.eventEventRecycler.setVisibility(View.GONE);
+            binding.eventNoneText.setVisibility(View.VISIBLE);
+        }else{
+            binding.eventEventRecycler.setVisibility(View.VISIBLE);
+            binding.eventNoneText.setVisibility(View.GONE);
+        }
+    }
 }

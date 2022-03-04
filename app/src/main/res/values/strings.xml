@@ -4,7 +4,7 @@
     <string name="incidents">Incidents</string>
     <string name="home_responding">Responding</string>
     <string name="sign_up">Sign up</string>
-    <string name="announcement">Announcement</string>
+    <string name="announcement">Announcements</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="home">Home</string>
@@ -26,7 +26,7 @@
     <string name="unavailable">Unavailable</string>
     <string name="station">Station</string>
     <string name="eta_label">ETA:&#160;</string>
-    <string name="event_title_description_is_empty">Event Title/ Description is empty</string>
+    <string name="event_title_description_is_empty">Event Title/Description is empty</string>
     <string name="type_of_call">Type of Call:&#160;</string>
     <string name="responding_label">Responding:&#160;</string>
     <string name="received_label">Received Time:&#160;</string>
@@ -53,6 +53,40 @@
     <string name="no_responders">No Responders</string>
     <string name="no_active_incidents">No Active Incidents</string>
     <string name="preferences">Preferences</string>
+    <string name="title">Title:</string>
+    <string name="description">Description:</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="event_date">Event Date</string>
+    <string name="mm_dd_yy">MM/DD/YYYY</string>
+    <string name="hh_mm">HH:MM</string>
+    <string name="event_time">Event Time</string>
+    <string name="set_time">Set Time</string>
+    <string name="set_date">Set Date</string>
+    <string name="event">Event</string>
+    <string name="location">Location</string>
+    <string name="participants">Participants:</string>
+    <string name="location_header">Location:</string>
+    <string name="no_announcements">No Announcements</string>
+    <string name="no_events">No Events</string>
+    <string name="no_participants">No Participants</string>
+    <string name="send_message">Send Message</string>
+    <string name="user_image">User Image</string>
+    <string name="rank">Rank</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="last_name">Last Name</string>
+    <string name="first_name">First Name</string>
+    <string name="choose_profile_image">Choose profile image</string>
+    <string name="take_profile_image">Take Profile Image</string>
+    <string name="submit_changes">Submit changes</string>
+    <string name="edit_user">Edit User</string>
+    <string name="google_maps">Google Maps</string>
+    <string name="file_report">File Report</string>
+    <string name="units">Units</string>
+    <string name="box">Box #</string>
+    <string name="incident_type">Incident Type</string>
+    <string name="officer_report">Officer Report</string>
+    <string name="address">Address</string>
 
     <!-- Strings related to login -->
 </resources>

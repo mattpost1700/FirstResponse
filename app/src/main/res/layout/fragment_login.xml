@@ -19,14 +19,17 @@
             android:id="@+id/login_username"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="248dp"
-            android:autofillHints=""
+            android:layout_marginTop="250dp"
+            android:autofillHints="username"
             android:hint="@string/username"
             android:inputType="text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+
+
+            android:text="username"
+            />
 
         <EditText
             android:id="@+id/login_password"
@@ -39,14 +42,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/login_username" />
+            app:layout_constraintTop_toBottomOf="@+id/login_username"
 
-        <Button
+            android:text="password"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/login_submit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:background="@drawable/responder_view_all_button"
+            android:background="@drawable/standard_button_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:text="@string/submit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

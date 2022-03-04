@@ -41,6 +41,7 @@ import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
 import com.example.first_responder_app.viewModels.IncidentViewModel;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
@@ -132,9 +133,8 @@ public class HomeFragment extends Fragment {
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
-            Bundle result = new Bundle();
-            result.putSerializable("user", respondersList.get(position));
-            getParentFragmentManager().setFragmentResult("requestKey", result);
+            UserViewModel userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+            userViewModel.setUserDataModel(respondersList.get(position));
 
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToUserFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);

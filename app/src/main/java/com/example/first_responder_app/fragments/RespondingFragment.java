@@ -32,6 +32,7 @@ import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter
 import com.example.first_responder_app.recyclerViews.RespondersGroupRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.RespondingViewModel;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -72,9 +73,8 @@ public class RespondingFragment extends Fragment {
 
         // onclick
         RespondersGroupRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
-            Bundle result = new Bundle();
-            result.putSerializable("user", listOfRespondingDataModel.get(position));
-            getParentFragmentManager().setFragmentResult("requestKey", result);
+            UserViewModel userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+            userViewModel.setUserDataModel(listOfRespondingDataModel.get(position));
 
             NavDirections action = RespondingFragmentDirections.actionRespondingFragmentToUserFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);

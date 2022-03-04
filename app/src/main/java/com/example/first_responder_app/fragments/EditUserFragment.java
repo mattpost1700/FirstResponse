@@ -31,6 +31,7 @@ import com.example.first_responder_app.databinding.FragmentEditUserBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.EditUserViewModel;
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -118,6 +119,15 @@ public class EditUserFragment extends Fragment {
                 if (errorMsg.equals("")) {
                     //TODO: await
                     firestoreDatabase.editUser(firstName, lastName, rankID, phone, address, id, getActivity());
+
+                    user.setFirst_name(firstName);
+                    user.setLast_name(lastName);
+                    user.setRankId(rankID);
+                    user.setPhone_number(Long.parseLong(phone));
+                    user.setAddress(address);
+
+                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.setUserDataModel(user);
                     NavDirections action = EditUserFragmentDirections.actionEditUserFragmentToUserFragment();
                     Navigation.findNavController(binding.getRoot()).navigate(action);
                 } else {

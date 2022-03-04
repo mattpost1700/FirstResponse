@@ -40,7 +40,7 @@ public class EventGroupFragment extends Fragment{
     private List<EventsDataModel> listOfEvents;
     private EventGroupRecyclerViewAdapter eventGroupRecyclerViewAdapter;
     private String userID;
-
+    FragmentEventGroupBinding binding;
     public static EventGroupFragment newInstance() {
         return new EventGroupFragment();
     }
@@ -50,7 +50,7 @@ public class EventGroupFragment extends Fragment{
                              @Nullable Bundle savedInstanceState) {
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentEventGroupBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event_group, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event_group, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
@@ -93,11 +93,26 @@ public class EventGroupFragment extends Fragment{
                 }
                 listOfEvents.clear();
                 listOfEvents.addAll(temp);
+                checkEventsEmpty();
                 eventGroupRecyclerViewAdapter.notifyDataSetChanged();
             } else {
                 Log.d(TAG, "db get failed in event page " + eventTask.getException());
             }
         });
+    }
+
+    /**
+     * Check if the events list is empty
+     * If so show the "no events" text
+     */
+    private void checkEventsEmpty() {
+        if(listOfEvents.size() == 0){
+            binding.eventgroupRecycler.setVisibility(View.GONE);
+            binding.eventGroupNoneText.setVisibility(View.VISIBLE);
+        }else{
+            binding.eventgroupRecycler.setVisibility(View.VISIBLE);
+            binding.eventGroupNoneText.setVisibility(View.GONE);
+        }
     }
 
     @Override

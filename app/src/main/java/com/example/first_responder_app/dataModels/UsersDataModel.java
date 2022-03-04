@@ -63,6 +63,8 @@ public class UsersDataModel implements Serializable {
 
     public String getAddress() { return address; }
 
+    public void setAddress(String address) { this.address = address; }
+
     public String getFirst_name() { return first_name; }
 
     public void setFirst_name(String first_name) { this.first_name = first_name; }

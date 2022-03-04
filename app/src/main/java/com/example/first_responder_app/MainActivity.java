@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.view.MenuCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -51,6 +52,7 @@ import com.example.first_responder_app.fragments.IncidentFragment;
 import com.example.first_responder_app.fragments.LoginFragment;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
@@ -93,11 +95,15 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             Log.d(TAG, "onCreate: ");
             String user_id = savedInstanceState.getString("user_id");
             String username = savedInstanceState.getString("username");
+            String first = savedInstanceState.getString("first");
+            String last = savedInstanceState.getString("last");
 
             if(user_id != null && username != null) {
                 UsersDataModel user = new UsersDataModel();
                 user.setDocumentId(user_id);
                 user.setUsername(username);
+                user.setFirst_name(first);
+                user.setLast_name(last);
 
                 setActive(user);
             }
@@ -145,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
 
                 if(activeUser != null) {
-                    navController.navigate(R.id.editUserFragment);
+                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.setUserDataModel(activeUser);
+                    navController.navigate(R.id.userFragment);
                     closeNavDrawer();
                 }else{
                     Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
@@ -170,9 +178,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch(item.getItemId()){
             case R.id.action_user:
-                if(activeUser != null)
-                    navController.navigate(R.id.editUserFragment);
-                else
+                if(activeUser != null) {
+                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.setUserDataModel(activeUser);
+                    navController.navigate(R.id.userFragment);
+                }else
                     Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
                 break;
             default:
@@ -193,6 +203,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         if(activeUser != null) {
             outState.putString("user_id", activeUser.getDocumentId());
             outState.putString("username", activeUser.getUsername());
+            outState.putString("first", activeUser.getFirst_name());
+            outState.putString("last", activeUser.getLast_name());
         }
     }
 
@@ -227,11 +239,14 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
      */
     @Override
     public void setActive(UsersDataModel user) {
+
         this.activeUser = user;
         NavigationView navView = findViewById(R.id.navView);
         View header = navView.getHeaderView(0);
-        Log.d(TAG, "setActive: " + header.findViewById(R.id.nav_username));
+        TextView name = header.findViewById(R.id.nav_name);
         TextView username = header.findViewById(R.id.nav_username);
+        String fullName = user.getFirst_name() + " " + user.getLast_name();
+        name.setText(fullName);
         username.setText(user.getUsername());
 
         //Ensure that the active user data is updated if database is updated
@@ -410,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 mLocationManager.removeUpdates(mLocationListener);
                 mLocationManager = null;
             }
+
         }
 
 
