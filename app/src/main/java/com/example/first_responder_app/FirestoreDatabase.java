@@ -15,9 +15,11 @@ import com.google.firebase.Timestamp;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,15 +27,15 @@ import java.util.regex.Pattern;
 
 public class FirestoreDatabase {
 
-    private static final String ANNOUNCEMENTS_COLLECTION_DIR = "announcements";
-    private static final String EVENTS_COLLECTION_DIR = "events";
-    private static final String INCIDENT_COLLECTION_DIR = "incident";
+    public static final String ANNOUNCEMENTS_COLLECTION_DIR = "announcements";
+    public static final String EVENTS_COLLECTION_DIR = "events";
+    public static final String INCIDENT_COLLECTION_DIR = "incident";
     @Deprecated
-    private static final String INCIDENT_TYPES_COLLECTION_DIR = "incident_types";
-    private static final String RANKS_COLLECTION_DIR = "ranks";
-    private static final String USERS_COLLECTION_DIR = "users";
-    private static final String REPORTS_COLLECTION_DIR = "reports";
-    private static final String GROUPS_COLLECTION_DIR = "groups";
+    public static final String INCIDENT_TYPES_COLLECTION_DIR = "incident_types";
+    public static final String RANKS_COLLECTION_DIR = "ranks";
+    public static final String USERS_COLLECTION_DIR = "users";
+    public static final String REPORTS_COLLECTION_DIR = "reports";
+    public static final String GROUPS_COLLECTION_DIR = "groups";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
