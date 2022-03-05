@@ -285,7 +285,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         String addr = incidentDataModel.getLocation();
         Integer responding = incidentDataModel.getResponding().size();
-        String time = incidentDataModel.getReceived_time().toDate().toString();
+        String time = incidentDataModel.getCreated_at().toDate().toString();
         String units = incidentDataModel.getUnits().toString();
         units = units.replace("[", "");
         units = units.replace("]", "");

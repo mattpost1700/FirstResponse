@@ -127,6 +127,7 @@ public class LoginFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
     }
 
+    // TODO: Do not read in all users? Needs to be fixed!
     private void populateUserList() {
 
         db.collection("users").get().addOnCompleteListener(usersTask -> {

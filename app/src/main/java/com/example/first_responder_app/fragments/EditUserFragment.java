@@ -122,8 +122,8 @@ public class EditUserFragment extends Fragment {
 
                     user.setFirst_name(firstName);
                     user.setLast_name(lastName);
-                    user.setRankId(rankID);
-                    user.setPhone_number(Long.parseLong(phone));
+                    user.setRank_id(rankID);
+                    user.setPhone_number(phone);
                     user.setAddress(address);
 
                     UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
@@ -160,7 +160,7 @@ public class EditUserFragment extends Fragment {
                             String initialRankName = null;
                             String initialRankId = null;
                             if (user != null) {
-                                initialRankId = user.getRankId();
+                                initialRankId = user.getRank_id();
                             }
 
                             for (QueryDocumentSnapshot document : task.getResult()) {
@@ -196,7 +196,7 @@ public class EditUserFragment extends Fragment {
         if (user != null) {
             firstName.setText(user.getFirst_name());
             lastName.setText(user.getLast_name());
-            phone.setText(Long.toString(user.getPhone_number()));
+            phone.setText(user.getPhone_number());
             address.setText(user.getAddress());
 
         }

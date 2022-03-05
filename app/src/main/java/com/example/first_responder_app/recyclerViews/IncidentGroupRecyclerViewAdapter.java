@@ -38,7 +38,7 @@ public class IncidentGroupRecyclerViewAdapter extends RecyclerView.Adapter<Incid
     @Override
     public void onBindViewHolder(@NonNull IncidentGroupRecyclerViewAdapter.ViewHolder holder, int position) {
         IncidentDataModel incident = incidentList.get(position);
-        Date date = incident.getReceived_time().toDate();
+        Date date = incident.getCreated_at().toDate();
         String dateString = new SimpleDateFormat("h:mm aa", Locale.getDefault()).format(date);
 
         holder.incidentAddressTextView.setText(incident.getLocation());
