@@ -56,6 +56,7 @@ public class LoginFragment extends Fragment {
     private long last_text_edit = 0;
     private UsersDataModel user;
     private final Handler handler = new Handler();
+    private FragmentLoginBinding binding;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
@@ -74,18 +75,12 @@ public class LoginFragment extends Fragment {
         Context context = getActivity();
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        assert navHostFragment != null;
         NavController navController = navHostFragment.getNavController();
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String usernameQuickLogin = sharedPref.getString("savedUsername", null);
-        String passwordQuickLogin = sharedPref.getString("savedPassword", null);
-        Log.d("testing", "usernameQuick: " + usernameQuickLogin);
-        Log.d("testing", "pwQuick: " + passwordQuickLogin);
-
-        //TODO: use sharedpreference to do auto login
-
 
         //check whether user finished typing and query the data
         binding.loginUsername.addTextChangedListener(new TextWatcher() {
@@ -166,6 +161,20 @@ public class LoginFragment extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String usernameQuickLogin = sharedPref.getString("savedUsername", null);
+        String passwordQuickLogin = sharedPref.getString("savedPassword", null);
+        Log.d("testing", "usernameQuick: " + usernameQuickLogin);
+        Log.d("testing", "pwQuick: " + passwordQuickLogin);
+        if (usernameQuickLogin != null && passwordQuickLogin != null){
+            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        }
     }
 
     @Override
