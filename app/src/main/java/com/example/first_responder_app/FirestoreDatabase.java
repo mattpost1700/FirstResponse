@@ -28,9 +28,12 @@ public class FirestoreDatabase {
     private static final String ANNOUNCEMENTS_COLLECTION_DIR = "announcements";
     private static final String EVENTS_COLLECTION_DIR = "events";
     private static final String INCIDENT_COLLECTION_DIR = "incident";
+    @Deprecated
     private static final String INCIDENT_TYPES_COLLECTION_DIR = "incident_types";
     private static final String RANKS_COLLECTION_DIR = "ranks";
     private static final String USERS_COLLECTION_DIR = "users";
+    private static final String REPORTS_COLLECTION_DIR = "reports";
+    private static final String GROUPS_COLLECTION_DIR = "groups";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
@@ -202,7 +205,7 @@ public class FirestoreDatabase {
      * @param context The context
      */
     public void editUser(String firstName, String lastName, String rank, String phone, String address, String id, Context context) {
-        Long phoneNum = parsePhone(phone);
+        String phoneNum = parsePhone(phone);
 
         db.collection("users").document(id)
                 .update("first_name", firstName,
@@ -219,7 +222,7 @@ public class FirestoreDatabase {
                         if (activeUser != null) {
                             UsersDataModel user = activeUser.getActive();
                             if (user != null && (user.getDocumentId().equals(id))) {
-                                user.setRankId(rank);
+                                user.setRank_id(rank);
                                 user.setFirst_name(firstName);
                                 user.setLast_name(lastName);
                                 user.setPhone_number(phoneNum);
@@ -240,9 +243,8 @@ public class FirestoreDatabase {
 
     }
 
-    private Long parsePhone(String phone) {
-        phone = phone.replaceAll("\\D+","");
-        return Long.valueOf(phone);
+    private String parsePhone(String phone) {
+        return phone.replaceAll("\\D+","");
     }
 
     /**

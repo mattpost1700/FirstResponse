@@ -6,7 +6,7 @@ import com.google.firebase.firestore.DocumentId;
 import java.io.Serializable;
 import java.util.List;
 
-public class RanksDataModel implements Serializable {
+public class ReportDataModel implements Serializable {
 
     // Default fields
     @DocumentId
@@ -15,35 +15,30 @@ public class RanksDataModel implements Serializable {
 
     // Foreign keys
     private String fire_department_id;
+    private String incident_id;
+    private String user_created_id;
 
     // Object params
-    private String rank_name;
-    private int rank_level;
+    private String type_name;
 
     /** Constructors **/
 
-    /**
-     * @deprecated Uses old data model
-     */
-    public RanksDataModel(String rank_name, int rank_level) {
-        this.rank_name = rank_name;
-        this.rank_level = rank_level;
-    }
+    public ReportDataModel() {}
 
-    public RanksDataModel() {}
-
-    public RanksDataModel(Timestamp created_at, String fire_department_id, String rank_name, int rank_level) {
+    public ReportDataModel(Timestamp created_at, String fire_department_id, String incident_id, String user_created_id, String type_name) {
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
-        this.rank_name = rank_name;
-        this.rank_level = rank_level;
+        this.incident_id = incident_id;
+        this.user_created_id = user_created_id;
+        this.type_name = type_name;
     }
 
-    public RanksDataModel(String fire_department_id, String rank_name, int rank_level) {
+    public ReportDataModel(String fire_department_id, String incident_id, String user_created_id, String type_name) {
         this.created_at = Timestamp.now();
         this.fire_department_id = fire_department_id;
-        this.rank_name = rank_name;
-        this.rank_level = rank_level;
+        this.incident_id = incident_id;
+        this.user_created_id = user_created_id;
+        this.type_name = type_name;
     }
 
     /** Setters **/
@@ -60,12 +55,16 @@ public class RanksDataModel implements Serializable {
         this.fire_department_id = fire_department_id;
     }
 
-    public void setRank_name(String rank_name) {
-        this.rank_name = rank_name;
+    public void setIncident_id(String incident_id) {
+        this.incident_id = incident_id;
     }
 
-    public void setRank_level(int rank_level) {
-        this.rank_level = rank_level;
+    public void setUser_created_id(String user_created_id) {
+        this.user_created_id = user_created_id;
+    }
+
+    public void setType_name(String type_name) {
+        this.type_name = type_name;
     }
 
     /** Getters **/
@@ -82,11 +81,15 @@ public class RanksDataModel implements Serializable {
         return fire_department_id;
     }
 
-    public String getRank_name() {
-        return rank_name;
+    public String getIncident_id() {
+        return incident_id;
     }
 
-    public int getRank_level() {
-        return rank_level;
+    public String getUser_created_id() {
+        return user_created_id;
+    }
+
+    public String getType_name() {
+        return type_name;
     }
 }

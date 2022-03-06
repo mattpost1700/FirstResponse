@@ -88,7 +88,7 @@ public class UserFragment extends Fragment {
 
     private void setText(FragmentUserBinding binding){
         binding.userFullNameTv.setText(user.getFull_name());
-        binding.userRankTv.setText(HomeFragment.getRank(user.getRankId()) == null ? "Unable to get rank" : HomeFragment.getRank(user.getRankId()).getRank_name());
+        binding.userRankTv.setText(HomeFragment.getRank(user.getRank_id()) == null ? "Unable to get rank" : HomeFragment.getRank(user.getRank_id()).getRank_name());
         binding.userPhoneNumberTv.setText("" + user.getPhone_number());
     }
 
