@@ -2,19 +2,18 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -25,7 +24,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.util.Log;
@@ -42,28 +42,29 @@ import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
-import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentIncidentBinding;
+import com.example.first_responder_app.viewModels.ReportViewModel;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.color.MaterialColors;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
 
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
@@ -82,6 +83,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     ETA eta;
     String id;
     IncidentDataModel incident;
+    ListenerRegistration listenerRegistration;
 
     private IncidentViewModel mViewModel;
     private View bindingView;
@@ -109,7 +111,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         if (savedInstanceState != null) {
             mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
-        mMapView = (MapView) binding.mapView;
+        mMapView = (MapView) binding.googleMapView;
         mMapView.onCreate(mapViewBundle);
 
         mMapView.getMapAsync(this);
@@ -121,6 +123,18 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         Log.d(TAG, "onCreate: " + getActivity().findViewById(R.id.incident_button_layout));
 
         initializeIncident(incident);
+
+
+
+
+        //TODO: Check if user has permissions to file report (If not hide FAB)
+        binding.incidentFileReportButton.setOnClickListener(v -> {
+            ReportViewModel userViewModel = new ViewModelProvider(requireActivity()).get(ReportViewModel.class);
+            userViewModel.setIncidentDataModel(incidentDataModel);
+
+            NavDirections action = IncidentFragmentDirections.actionIncidentFragmentToReportFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
 
 
         return binding.getRoot();
@@ -160,9 +174,11 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         //Find the type of the incident
         FirestoreDatabase.getInstance().getDb().collection("incident_types").document(incident.getIncident_type()).get().addOnCompleteListener(typeTask -> {
+            Log.d(TAG, "READ DATABASE - INCIDENT FRAGMENT");
+
             if (typeTask.isSuccessful()) {
                 String t = (String)typeTask.getResult().get("type_name");
-                ((TextView)bindingView.findViewById(R.id.incident_type2)).setText(t);
+                ((TextView)bindingView.findViewById(R.id.incident_type_chip)).setText(t);
             } else {
                 Log.d(TAG, "Error getting documents: ", typeTask.getException());
             }
@@ -176,36 +192,39 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         setupLocationListener();
 
+        if(listenerRegistration == null) {
+            //Ensure that the incident data is updated if database is updated
+            docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
+            listenerRegistration = docRef.addSnapshotListener((snapshot, e) -> {
+                Log.d(TAG, "READ DATABASE - INCIDENT FRAGMENT");
 
-        //Ensure that the incident data is updated if database is updated
-        docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
-        docRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                System.err.println("Listen failed: " + e);
-                return;
-            }
+                if (e != null) {
+                    System.err.println("Listen failed: " + e);
+                    return;
+                }
 
-            if (snapshot != null && snapshot.exists()) {
-                incidentDataModel = snapshot.toObject(IncidentDataModel.class);
+                if (snapshot != null && snapshot.exists()) {
+                    incidentDataModel = snapshot.toObject(IncidentDataModel.class);
 
-                    if (incidentDataModel != null){
+                    if (incidentDataModel != null) {
                         setTextViews(incidentDataModel);
 
 
-                    Map<String, String> statuses = incidentDataModel.getStatus();
-                    if (statuses != null) {
-                        String status1 = statuses.get(active_id);
-                        setActiveButton(status1);
+                        Map<String, String> statuses = incidentDataModel.getStatus();
+                        if (statuses != null) {
+                            String status1 = statuses.get(active_id);
+                            setActiveButton(status1);
+                        }
+
+                        //Get the Address object of the incident
+                        incidentAddress = addrToCoords(incidentDataModel.getLocation());
                     }
 
-                    //Get the Address object of the incident
-                    incidentAddress = addrToCoords(incidentDataModel.getLocation());
-                    }
-
-            } else {
-                System.out.print("Current data: null");
-            }
-        });
+                } else {
+                    System.out.print("Current data: null");
+                }
+            });
+        }
     }
 
 
@@ -241,11 +260,13 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             int count = linearLayout.getChildCount();
 
             for (int i = 0; i < count; i++) {
-                Button b = (Button) linearLayout.getChildAt(i);
+                Chip b = (Chip) linearLayout.getChildAt(i);
                 if (s != null && s.equals((String)b.getText()) && context != null) {
-                    b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorSecondary, context.getResources().getColor(R.color.teal_700)));
+                    b.setChipBackgroundColor(ColorStateList.valueOf(MaterialColors.getColor(context, R.attr.colorSecondaryVariant, context.getResources().getColor(R.color.colorSecondaryDark))));
+                    b.setTextColor(MaterialColors.getColor(context, R.attr.colorOnSecondary, context.getResources().getColor(R.color.white)));
                 }else if(context != null){
-                    b.setBackgroundColor(MaterialColors.getColor(context, R.attr.colorPrimary, context.getResources().getColor(R.color.purple_200)));
+                    b.setChipBackgroundColor(ColorStateList.valueOf(MaterialColors.getColor(context, R.attr.colorPrimaryDark, context.getResources().getColor(R.color.colorPrimaryDark))));
+                    b.setTextColor(MaterialColors.getColor(context, R.attr.colorOnPrimary, context.getResources().getColor(R.color.white)));
                 }
             }
         }
@@ -264,27 +285,39 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         String addr = incidentDataModel.getLocation();
         Integer responding = incidentDataModel.getResponding().size();
-        String time = incidentDataModel.getReceived_time().toDate().toString();
+        String time = incidentDataModel.getCreated_at().toDate().toString();
         String units = incidentDataModel.getUnits().toString();
         units = units.replace("[", "");
         units = units.replace("]", "");
+        String[] unitsArr = units.split(", ");
 
         if(bindingView != null) {
             if (addr != null) {
-                TextView addrText = ((TextView) bindingView.findViewById(R.id.incident_address));
+                TextView addrText = ((TextView) bindingView.findViewById(R.id.incident_address_tv));
                 if(addrText != null) addrText.setText(addr);
             }
             if (responding != null) {
-                TextView respText = ((TextView) bindingView.findViewById(R.id.incident_responding2));
+                TextView respText = ((TextView) bindingView.findViewById(R.id.incident_responding_count));
                 if(respText != null) respText.setText(responding.toString());
             }
             if (time != null) {
-                TextView recText = ((TextView) bindingView.findViewById(R.id.incident_received_time2));
+                TextView recText = ((TextView) bindingView.findViewById(R.id.incident_received_time_chip));
                 if(recText != null) recText.setText(time);
             }
-            if (units != null) {
-                TextView unitText = ((TextView) bindingView.findViewById(R.id.incident_units2));
-                if(unitText != null) unitText.setText(units);
+            if (unitsArr != null) {
+                ChipGroup chipGroup = bindingView.findViewById(R.id.incident_chip_group);
+                if(chipGroup.getChildCount() == 0) {
+                    for (int i = 0; i < unitsArr.length; i++) {
+                        TextView chip = new TextView(context);
+                        chip.setText(unitsArr[i]);
+                        chip.setPadding(25,15,25,15);
+                        chip.setBackground(ContextCompat.getDrawable(context, R.drawable.chip_background));
+                        int id = View.generateViewId();
+                        Log.d(TAG, "setTextViews: " + id);
+                        chip.setId(id);
+                        chipGroup.addView(chip);
+                    }
+                }
             }
         }
     }
@@ -296,7 +329,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     public void setEtaText(String text){
         TextView etaText = null;
         if(bindingView != null) {
-            etaText = ((TextView)bindingView.findViewById(R.id.incident_eta2));
+            etaText = ((TextView)bindingView.findViewById(R.id.incident_eta_chip));
 
             if(etaText != null){
                 etaText.setText(text);
@@ -365,14 +398,18 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             Toast.makeText(context, "You must be logged in", Toast.LENGTH_LONG).show();
         }else if(activeUser != null){
 
+            List<String> responses = activeUser.getResponses();
+            if(!AppUtil.timeIsWithin(activeUser.getResponding_time())){
+                responses = new ArrayList<>();
+            }
 
             //TODO: remove hardcoded string
             if (text.equals("Unavailable")) {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, false);
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, responses);
                 setActiveButton(text);
 
             }else {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), id, text, true);
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, responses);
                 setActiveButton(text);
             }
         }
@@ -415,6 +452,9 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        if(listenerRegistration != null) listenerRegistration.remove();
+        listenerRegistration = null;
 
         if(mLocationManager != null)mLocationManager.removeUpdates(mLocationListener);
 
@@ -482,20 +522,20 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onPause() {
-        mMapView.onPause();
+        if(mMapView != null) mMapView.onPause();
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        mMapView.onDestroy();
+        if(mMapView != null) mMapView.onDestroy();
         super.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        mMapView.onLowMemory();
+        if(mMapView != null) mMapView.onLowMemory();
     }
 
 

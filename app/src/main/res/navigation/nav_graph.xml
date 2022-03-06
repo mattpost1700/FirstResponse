@@ -63,7 +63,11 @@
         android:id="@+id/incidentGroupFragment"
         android:name="com.example.first_responder_app.fragments.IncidentGroupFragment"
         android:label="incident_group_fragment"
-        tools:layout="@layout/fragment_incident_group" />
+        tools:layout="@layout/fragment_incident_group" >
+        <action
+            android:id="@+id/action_incidentGroupFragment_to_incidentFragment"
+            app:destination="@id/incidentFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/respondingFragment"
@@ -152,12 +156,16 @@
         android:id="@+id/userFragment"
         android:name="com.example.first_responder_app.fragments.UserFragment"
         android:label="user_fragment"
-        tools:layout="@layout/fragment_user"/>
+        tools:layout="@layout/fragment_user">
+        <action
+            android:id="@+id/action_userFragment_to_editUserFragment2"
+            app:destination="@id/editUserFragment" />
+    </fragment>
     <fragment
         android:id="@+id/reportFragment"
         android:name="com.example.first_responder_app.fragments.ReportFragment"
         android:label="report_fragment"
-        tools:layout="@layout/report_fragment" >
+        tools:layout="@layout/fragment_report" >
         <action
             android:id="@+id/action_reportFragment_to_incidentGroupFragment"
             app:destination="@id/incidentGroupFragment" />

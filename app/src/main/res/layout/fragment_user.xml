@@ -19,74 +19,101 @@
             android:layout_width="200dp"
             android:layout_height="200dp"
 
-            app:layout_constraintBottom_toTopOf="@+id/user_profile_info_box"
+            android:src="@android:drawable/ic_menu_help"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.478"
-            android:src="@android:drawable/ic_menu_help"/>
+            app:layout_constraintVertical_bias="0.19999999" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/user_profile_info_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:layout_marginStart="@dimen/margin_from_side"
-            android:layout_marginEnd="@dimen/margin_from_side"
-            android:layout_marginBottom="180dp"
-
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/user_send_message_fab"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/user_profile_picture_image_view"
+            app:layout_constraintVertical_bias="0.19999999">
 
             <TextView
                 android:id="@+id/user_full_name_tv"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/anton_regular"
                 android:text=""
-
-                android:textSize="25sp"
-
+                android:textSize="35sp"
+                app:layout_constraintBottom_toBottomOf="@+id/user_rank_tv"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/user_profile_info_box" />
 
-            <TextView
+            <com.google.android.material.chip.Chip
                 android:id="@+id/user_rank_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-
                 android:textSize="25sp"
-
+                app:chipBackgroundColor="?attr/chipBackgroundColor"
+                app:chipIcon="@drawable/ic_baseline_star_24"
+                app:chipStartPadding="5dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/user_full_name_tv" />
 
-            <TextView
+            <com.google.android.material.chip.Chip
                 android:id="@+id/user_phone_number_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text=""
-
                 android:textSize="25sp"
+                app:chipBackgroundColor="?attr/chipBackgroundColor"
+                app:chipIcon="@drawable/ic_baseline_phone_24"
+                app:chipStartPadding="5dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/user_rank_tv" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/user_email_address_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="25sp"
+                app:chipBackgroundColor="?attr/chipBackgroundColor"
+                app:chipIcon="@drawable/ic_baseline_email_24"
+                app:chipStartPadding="5dp"
 
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/user_rank_tv" />
+                app:layout_constraintTop_toBottomOf="@id/user_phone_number_tv" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/user_send_message_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="36dp"
-            android:layout_marginTop="27dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:fabCustomSize="50dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
             android:clickable="true"
-
             android:src="@drawable/ic_send_black_24dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_profile_info_box" />
+            android:contentDescription="@string/send_message" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/user_edit_fab"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:fabCustomSize="50dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:src="@drawable/ic_baseline_settings_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:contentDescription="@string/edit_user" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

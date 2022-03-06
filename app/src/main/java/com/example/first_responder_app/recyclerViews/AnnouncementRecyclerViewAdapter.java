@@ -1,9 +1,12 @@
 package com.example.first_responder_app.recyclerViews;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -53,11 +56,13 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         TextView des;
+        LinearLayout layout;
 
         ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.rowlayout_announcement_announTitle);
             des = itemView.findViewById(R.id.rowlayout_announcement_announDes);
+            layout = (LinearLayout) itemView;
             itemView.setOnClickListener(this);
         }
 
@@ -67,7 +72,20 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
             if (des.getVisibility()== View.GONE){
                 des.setVisibility(View.VISIBLE);
             } else {
+
+                int height = layout.getHeight();
+                ValueAnimator va = ValueAnimator.ofInt(height, 0);
+                va.setDuration(350);
+                va.addUpdateListener(animation -> {
+                    Integer value = (Integer) animation.getAnimatedValue();
+                    layout.setMinimumHeight(value);
+                    layout.requestLayout();
+                });
+                va.start();
+
+
                 des.setVisibility(View.GONE);
+
             }
         }
     }

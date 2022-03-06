@@ -16,69 +16,87 @@
 
         <TextView
             android:id="@+id/event_eventTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:text="Event"
-            android:textSize="28sp"
+            android:layout_marginStart="20dp"
+            android:fontFamily="@font/anton_regular"
+            android:text="@string/event"
+            android:textSize="35sp"
+            app:layout_constraintEnd_toStartOf="@+id/event_event_participantsNum"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/event_event_location"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:text="fire department tv room"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_event_location_fixed"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/event_event_location_fixed" />
 
         <TextView
             android:id="@+id/event_event_description"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="20dp"
             android:text="movie night at 8:00 on 6/6"
+            android:lineSpacingMultiplier="0.7"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_event_description_fixed"
-            app:layout_constraintTop_toBottomOf="@+id/event_event_description_fixed" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_eventTitle" />
 
         <TextView
             android:id="@+id/event_event_participants_fixed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:text="Participants: "
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="25dp"
+            android:fontFamily="@font/anton_regular"
+            android:text="@string/participants"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_event_description_fixed"
-            app:layout_constraintTop_toBottomOf="@+id/event_event_description_fixed" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_event_location" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/sign_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
+            android:background="@drawable/standard_button_primary"
+            android:textColor="?attr/colorOnPrimary"
             android:text="@string/sign_up"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
-        <TextView
+        <com.google.android.material.chip.Chip
             android:id="@+id/event_event_participantsNum"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="current number of participants: 2"
+            android:layout_marginEnd="20dp"
+            app:chipEndPadding="5dp"
+            app:chipIcon="@drawable/incident_responding"
+            app:chipBackgroundColor="?attr/chipBackgroundColor"
+            app:chipStartPadding="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/event_eventTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/event_eventTitle"
-            app:layout_constraintTop_toBottomOf="@+id/event_eventTitle" />
+            app:layout_constraintTop_toTopOf="@+id/event_eventTitle" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/event_eventRecycler"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:requiresFadingEdge="vertical"
             app:layout_constraintBottom_toTopOf="@+id/sign_up"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -88,23 +106,31 @@
             tools:itemCount="2" />
 
         <TextView
+            android:id="@+id/event_none_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/no_participants"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/event_eventRecycler"
+            app:layout_constraintTop_toBottomOf="@+id/event_event_participants_fixed"
+            app:layout_constraintVertical_bias="0.16000003" />
+
+        <TextView
             android:id="@+id/event_event_location_fixed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Location: "
+            android:fontFamily="@font/anton_regular"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/location_header"
             android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_eventTitle"
-            app:layout_constraintTop_toBottomOf="@+id/event_event_participantsNum" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/event_event_description" />
 
-        <TextView
-            android:id="@+id/event_event_description_fixed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="44dp"
-            android:text="Description: "
-            android:textSize="20sp"
-            app:layout_constraintStart_toStartOf="@+id/event_event_location_fixed"
-            app:layout_constraintTop_toBottomOf="@+id/event_event_location_fixed" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

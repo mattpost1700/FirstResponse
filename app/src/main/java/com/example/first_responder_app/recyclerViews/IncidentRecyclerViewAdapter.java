@@ -34,11 +34,10 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
         return new IncidentRecyclerViewAdapter.ViewHolder(view);
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull IncidentRecyclerViewAdapter.ViewHolder holder, int position) {
         IncidentDataModel incident = incidentList.get(position);
-        Date date = incident.getReceived_time().toDate();
+        Date date = incident.getCreated_at().toDate();
         String dateString = new SimpleDateFormat("h:mm aa", Locale.getDefault()).format(date);
 
         holder.incidentAddressTextView.setText(incident.getLocation());
@@ -57,8 +56,8 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
 
         ViewHolder(View itemView) {
             super(itemView);
-            incidentAddressTextView = itemView.findViewById(R.id.incident_address_text_view);
-            incidentTimeTextView = itemView.findViewById(R.id.incident_time_text_view);
+            incidentAddressTextView = itemView.findViewById(R.id.incident_row_address_text_view);
+            incidentTimeTextView = itemView.findViewById(R.id.incident_row_time_text_view);
             itemView.setOnClickListener(this);
         }
 

@@ -22,15 +22,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentRespondingBinding;
 import com.example.first_responder_app.databinding.FragmentUserBinding;
 import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
+import com.example.first_responder_app.recyclerViews.RespondersGroupRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.RespondingViewModel;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -40,7 +44,13 @@ public class RespondingFragment extends Fragment {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<UsersDataModel> listOfRespondingDataModel;
-    RespondersRecyclerViewAdapter respondingRecyclerViewAdapter;
+    List<IncidentDataModel> listOfIncidentDataModel;
+    RespondersGroupRecyclerViewAdapter respondingRecyclerViewAdapter;
+
+    ListenerRegistration incidentListener;
+    ListenerRegistration respondingListener;
+
+    FragmentRespondingBinding binding;
 
     private RespondingViewModel mViewModel;
 
@@ -50,9 +60,10 @@ public class RespondingFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        FragmentRespondingBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_responding, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_responding, container, false);
 
         listOfRespondingDataModel = new ArrayList<>();
+        listOfIncidentDataModel = new ArrayList<>();
 
         final SwipeRefreshLayout pullToRefresh = binding.respondingSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
@@ -61,10 +72,9 @@ public class RespondingFragment extends Fragment {
         });
 
         // onclick
-        RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
-            Bundle result = new Bundle();
-            result.putSerializable("user", listOfRespondingDataModel.get(position));
-            getParentFragmentManager().setFragmentResult("requestKey", result);
+        RespondersGroupRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
+            UserViewModel userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+            userViewModel.setUserDataModel(listOfRespondingDataModel.get(position));
 
             NavDirections action = RespondingFragmentDirections.actionRespondingFragmentToUserFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
@@ -73,43 +83,93 @@ public class RespondingFragment extends Fragment {
         // Recycler view
         RecyclerView respondingRecyclerView = binding.respondingRecyclerView;
         respondingRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        respondingRecyclerViewAdapter = new RespondersRecyclerViewAdapter(getContext(), listOfRespondingDataModel);
+        respondingRecyclerViewAdapter = new RespondersGroupRecyclerViewAdapter(getContext(), listOfRespondingDataModel, listOfIncidentDataModel);
         respondingRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondingRecyclerView.setAdapter(respondingRecyclerViewAdapter);
 
         addResponderEventListener();
+        addIncidentEventListener();
 
         return binding.getRoot();
     }
 
+    /**
+     * Check if the responder list is empty
+     * If so show the "no responders" text
+     */
+    private void checkRespondersEmpty() {
+        if(listOfRespondingDataModel.size() == 0){
+            binding.respondingRecyclerView.setVisibility(View.GONE);
+            binding.noRespondingResponders.setVisibility(View.VISIBLE);
+        }else{
+            binding.respondingRecyclerView.setVisibility(View.VISIBLE);
+            binding.noRespondingResponders.setVisibility(View.GONE);
+        }
+    }
+
     private void addResponderEventListener() {
-        db.collection("users").whereEqualTo("is_responding", true).addSnapshotListener((value, error) -> {
+        if(respondingListener != null) return;
+        respondingListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
+
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore users collection");
             }
             else {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : value) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
+                    UsersDataModel user = userDoc.toObject(UsersDataModel.class);
+                    List<String> responses = user.getResponses();
+                    if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
+                        temp.add(user);
                 }
 
                 listOfRespondingDataModel.clear();
                 listOfRespondingDataModel.addAll(temp);
+                checkRespondersEmpty();
                 respondingRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
     }
 
+    private void addIncidentEventListener(){
+        if(incidentListener != null) return;
+        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
+
+            if(error != null) {
+                Log.w(TAG, "Listening failed for firestore incident collection");
+            }
+            else {
+                ArrayList<IncidentDataModel> temp = new ArrayList<>();
+                for (QueryDocumentSnapshot incidentDoc : value) {
+                    IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
+                    temp.add(incidentDataModel);
+                }
+
+                listOfIncidentDataModel.clear();
+                listOfIncidentDataModel.addAll(temp);
+                refreshData();
+            }
+        });
+    }
+
     private void refreshData() {
-        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
+        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
+            Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
+
             if(userTask.isSuccessful()) {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
+                    UsersDataModel user = userDoc.toObject(UsersDataModel.class);
+                    List<String> responses = user.getResponses();
+                    if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
+                        temp.add(user);
                 }
 
                 listOfRespondingDataModel.clear();
                 listOfRespondingDataModel.addAll(temp);
+                checkRespondersEmpty();
                 respondingRecyclerViewAdapter.notifyDataSetChanged();
                 Log.d("TAG", "populateResponders: ");
             }
@@ -126,4 +186,30 @@ public class RespondingFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
+
+    /**
+     * Check if a specific incident is active
+     *
+     * @param incident_id The id of the incident
+     *
+     * @return whether or not an incident is active
+     */
+    private boolean isActive(String incident_id){
+        for(int i = 0; i < listOfIncidentDataModel.size(); i++){
+            IncidentDataModel incident = listOfIncidentDataModel.get(i);
+            if(incident.getDocumentId().equals(incident_id)){
+                return !incident.isIncident_complete();
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(incidentListener != null) incidentListener.remove();
+        if(respondingListener != null) respondingListener.remove();
+        incidentListener = null;
+        respondingListener = null;
+    }
 }

@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
@@ -40,9 +41,12 @@ import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 
 import com.example.first_responder_app.viewModels.IncidentViewModel;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -66,6 +70,9 @@ public class HomeFragment extends Fragment {
     private RespondersRecyclerViewAdapter respondersRecyclerViewAdapter;
     private IncidentRecyclerViewAdapter incidentRecyclerViewAdapter;
 
+    private ListenerRegistration incidentListener;
+    private ListenerRegistration responderListener;
+    
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -80,6 +87,17 @@ public class HomeFragment extends Fragment {
         NavController navController = navHostFragment.getNavController();
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
+
+        //Setup click listeners for the view all incidents and view all responders buttons
+        binding.viewAllIncidents.setOnClickListener(view -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentGroupFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
+        binding.viewAllResponders.setOnClickListener(view -> {
+            NavDirections action = HomeFragmentDirections.actionHomeFragmentToRespondingFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
 
         final SwipeRefreshLayout pullToRefresh = bindingView.findViewById(R.id.homeSwipeRefreshLayout);
         pullToRefresh.setOnRefreshListener(() -> {
@@ -111,21 +129,19 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-        populateIncidents();
-        populateResponders();
+
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
-            Bundle result = new Bundle();
-            result.putSerializable("user", respondersList.get(position));
-            getParentFragmentManager().setFragmentResult("requestKey", result);
+            UserViewModel userViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+            userViewModel.setUserDataModel(respondersList.get(position));
 
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToUserFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
-            Log.d(TAG, "clicked (from incident listener)!");
+            Log.d(TAG, "onCreateView: clicked (from incident listener)!");
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
@@ -146,7 +162,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView respondersRecyclerView = bindingView.findViewById(R.id.responders_recycler_view);
         respondersRecyclerView.setLayoutManager(new LinearLayoutManager(bindingView.getContext()));
-        respondersRecyclerViewAdapter = new RespondersRecyclerViewAdapter(bindingView.getContext(), respondersList);
+        respondersRecyclerViewAdapter = new RespondersRecyclerViewAdapter(bindingView.getContext(), respondersList, listOfIncidentDataModel);
         respondersRecyclerViewAdapter.setResponderClickListener(responderClickListener);
         respondersRecyclerView.setAdapter(respondersRecyclerViewAdapter);
 
@@ -158,11 +174,41 @@ public class HomeFragment extends Fragment {
     }
 
     /**
+     * Check if the responder list is empty
+     * If so show the "no responders" text
+     */
+    private void checkRespondersEmpty() {
+        if(respondersList.size() == 0){
+            bindingView.findViewById(R.id.responders_recycler_view).setVisibility(View.GONE);
+            bindingView.findViewById(R.id.no_responders).setVisibility(View.VISIBLE);
+        }else{
+            bindingView.findViewById(R.id.responders_recycler_view).setVisibility(View.VISIBLE);
+            bindingView.findViewById(R.id.no_responders).setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Check if the incident list is empty
+     * If so show the "no responders" text
+     */
+    private void checkIncidentsEmpty() {
+        if(listOfIncidentDataModel.size() == 0){
+            bindingView.findViewById(R.id.incidents_recycler_view).setVisibility(View.GONE);
+            bindingView.findViewById(R.id.no_active_incidents).setVisibility(View.VISIBLE);
+        }else{
+            bindingView.findViewById(R.id.incidents_recycler_view).setVisibility(View.VISIBLE);
+            bindingView.findViewById(R.id.no_active_incidents).setVisibility(View.GONE);
+        }
+    }
+
+    /**
      * Refreshes the section from a pull down action
      *
      * @apiNote The event listeners should make this unnecessary, but is a fail safe
      */
     private void refreshData() {
+        checkRespondersEmpty();
+        checkIncidentsEmpty();
         populateIncidents();
         populateResponders();
     }
@@ -171,7 +217,10 @@ public class HomeFragment extends Fragment {
      * Adds an event listener for incidents. Live updates the incidents section
      */
     private void addIncidentEventListener() {
-        db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        if(incidentListener != null) return;
+        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
+
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore incident collection");
             }
@@ -184,7 +233,9 @@ public class HomeFragment extends Fragment {
 
                 listOfIncidentDataModel.clear();
                 listOfIncidentDataModel.addAll(temp);
+                checkIncidentsEmpty();
                 incidentRecyclerViewAdapter.notifyDataSetChanged();
+                populateResponders();
             }
         });
     }
@@ -193,28 +244,55 @@ public class HomeFragment extends Fragment {
      * Adds an event listener for responders. Live updates the responders section
      */
     private void addResponderEventListener() {
-        db.collection("users").whereEqualTo("is_responding", true).addSnapshotListener((value, error) -> {
+        if(responderListener != null) return;
+        responderListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addResponderEventListener)");
+
             if(error != null) {
                 Log.w(TAG, "Listening failed for firestore users collection");
             }
             else {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : value) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
+                    UsersDataModel user = userDoc.toObject(UsersDataModel.class);
+                    List<String> responses = user.getResponses();
+                    if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
+                        temp.add(user);
                 }
 
                 respondersList.clear();
                 respondersList.addAll(temp);
+                checkRespondersEmpty();
                 respondersRecyclerViewAdapter.notifyDataSetChanged();
             }
         });
     }
 
     /**
+     * Check if a specific incident is active
+     *
+     * @param incident_id The id of the incident
+     *
+     * @return whether or not an incident is active
+     */
+    private boolean isActive(String incident_id){
+        for(int i = 0; i < listOfIncidentDataModel.size(); i++){
+            IncidentDataModel incident = listOfIncidentDataModel.get(i);
+            if(incident.getDocumentId().equals(incident_id)){
+                return !incident.isIncident_complete();
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Displays the active incidents
      */
     private void populateIncidents() {
         db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateIncidents)");
+
             if (incidentTask.isSuccessful()) {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : incidentTask.getResult()) {
@@ -232,12 +310,22 @@ public class HomeFragment extends Fragment {
     }
 
     public void populateResponders() {
-        db.collection("users").whereEqualTo("is_responding", true).get().addOnCompleteListener(userTask -> {
+
+        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateResponders)");
+
             if(userTask.isSuccessful()) {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
-                    temp.add(userDoc.toObject(UsersDataModel.class));
+                    UsersDataModel user = userDoc.toObject(UsersDataModel.class);
+                    List<String> responses = user.getResponses();
+                    if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
+                        temp.add(user);
                 }
+
+                respondersList.clear();
+                respondersList.addAll(temp);
+                respondersRecyclerViewAdapter.notifyDataSetChanged();
 
                 // TODO: Should refresh
                 Log.d("TAG", "populateResponders: ");
@@ -250,6 +338,8 @@ public class HomeFragment extends Fragment {
      */
     private void saveRanksCollection() {
         db.collection("ranks").get().addOnCompleteListener(rankTask -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (saveRanksCollection)");
+
             if (rankTask.isSuccessful()) {
                 for (QueryDocumentSnapshot rankDoc : rankTask.getResult()) {
                     listOfRanks.add(rankDoc.toObject(RanksDataModel.class));
@@ -267,6 +357,7 @@ public class HomeFragment extends Fragment {
      * @return The rank data model or null is it was not found
      */
     public static RanksDataModel getRank(String documentId) {
+        if(documentId == null) return null;
         for(RanksDataModel rankDM : listOfRanks) {
             if(documentId.equals(rankDM.getDocumentId())) {
                 return rankDM;
@@ -280,5 +371,16 @@ public class HomeFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         // TODO: Use the ViewModel
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        if(incidentListener != null) incidentListener.remove();
+        if(responderListener != null) responderListener.remove();
+        incidentListener = null;
+        responderListener = null;
+
+        super.onDestroyView();
     }
 }

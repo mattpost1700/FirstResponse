@@ -3,13 +3,16 @@ package com.example.first_responder_app;
 import static android.content.ContentValues.TAG;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.MenuCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -29,6 +32,8 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,11 +49,14 @@ import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.fragments.HomeFragment;
 import com.example.first_responder_app.fragments.HomeFragmentDirections;
 import com.example.first_responder_app.fragments.IncidentFragment;
+import com.example.first_responder_app.fragments.LoginFragment;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.io.IOException;
@@ -67,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     List<Address> incidentAddr;
     List<IncidentDataModel> respIncident;
     NavController navController;
+    ListenerRegistration incidentListener;
+    ListenerRegistration userListener;
 
     final int ACCESS_LOCATION_FRAGMENT = 101;
     final int ACCESS_LOCATION_MAIN = 102;
@@ -76,13 +86,38 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        setupAppBar();
 
 
+
+
+        if(savedInstanceState != null){
+            Log.d(TAG, "onCreate: ");
+            String user_id = savedInstanceState.getString("user_id");
+            String username = savedInstanceState.getString("username");
+            String first = savedInstanceState.getString("first");
+            String last = savedInstanceState.getString("last");
+
+            if(user_id != null && username != null) {
+                UsersDataModel user = new UsersDataModel();
+                user.setDocumentId(user_id);
+                user.setUsername(username);
+                user.setFirst_name(first);
+                user.setLast_name(last);
+
+                setActive(user);
+            }
+        }
+    }
+
+    /**
+     * Setup the appbar for the application
+     */
+    public void setupAppBar(){
         //setup toolbar
         toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
-
-
 
         //setup navigation drawer
         drawer = findViewById(R.id.drawerLayout);
@@ -116,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
 
                 if(activeUser != null) {
-                    navController.navigate(R.id.editUserFragment);
+                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.setUserDataModel(activeUser);
+                    navController.navigate(R.id.userFragment);
                     closeNavDrawer();
                 }else{
                     Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
@@ -126,21 +163,36 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.appbar_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
 
 
-        if(savedInstanceState != null){
-            Log.d(TAG, "onCreate: ");
-            String user_id = savedInstanceState.getString("user_id");
-            String username = savedInstanceState.getString("username");
-
-            if(user_id != null && username != null) {
-                UsersDataModel user = new UsersDataModel();
-                user.setDocumentId(user_id);
-                user.setUsername(username);
-
-                setActive(user);
-            }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_user:
+                if(activeUser != null) {
+                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.setUserDataModel(activeUser);
+                    navController.navigate(R.id.userFragment);
+                }else
+                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
+                break;
+            default:
+                if(toggle.onOptionsItemSelected(item)){
+                    return true;
+                }
+                break;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -151,25 +203,25 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         if(activeUser != null) {
             outState.putString("user_id", activeUser.getDocumentId());
             outState.putString("username", activeUser.getUsername());
+            outState.putString("first", activeUser.getFirst_name());
+            outState.putString("last", activeUser.getLast_name());
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(toggle.onOptionsItemSelected(item)){
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void setDrawerLocked(boolean lock) {
+        ActionBar actionBar = getSupportActionBar();
         if(lock){
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             toolbar.setNavigationIcon(null);
+            if(actionBar != null)
+                actionBar.hide();
         }else{
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             toolbar.setNavigationIcon(icon);
+            if(actionBar != null)
+                actionBar.show();
         }
     }
 
@@ -187,39 +239,43 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
      */
     @Override
     public void setActive(UsersDataModel user) {
+
         this.activeUser = user;
         NavigationView navView = findViewById(R.id.navView);
         View header = navView.getHeaderView(0);
-        Log.d(TAG, "setActive: " + header.findViewById(R.id.nav_username));
+        TextView name = header.findViewById(R.id.nav_name);
         TextView username = header.findViewById(R.id.nav_username);
+        String fullName = user.getFirst_name() + " " + user.getLast_name();
+        name.setText(fullName);
         username.setText(user.getUsername());
 
-
         //Ensure that the active user data is updated if database is updated
-        DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("users").document(user.getDocumentId());
-        docRef.addSnapshotListener((snapshot, e) -> {
-            if (e != null) {
-                System.err.println("Listen failed: " + e);
-                return;
-            }
+        if(userListener == null) {
+            DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("users").document(user.getDocumentId());
+            userListener = docRef.addSnapshotListener((snapshot, e) -> {
+                Log.d(TAG, "READ DATABASE - MAIN ACTIVITY");
 
-            if (snapshot != null && snapshot.exists()) {
-                activeUser = snapshot.toObject(UsersDataModel.class);
-
-
-                if(activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time())){
-                    setActiveUserRespondingAddr();
-                }else{
-                    stopETA();
+                if (e != null) {
+                    System.err.println("Listen failed: " + e);
+                    return;
                 }
+                if (snapshot != null && snapshot.exists()) {
+                    activeUser = snapshot.toObject(UsersDataModel.class);
 
 
-            } else {
-                System.out.print("Current data: null");
-            }
-        });
+                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time())) {
+                        setActiveUserRespondingAddr();
+                    } else {
+                        stopETA();
+                    }
 
 
+                } else {
+                    System.out.print("Current data: null");
+                }
+            });
+
+        }
     }
 
     /**
@@ -233,30 +289,34 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
 
     public void setActiveUserRespondingAddr(){
-        FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
-            if(error != null) {
-                Log.w(TAG, "Listening failed for firestore incident collection");
-            }
-            else {
-                ArrayList<IncidentDataModel> temp = new ArrayList<>();
-                for (QueryDocumentSnapshot incidentDoc : value) {
-                    IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
-                    temp.add(incidentDataModel);
+        if(incidentListener == null) {
+            incidentListener = FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+                Log.d(TAG, "READ DATABASE - MAIN ACTIVITY");
+
+                if (error != null) {
+                    Log.w(TAG, "Listening failed for firestore incident collection");
+                } else {
+                    ArrayList<IncidentDataModel> temp = new ArrayList<>();
+                    for (QueryDocumentSnapshot incidentDoc : value) {
+                        IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
+                        temp.add(incidentDataModel);
+                    }
+
+                    respIncident = new ArrayList<>();
+                    incidentAddr = new ArrayList<>();
+
+                    for (int i = 0; i < temp.size(); i++) {
+                        respIncident.add(temp.get(i));
+                        String addr = temp.get(i).getLocation();
+                        incidentAddr.add(addrToCoords(addr));
+                    }
+                    Log.d(TAG, "setActiveUserRespondingAddr: " + respIncident.size());
+
+                    if (mLocationManager == null) updateETA();
+
                 }
-
-                respIncident = new ArrayList<>();
-                incidentAddr = new ArrayList<>();
-
-                for(int i = 0; i < temp.size(); i++){
-                    respIncident.add(temp.get(i));
-                    String addr = temp.get(i).getLocation();
-                    incidentAddr.add(addrToCoords(addr));
-                }
-
-                updateETA();
-
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -286,6 +346,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
      * Update the active user's ETA
      */
     public void updateETA(){
+        Log.d(TAG, "updateETA: ");
         //Ask for permissions if needed
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_LOCATION_MAIN);
@@ -364,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 mLocationManager.removeUpdates(mLocationListener);
                 mLocationManager = null;
             }
+
         }
 
 
@@ -382,7 +444,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     int idx = i;
                     ETA eta = new ETA();
                     eta.setListener(s -> {
-                        if (respIncident != null)
+                        if (respIncident != null && respIncident.size() > 0)
                             FirestoreDatabase.getInstance().updateETA(respIncident.get(idx).getDocumentId(), activeUser.getDocumentId(), respIncident.get(idx).getEta(), s);
                     });
                     eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins=" + loc.latitude + "%2C" + loc.longitude);
@@ -404,8 +466,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
             }
         };
-
-
 
 }
 

@@ -1,91 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.NewEventFragment">
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context=".fragments.NewAnnouncementFragment">
 
-    <data>
-        <variable
-            name="viewModel"
-            type="com.example.first_responder_app.viewModels.NewEventViewModel" />
-    </data>
+<data>
+    <variable
+        name="viewModel"
+        type="com.example.first_responder_app.viewModels.NewAnnouncementViewModel" />
+</data>
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.2">
 
-        <TextView
-            android:id="@+id/event_title_text"
-            android:layout_width="wrap_content"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:text="Event Title: "
-            android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginHorizontal="20dp">
 
-        <TextView
-            android:id="@+id/event_description_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Description: "
-            android:textSize="24sp"
-            app:layout_constraintStart_toStartOf="@+id/newEventTitle"
-            app:layout_constraintTop_toBottomOf="@+id/newEventTitle" />
 
-        <EditText
-            android:id="@+id/newEventTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="Input title here"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:text=""
-            app:layout_constraintStart_toStartOf="@+id/event_title_text"
-            app:layout_constraintTop_toBottomOf="@+id/event_title_text"
-            tools:ignore="TextContrastCheck" />
+            <TextView
+                android:id="@+id/event_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/newEventTitle"
+                android:text="@string/title"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/newEventDescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:hint="Input content here"
-            android:inputType="text"
-            android:minHeight="48dp"
-            android:text=""
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/event_title_text"
-            app:layout_constraintTop_toBottomOf="@+id/event_description_text"
-            tools:ignore="TextContrastCheck" />
+            <EditText
+                android:id="@+id/newEventTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints=""
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:text=""
+                app:layout_constraintStart_toStartOf="@+id/event_title_text"
+                app:layout_constraintTop_toBottomOf="@+id/event_title_text" />
 
-        <TextView
-            android:id="@+id/new_event_log"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:text="@string/invalid_entry"
-            android:textColor="#FF0000"
-            android:textSize="20sp"
-            android:visibility="invisible"
-            app:layout_constraintBottom_toTopOf="@+id/event_create_confirm"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.947"
-            app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/event_description_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/newEventDescription"
+                android:text="@string/description"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/newEventTitle"
+                app:layout_constraintTop_toBottomOf="@+id/newEventTitle" />
 
-        <Button
-            android:id="@+id/event_create_confirm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:text="@string/confirm"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            <EditText
+                android:id="@+id/newEventDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="25dp"
+                android:inputType="textMultiLine"
+                android:minHeight="48dp"
+                android:text=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/event_description_text"
+                app:layout_constraintTop_toBottomOf="@+id/event_description_text" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/event_location_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/newEventLocation"
+                android:text="@string/location"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/newEventTitle"
+                app:layout_constraintTop_toBottomOf="@+id/newEventDescription" />
+
+            <EditText
+                android:id="@+id/newEventLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="25dp"
+                android:minHeight="48dp"
+                android:text=""
+                android:autofillHints="postalAddress"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/event_description_text"
+                app:layout_constraintTop_toBottomOf="@+id/event_location_text" />
+
+            <TextView
+                android:id="@+id/event_date_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/newEventDescription"
+                android:text="@string/event_date"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/newEventTitle"
+                app:layout_constraintTop_toBottomOf="@+id/newEventLocation" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/event_date_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/standard_button_secondary"
+                android:text="@string/set_date"
+                android:textColor="?attr/colorOnSecondary"
+                app:layout_constraintBottom_toBottomOf="@+id/newEventDate"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/event_date_text" />
+
+            <TextView
+                android:id="@+id/newEventDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:text="@string/mm_dd_yy"
+                app:layout_constraintEnd_toStartOf="@+id/event_date_picker"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/event_description_text"
+                app:layout_constraintTop_toBottomOf="@+id/event_date_text" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/event_time_picker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/standard_button_secondary"
+                android:text="@string/set_time"
+                android:textColor="?attr/colorOnSecondary"
+                app:layout_constraintBottom_toBottomOf="@+id/newEventTime"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/event_time_text" />
+
+            <TextView
+                android:id="@+id/event_time_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/newEventDescription"
+                android:text="@string/event_time"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/newEventTitle"
+                app:layout_constraintTop_toBottomOf="@+id/newEventDate" />
+
+            <TextView
+                android:id="@+id/newEventTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/hh_mm"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toStartOf="@+id/event_time_picker"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/event_description_text"
+                app:layout_constraintTop_toBottomOf="@+id/event_time_text" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/event_create_confirm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:background="@drawable/standard_button_primary"
+                android:text="@string/confirm"
+                android:textColor="?attr/colorOnPrimary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/newEventTime" />
+
+            <TextView
+                android:id="@+id/new_event_log"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginTop="5dp"
+                android:text="@string/invalid_entry"
+                android:textColor="#FF0000"
+                android:textSize="20sp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/event_create_confirm" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

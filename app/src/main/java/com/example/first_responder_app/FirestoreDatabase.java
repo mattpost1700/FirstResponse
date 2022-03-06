@@ -31,11 +31,14 @@ public class FirestoreDatabase {
     private static final String ANNOUNCEMENTS_COLLECTION_DIR = "announcements";
     private static final String EVENTS_COLLECTION_DIR = "events";
     private static final String INCIDENT_COLLECTION_DIR = "incident";
+    @Deprecated
     private static final String INCIDENT_TYPES_COLLECTION_DIR = "incident_types";
     private static final String RANKS_COLLECTION_DIR = "ranks";
     private static final String USERS_COLLECTION_DIR = "users";
     private static final String CHAT_COLLECTION_DIR = "chat";
     private static final String MESSAGE_COLLECTION_DIR = "messages";
+    private static final String REPORTS_COLLECTION_DIR = "reports";
+    private static final String GROUPS_COLLECTION_DIR = "groups";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
@@ -76,13 +79,11 @@ public class FirestoreDatabase {
     }
 
     public void addMessage(String chatId, String messageText, String senderId, ChatRecyclerViewAdapter chatRecyclerViewAdapter, ChatViewModel mViewModel) {
-        //Fragment currentFragment = getActivity().getFragmentManager().findFragmentById(R.id.fragment_container);
-
         Timestamp now = Timestamp.now();
         db.collection(CHAT_COLLECTION_DIR).document(chatId).update("most_recent_message", messageText);
         db.collection(CHAT_COLLECTION_DIR).document(chatId).update("most_recent_message_time", now);
 
-        //It does not like when I putnit into a message object and try to add it
+        //It does not like when I put it into a message object and try to add it
         HashMap<String, Object> newMsg = new HashMap<>();
         newMsg.put("message_text", messageText);
         newMsg.put("sender", senderId);
@@ -110,48 +111,28 @@ public class FirestoreDatabase {
      * Update the database to show the active user is responding
      *
      * @param user_id The id of the user that is responding
-     * @param incident_id The id of the incident that the user is responding to
+     * @param incident The incident that the user is responding to
      * @param status The response that the user gave
      * @param available Whether the user is available or not
      */
-    public void responding(String user_id, String incident_id, String status, boolean available){
-        db.collection("incident").document(incident_id).get().addOnCompleteListener((typeTask) -> {
-            if (typeTask.isSuccessful()) {
-                IncidentDataModel incidentDataModel = typeTask.getResult().toObject(IncidentDataModel.class);
+    public void responding(String user_id, IncidentDataModel incident, String status, boolean available, List<String> responding){
+        Log.d(TAG, "responding: ");
 
-                //Update status map
-                Map<String, String> statusList = incidentDataModel.getStatus();
+        //Update status map
+        Map<String, String> statusList = incident.getStatus();
+        String incident_id = incident.getDocumentId();
 
-                if (statusList == null) {
-                    statusList = new HashMap<>();
-                }
+        if (statusList == null) {
+            statusList = new HashMap<>();
+        }
 
-                if(statusList.get(user_id) != null && statusList.get(user_id).equals(status)){
-                    removeStatus(incident_id, statusList, incidentDataModel.getEta(),incidentDataModel.getResponding(), user_id, available);
-                }else {
-                    updateStatus(incident_id, statusList, incidentDataModel.getEta(), user_id, status, incidentDataModel.getResponding(), available);
-                }
-            } else {
-                Log.d(TAG, "Error getting documents: ", typeTask.getException());
-            }
-        });
+        if(statusList.get(user_id) != null && statusList.get(user_id).equals(status)){
+            removeStatus(incident_id, statusList, incident.getEta(),incident.getResponding(), user_id, available, responding);
+        }else {
+            updateStatus(incident_id, statusList, incident.getEta(), user_id, status, incident.getResponding(), available, responding);
+        }
 
-        db.collection("incident").whereArrayContains("responding", user_id).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
-            if(error != null) {
-                Log.w(TAG, "Listening failed for firestore incident collection");
-            }
-            else {
-
-                if(value.isEmpty()){
-                    db.collection("users").document(user_id).update("is_responding", false);
-                    db.collection("users").document(user_id).update("responding_time", null);
-                }else{
-                    db.collection("users").document(user_id).update("is_responding", true);
-                    db.collection("users").document(user_id).update("responding_time", Timestamp.now());
-                }
-
-            }
-        });
+        db.collection("users").document(user_id).update("responding_time", Timestamp.now());
     }
     /**
      * Update the status of a user
@@ -163,7 +144,7 @@ public class FirestoreDatabase {
      * @param responding The list of responding users
      * @param available If the user is available
      */
-    private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available){
+    private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available, List<String> responses){
 
         //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
         boolean previouslyResponding = statusList.containsKey(user_id) && !statusList.get(user_id).toString().equals("Unavailable");
@@ -183,9 +164,18 @@ public class FirestoreDatabase {
             if (!responding.contains(user_id)) {
                 responding.add(user_id);
             }
+
+            if(responses == null) responses = new ArrayList<>();
+            responses.remove(incident_id);
+            responses.add(incident_id);
+            db.collection("users").document(user_id).update("responses", responses);
         } else {
             responding.remove(user_id);
             eta.remove(user_id);
+
+            if(responses == null) responses = new ArrayList<>();
+            responses.remove(incident_id);
+            db.collection("users").document(user_id).update("responses", responses);
         }
 
 
@@ -205,7 +195,7 @@ public class FirestoreDatabase {
      * @param user_id The id of the user
      * @param available If the user is available
      */
-    private void removeStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, List<String> responding, String user_id, boolean available){
+    private void removeStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, List<String> responding, String user_id, boolean available, List<String> responses){
         responding.remove(user_id);
         statusList.remove(user_id);
         eta.remove(user_id);
@@ -216,6 +206,9 @@ public class FirestoreDatabase {
         updates.put("eta", eta);
         db.collection("incident").document(incident_id).update(updates);
 
+        if(responses == null) responses = new ArrayList<>();
+        responses.remove(incident_id);
+        db.collection("users").document(user_id).update("responses", responses);
     }
 
     /**
@@ -246,7 +239,7 @@ public class FirestoreDatabase {
      * @param context The context
      */
     public void editUser(String firstName, String lastName, String rank, String phone, String address, String id, Context context) {
-        Long phoneNum = parsePhone(phone);
+        String phoneNum = parsePhone(phone);
 
         db.collection("users").document(id)
                 .update("first_name", firstName,
@@ -263,7 +256,7 @@ public class FirestoreDatabase {
                         if (activeUser != null) {
                             UsersDataModel user = activeUser.getActive();
                             if (user != null && (user.getDocumentId().equals(id))) {
-                                user.setRankId(rank);
+                                user.setRank_id(rank);
                                 user.setFirst_name(firstName);
                                 user.setLast_name(lastName);
                                 user.setPhone_number(phoneNum);
@@ -284,9 +277,8 @@ public class FirestoreDatabase {
 
     }
 
-    private Long parsePhone(String phone) {
-        phone = phone.replaceAll("\\D+","");
-        return Long.valueOf(phone);
+    private String parsePhone(String phone) {
+        return phone.replaceAll("\\D+","");
     }
 
     /**

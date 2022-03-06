@@ -1,6 +1,7 @@
 package com.example.first_responder_app.fragments;
 
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +53,23 @@ public class NewEventFragment extends Fragment {
 
         mViewModel = new ViewModelProvider(this).get(NewEventViewModel.class);
         firestoreDatabase = new FirestoreDatabase();
+
+        //Open Timepicker when the timepicker button is pressed
+        binding.eventTimePicker.setOnClickListener(v -> {
+            Log.d("TAG", "onCreateView: CLICKED");
+            TimePickerFragment fragment = new TimePickerFragment();
+            fragment.setListener(binding.newEventTime::setText);
+            fragment.show(getActivity().getSupportFragmentManager(), "Timepicker");
+        });
+
+        //Open Datepicker when the datepicker button is pressed
+        binding.eventDatePicker.setOnClickListener(v -> {
+            Log.d("TAG", "onCreateView: CLICKED");
+            DatePickerFragment fragment = new DatePickerFragment();
+            fragment.setListener(binding.newEventDate::setText);
+            fragment.show(getActivity().getSupportFragmentManager(), "Datepicker");
+        });
+
 
         binding.eventCreateConfirm.setOnClickListener(v -> {
             //TODO: validate input if needed
