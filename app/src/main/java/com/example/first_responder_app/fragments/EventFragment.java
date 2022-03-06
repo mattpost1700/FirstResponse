@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.recyclerViews.EventRecyclerViewAdapter;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.EventsDataModel;
@@ -35,6 +36,7 @@ import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.R;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -54,6 +56,8 @@ public class EventFragment extends Fragment {
 
     private FirestoreDatabase firestoreDatabase = FirestoreDatabase.getInstance();
     private FirebaseFirestore db = firestoreDatabase.getDb();
+
+    private ListenerRegistration eventListener;
 
     public static EventFragment newInstance() {
         return new EventFragment();
@@ -97,7 +101,7 @@ public class EventFragment extends Fragment {
         });
 
         // TODO: add background listener if there's an update
-
+        //addParticipatingEventListener();
 
         binding.signUp.setOnClickListener(v -> {
             if (binding.signUp.getText().equals("Withdraw")){
@@ -107,10 +111,10 @@ public class EventFragment extends Fragment {
                         .document(eventInfo.getDocumentId())
                         .set(eventInfo)
                         .addOnSuccessListener(documentReference -> {
-                            eventRecyclerViewAdapter.notifyDataSetChanged(); // TODO: optimize later
+                            // TODO: Very inefficient
                             isParticipating = false;
-                            updateUI(false);
-                            binding.signUp.setText("Sign up");
+                            participants = new ArrayList<>();
+                            updateUI(true);
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
             }
@@ -121,27 +125,38 @@ public class EventFragment extends Fragment {
                         .document(eventInfo.getDocumentId())
                         .set(eventInfo)
                         .addOnSuccessListener(documentReference -> {
-                            eventRecyclerViewAdapter.notifyDataSetChanged(); // TODO: optimize later
+                            // TODO: Very inefficient
                             isParticipating = true;
-                            updateUI(false);
-                            binding.signUp.setText("Withdraw");
+                            participants = new ArrayList<>();
+                            updateUI(true);
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
             }
         });
+
         return binding.getRoot();
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+
+    // WIP
+    private void addParticipatingEventListener() {
+        if(eventListener != null) return;
+        eventListener = db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR).document(eventInfo.getDocumentId()).addSnapshotListener((value, error) -> {
+            Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
+
+            if(error != null) {
+                Log.w(TAG, "Listening failed for firestore incident collection");
+            }
+            else {
+                populateParticipantListFromDB();
+            }
+        });
     }
 
     private void updateUI(boolean checkDB) {
-        if (isParticipating){
+        if (isParticipating) {
             binding.signUp.setText("Withdraw");
-        }
-        else{
+        } else {
             binding.signUp.setText("Sign up");
         }
 
@@ -204,5 +219,19 @@ public class EventFragment extends Fragment {
             binding.eventEventRecycler.setVisibility(View.VISIBLE);
             binding.eventNoneText.setVisibility(View.GONE);
         }
+    }
+
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if(eventListener != null) eventListener.remove();
+        eventListener = null;
+
+        super.onDestroyView();
     }
 }
