@@ -17,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,13 +45,16 @@ public class EventFragment extends Fragment {
 
     private EventViewModel mViewModel;
     private EventsDataModel eventInfo;
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private List<UsersDataModel> participants;
     private boolean isAnyParticipants;
     private boolean isParticipating;
     private String userID;
     FragmentEventBinding binding;
+
+    private FirestoreDatabase firestoreDatabase = FirestoreDatabase.getInstance();
+    private FirebaseFirestore db = firestoreDatabase.getDb();
+
     public static EventFragment newInstance() {
         return new EventFragment();
     }
@@ -58,13 +62,10 @@ public class EventFragment extends Fragment {
 
     @SuppressLint("SetTextI18n")
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
 
         //initialize vars as well as fetching userID
@@ -77,32 +78,8 @@ public class EventFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(EventViewModel.class);
         eventInfo = mViewModel.getEventDetail();
         isParticipating = eventInfo.getParticipants().contains(user.getDocumentId());
-        if (isParticipating){
-            binding.signUp.setText("Withdraw");
-        }
-        else{
-            binding.signUp.setText("Sign up");
-        }
 
-        //populate participant info from db
-        if (eventInfo.getParticipants().size() != 0){
-            isAnyParticipants = true;
-            int upper = Math.floorDiv(eventInfo.getParticipantsSize(),10);
-            for (int i = 0; i < upper; i++){
-                populateParticipantList(i*10, i*10+10);
-            }
-            populateParticipantList(
-                    (eventInfo.getParticipantsSize() - eventInfo.getParticipantsSize()%10)
-                    , eventInfo.getParticipantsSize());
-        }else{
-            checkParticipantsEmpty();
-        }
-
-        //setting event info to corresponding text
-        binding.eventEventTitle.setText(eventInfo.getTitle());
-        binding.eventEventDescription.setText(eventInfo.getDescription());
-        binding.eventEventLocation.setText(eventInfo.getLocation());
-        binding.eventEventParticipantsNum.setText(eventInfo.getParticipantsSize() + "");
+        populateParticipantListFromDB();
 
         //recycler binding
         RecyclerView eventRecyclerView = binding.eventEventRecycler;
@@ -110,22 +87,46 @@ public class EventFragment extends Fragment {
         eventRecyclerViewAdapter = new EventRecyclerViewAdapter(getContext(), participants, isAnyParticipants);
         eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
 
+        updateUI(false);
+
+        final SwipeRefreshLayout pullToRefresh = binding.eventRefreshLayout;
+        pullToRefresh.setOnRefreshListener(() -> {
+            participants = new ArrayList<>();
+            updateUI(true);
+            pullToRefresh.setRefreshing(false);
+        });
+
+        // TODO: add background listener if there's an update
+
+
         binding.signUp.setOnClickListener(v -> {
-            if (isParticipating){
+            if (binding.signUp.getText().equals("Withdraw")){
                 eventInfo.getParticipants().remove(userID);
-                FirestoreDatabase dbtemp = new FirestoreDatabase();
-                dbtemp.updateEvent(eventInfo);
-                Toast.makeText(getActivity(), "Successful on withdrawing event registration", Toast.LENGTH_SHORT).show();
-                NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
-                Navigation.findNavController(binding.getRoot()).navigate(action);
+
+                db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR)
+                        .document(eventInfo.getDocumentId())
+                        .set(eventInfo)
+                        .addOnSuccessListener(documentReference -> {
+                            eventRecyclerViewAdapter.notifyDataSetChanged(); // TODO: optimize later
+                            isParticipating = false;
+                            updateUI(false);
+                            binding.signUp.setText("Sign up");
+                        })
+                        .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
             }
             else {
                 eventInfo.getParticipants().add(userID);
-                FirestoreDatabase dbtemp = new FirestoreDatabase();
-                dbtemp.updateEvent(eventInfo);
-                Toast.makeText(getActivity(), "Successful on accepting event registration", Toast.LENGTH_SHORT).show();
-                NavDirections action = EventFragmentDirections.actionEventFragmentToEventGroupFragment();
-                Navigation.findNavController(binding.getRoot()).navigate(action);
+
+                db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR)
+                        .document(eventInfo.getDocumentId())
+                        .set(eventInfo)
+                        .addOnSuccessListener(documentReference -> {
+                            eventRecyclerViewAdapter.notifyDataSetChanged(); // TODO: optimize later
+                            isParticipating = true;
+                            updateUI(false);
+                            binding.signUp.setText("Withdraw");
+                        })
+                        .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
             }
         });
         return binding.getRoot();
@@ -134,6 +135,35 @@ public class EventFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+
+    private void updateUI(boolean checkDB) {
+        if (isParticipating){
+            binding.signUp.setText("Withdraw");
+        }
+        else{
+            binding.signUp.setText("Sign up");
+        }
+
+        if(checkDB) populateParticipantListFromDB();
+
+        binding.eventEventTitle.setText(eventInfo.getTitle());
+        binding.eventEventDescription.setText(eventInfo.getDescription());
+        binding.eventEventLocation.setText(eventInfo.getLocation());
+        binding.eventEventParticipantsNum.setText(eventInfo.getParticipantsSize() + "");
+    }
+
+    private void populateParticipantListFromDB() {
+        if (eventInfo.getParticipants().size() != 0){
+            isAnyParticipants = true;
+            int upper = Math.floorDiv(eventInfo.getParticipantsSize(),10);
+            for (int i = 0; i < upper; i++){
+                populateParticipantList(i*10, i*10+10);
+            }
+            populateParticipantList((eventInfo.getParticipantsSize() - eventInfo.getParticipantsSize()%10), eventInfo.getParticipantsSize());
+        } else{
+            checkParticipantsEmpty();
+        }
     }
 
     private void populateParticipantList(int startIdx, int endIdx) {
@@ -154,13 +184,11 @@ public class EventFragment extends Fragment {
                         checkParticipantsEmpty();
 
                 } else{
-                        Log.d("Event: ", "participant data failed to query");
+                    Log.w(TAG, "populateParticipantList: Participant data failed to query", participantTask.getException());
                     }
         });
 
     }
-
-
 
     /**
      * Check if the participant list is empty
