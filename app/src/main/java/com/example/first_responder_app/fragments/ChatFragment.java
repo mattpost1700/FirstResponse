@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,38 +19,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.ChatFragmentBinding;
-import com.example.first_responder_app.databinding.FragmentEditUserBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.messaging.Chat;
 import com.example.first_responder_app.messaging.Message;
-import com.example.first_responder_app.messaging.MessageAdapter;
-import com.example.first_responder_app.recyclerViews.ChatGroupRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.ChatRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.ChatViewModel;
 import com.example.first_responder_app.R;
-import com.example.first_responder_app.viewModels.EventViewModel;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.UserDataReader;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ChatFragment extends Fragment {
 
     private ChatViewModel mViewModel;
     private Message messageInfo;
-    private MessageAdapter messageAdapter;
     private FirestoreDatabase firestoreDatabase;
     private FirebaseFirestore db;
     private ActiveUser activeUser;
