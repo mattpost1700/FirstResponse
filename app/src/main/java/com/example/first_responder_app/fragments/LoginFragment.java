@@ -44,6 +44,8 @@ import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -135,6 +137,7 @@ public class LoginFragment extends Fragment {
             else {
                 if (checkUsernameExists(mViewModel.getUsername())) {
                     if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
+                        //TODO: make the sharedpreference not permanent 
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("savedUsername", mViewModel.getUsername());
                         editor.putString("savedPassword", mViewModel.getPassword());
@@ -173,6 +176,7 @@ public class LoginFragment extends Fragment {
         Log.d("testing", "pwQuick: " + passwordQuickLogin);
         if (usernameQuickLogin != null && passwordQuickLogin != null){
             populateUserList(usernameQuickLogin);
+            Log.d("lastLogin", Calendar.getInstance().getTime().toString());
             NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         }
