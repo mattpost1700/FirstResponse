@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class NewEventFragment extends Fragment {
 
     private NewEventViewModel mViewModel;
-    FirestoreDatabase firestoreDatabase = new FirestoreDatabase();
+    FirestoreDatabase firestoreDatabase;
     NotificationService _notificationService = new NotificationService();
 
     public static NewEventFragment newInstance() {
@@ -50,6 +50,7 @@ public class NewEventFragment extends Fragment {
         //also if you have any other code relates to onCreateView just add it from here
 
         mViewModel = new ViewModelProvider(this).get(NewEventViewModel.class);
+        firestoreDatabase = new FirestoreDatabase();
 
         binding.eventCreateConfirm.setOnClickListener(v -> {
             //TODO: validate input if needed

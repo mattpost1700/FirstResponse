@@ -13,7 +13,7 @@
         android:id="@+id/eventGroupFragment"
         android:title="@string/events" />
     <item
-        android:id="@+id/chatFragment"
+        android:id="@+id/chatGroupFragment"
         android:title="@string/chat" />
     <item
         android:id="@+id/announcementFragment"

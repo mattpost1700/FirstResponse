@@ -1,5 +1,8 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -7,17 +10,57 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.databinding.ChatFragmentBinding;
+import com.example.first_responder_app.databinding.FragmentEditUserBinding;
+import com.example.first_responder_app.interfaces.ActiveUser;
+import com.example.first_responder_app.messaging.Chat;
+import com.example.first_responder_app.messaging.Message;
+import com.example.first_responder_app.messaging.MessageAdapter;
+import com.example.first_responder_app.recyclerViews.ChatGroupRecyclerViewAdapter;
+import com.example.first_responder_app.recyclerViews.ChatRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.ChatViewModel;
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.viewModels.EventViewModel;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.UserDataReader;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChatFragment extends Fragment {
 
     private ChatViewModel mViewModel;
+    private Message messageInfo;
+    private MessageAdapter messageAdapter;
+    private FirestoreDatabase firestoreDatabase;
+    private FirebaseFirestore db;
+    private ActiveUser activeUser;
+    private UsersDataModel user;
+    private List<Message> listOfMessages;
+    private List<String> listOfMembers;
+    private ChatRecyclerViewAdapter chatRecyclerViewAdapter;
+    private Chat c;
 
     // ref: https://github.com/ScaleDrone/android-chat-tutorial/blob/master/app/src/main/res/layout/activity_main.xml
     public static ChatFragment newInstance() {
@@ -27,7 +70,54 @@ public class ChatFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.chat_fragment, container, false);
+        //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
+        ChatFragmentBinding binding = DataBindingUtil.inflate(inflater, R.layout.chat_fragment, container, false);
+        NavHostFragment navHostFragment =
+                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        // TODO: navCont created for side bar(still need to be implemented)
+        NavController navController = navHostFragment.getNavController();
+
+        firestoreDatabase = new FirestoreDatabase();
+        db = FirebaseFirestore.getInstance();
+
+        activeUser = (ActiveUser)getActivity();
+        if(activeUser != null){
+            user = activeUser.getActive();
+        }
+
+        mViewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
+        c = mViewModel.getChatDetail();
+        listOfMembers = c.getMembers();
+        listOfMessages = mViewModel.getListOfMessages();
+        populateMessageList();
+
+
+        //getting data from chat
+        mViewModel = new ViewModelProvider(requireActivity()).get(ChatViewModel.class);
+        messageInfo = mViewModel.getMessageDetail();
+
+        RecyclerView chatRecyclerView = binding.chatRecyclerView;
+        chatRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        chatRecyclerViewAdapter = new ChatRecyclerViewAdapter(getContext(), listOfMessages, listOfMembers);
+        //chatRecyclerViewAdapter.setClickListener(chatClickListener);
+        chatRecyclerView.setAdapter(chatRecyclerViewAdapter);
+
+
+
+        binding.sendButton.setOnClickListener(v -> {
+            String userName = "";
+            if (user != null) {
+                userName = user.getFirst_name() + " " + user.getLast_name();
+            }
+            String msg = binding.editText.getText().toString();
+
+            if (!msg.equals("") && user != null) {
+                firestoreDatabase.addMessage(c.getId(), msg, user.getDocumentId(), chatRecyclerViewAdapter, mViewModel);
+            }
+
+        });
+
+        return binding.getRoot();
     }
 
     @Override
@@ -37,32 +127,29 @@ public class ChatFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-    public class MemberData {
-        private String name;
-        private String color;
+    private void populateMessageList() {
+        String chatId = c.getId();
+        db.collection("chat").document(chatId).collection("messages")
+                .get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Message> temp = new ArrayList<>();
 
-        public MemberData(String name, String color) {
-            this.name = name;
-            this.color = color;
-        }
+                        for (QueryDocumentSnapshot doc : task.getResult()){
+                            Timestamp t = (Timestamp) doc.get("time_sent");;
+                            Message m = new Message(doc.getId(), (String) doc.get("message_text"), (String) doc.get("sender"), t);
+                            temp.add(m);
+                        }
+                        listOfMessages.clear();
+                        listOfMessages.addAll(temp);
+                        Collections.sort(listOfMessages);
+                        mViewModel.setListOfMessages(listOfMessages);
 
-        public MemberData() {
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getColor() {
-            return color;
-        }
-
-        @Override
-        public String toString() {
-            return "MemberData{" +
-                    "name='" + name + '\'' +
-                    ", color='" + color + '\'' +
-                    '}';
-        }
+                        chatRecyclerViewAdapter.notifyDataSetChanged();
+                    } else {
+                        Log.d(TAG, "db get failed in chat page " + task.getException());
+                    }
+                });
     }
+
+
 }
