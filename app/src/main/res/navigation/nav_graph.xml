@@ -36,8 +36,8 @@
             android:id="@+id/action_homeFragment_to_announcementFragment"
             app:destination="@id/announcementFragment" />
         <action
-            android:id="@+id/action_homeFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            android:id="@+id/action_homeFragment_to_chatGroupFragment"
+            app:destination="@id/chatGroupFragment" />
         <action
             android:id="@+id/action_homeFragment_to_preferencesFragment"
             app:destination="@id/preferencesFragment" />
@@ -125,6 +125,15 @@
         <action
             android:id="@+id/action_newAnnouncementFragment_to_announcementFragment"
             app:destination="@id/announcementFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatGroupFragment"
+        android:name="com.example.first_responder_app.fragments.ChatGroupFragment"
+        android:label="chat_group_fragment"
+        tools:layout="@layout/chat_group_fragment">
+        <action
+            android:id="@+id/action_chatGroupFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment"
