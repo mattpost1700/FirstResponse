@@ -1,1 +1,22 @@
-/build
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Android Studio generated folders
+.navigation/
+captures/
+.externalNativeBuild
+
+# IntelliJ project files
+*.iml
+.idea/
+.idea/misc.xml
+.idea/misc.xml
+
+# Misc
+.DS_Store
+*.apk
+*.ap_
