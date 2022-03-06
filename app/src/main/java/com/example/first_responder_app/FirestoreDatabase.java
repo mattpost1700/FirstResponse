@@ -3,6 +3,8 @@ package com.example.first_responder_app;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,9 @@ import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.UserDataReader;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,8 +42,13 @@ public class FirestoreDatabase {
     public static final String REPORTS_COLLECTION_DIR = "reports";
     public static final String GROUPS_COLLECTION_DIR = "groups";
 
+    public static final String PROFILE_PICTURE_STORAGE_DIRECTORY = "profile_pictures/";
+
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
+    private static FirebaseStorage storage = FirebaseStorage.getInstance();
+
+    public static StorageReference profilePictureRef = storage.getReference().child(PROFILE_PICTURE_STORAGE_DIRECTORY);
 
     public static FirestoreDatabase getInstance(){
         return instance;
@@ -46,6 +56,10 @@ public class FirestoreDatabase {
 
     public FirebaseFirestore getDb(){
         return db;
+    }
+
+    public FirebaseStorage getStorage(){
+        return storage;
     }
 
     public void addEvent(String location, String title, String description, ArrayList<String> participants) {

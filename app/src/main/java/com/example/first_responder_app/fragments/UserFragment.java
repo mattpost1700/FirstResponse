@@ -1,9 +1,15 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,15 +29,21 @@ import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.IOException;
 
 
 public class UserFragment extends Fragment {
 
-    private FirestoreDatabase firestoreDatabase;
-    private FirebaseFirestore db;
+    private final FirestoreDatabase firestoreDatabase = new FirestoreDatabase();
+    private FirebaseFirestore db = firestoreDatabase.getDb();
     private UsersDataModel activeUser;
     private UsersDataModel user;
+    private ImageView profilePictureImageView;
 
     private UserViewModel mViewModel;
 
@@ -47,6 +59,8 @@ public class UserFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
         user = mViewModel.getUserDataModel();
 
+        profilePictureImageView = binding.userProfilePictureImageView;
+
 
         //Get active user id
         ActiveUser active = (ActiveUser)getActivity();
@@ -57,8 +71,6 @@ public class UserFragment extends Fragment {
 
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
-//        firestoreDatabase = new FirestoreDatabase();
-//        db = firestoreDatabase.getDb();
 
         boolean THIS_IS_CURRENT_USER = user != null && activeUser != null &&
                                         activeUser.getDocumentId().equals(user.getDocumentId());
@@ -80,7 +92,19 @@ public class UserFragment extends Fragment {
 
         // TODO: GetRank should be in AppUtil or Firestore db
 
-        // TODO: Add db/storage query
+        try {
+            final File localFile = File.createTempFile("Images", "bmp");
+            StorageReference ref = FirestoreDatabase.profilePictureRef.child(user.getRemote_path_to_profile_picture());
+            ref.getFile(localFile)
+                    .addOnSuccessListener(bytes -> {
+                        profilePictureImageView.setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
+                    });
+        } catch (IOException e) {
+            Log.e(TAG, "onCreateView: Failed creating temp file", e);
+        }
 
         return binding.getRoot();
     }
