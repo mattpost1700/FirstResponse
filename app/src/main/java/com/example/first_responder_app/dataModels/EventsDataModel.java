@@ -25,6 +25,7 @@ public class EventsDataModel implements Serializable {
     private String title;
     private String description;
     private String location;
+    private int duration_in_minutes;
 
     /** Constructors **/
 
@@ -40,7 +41,7 @@ public class EventsDataModel implements Serializable {
 
     public EventsDataModel() {}
 
-    public EventsDataModel(Timestamp created_at, String fire_department_id, String intended_group_id, String user_created_id, List<String> participants, Timestamp event_time, String title, String description, String location) {
+    public EventsDataModel(Timestamp created_at, String fire_department_id, String intended_group_id, String user_created_id, List<String> participants, Timestamp event_time, String title, String description, String location, int duration_in_minutes) {
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.intended_group_id = intended_group_id;
@@ -50,9 +51,10 @@ public class EventsDataModel implements Serializable {
         this.title = title;
         this.description = description;
         this.location = location;
+        this.duration_in_minutes = duration_in_minutes;
     }
 
-    public EventsDataModel(String fire_department_id, String intended_group_id, String user_created_id, Timestamp event_time, String title, String description, String location) {
+    public EventsDataModel(String fire_department_id, String intended_group_id, String user_created_id, Timestamp event_time, String title, String description, String location, int duration_in_minutes) {
         this.created_at = Timestamp.now();
         this.fire_department_id = fire_department_id;
         this.intended_group_id = intended_group_id;
@@ -62,6 +64,7 @@ public class EventsDataModel implements Serializable {
         this.title = title;
         this.description = description;
         this.location = location;
+        this.duration_in_minutes = duration_in_minutes;
     }
 
     /** Setters **/
@@ -106,6 +109,10 @@ public class EventsDataModel implements Serializable {
         this.location = location;
     }
 
+    public void setDuration_in_minutes(int duration_in_minutes) {
+        this.duration_in_minutes = duration_in_minutes;
+    }
+
     /** Getters **/
 
     public String getDocumentId() {
@@ -146,6 +153,10 @@ public class EventsDataModel implements Serializable {
 
     public String getLocation() {
         return location;
+    }
+
+    public int getDuration_in_minutes() {
+        return duration_in_minutes;
     }
 
     /** Helpers **/
