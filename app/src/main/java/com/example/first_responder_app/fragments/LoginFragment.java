@@ -172,6 +172,7 @@ public class LoginFragment extends Fragment {
         Log.d("testing", "usernameQuick: " + usernameQuickLogin);
         Log.d("testing", "pwQuick: " + passwordQuickLogin);
         if (usernameQuickLogin != null && passwordQuickLogin != null){
+            populateUserList(usernameQuickLogin);
             NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         }
