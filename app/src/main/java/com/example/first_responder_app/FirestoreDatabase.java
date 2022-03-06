@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
+import com.example.first_responder_app.messaging.Message;
+import com.example.first_responder_app.recyclerViews.ChatRecyclerViewAdapter;
+import com.example.first_responder_app.viewModels.ChatViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -39,9 +42,10 @@ public class FirestoreDatabase {
     public static final String INCIDENT_TYPES_COLLECTION_DIR = "incident_types";
     public static final String RANKS_COLLECTION_DIR = "ranks";
     public static final String USERS_COLLECTION_DIR = "users";
+    public static final String CHAT_COLLECTION_DIR = "chat";
+    public static final String MESSAGE_COLLECTION_DIR = "messages";
     public static final String REPORTS_COLLECTION_DIR = "reports";
     public static final String GROUPS_COLLECTION_DIR = "groups";
-
     public static final String PROFILE_PICTURE_STORAGE_DIRECTORY = "profile_pictures/";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -84,9 +88,38 @@ public class FirestoreDatabase {
     }
 
     public void updateEvent(EventsDataModel updatedEvent){
-        db.collection("events")
+        db.collection(EVENTS_COLLECTION_DIR)
                 .document(updatedEvent.getDocumentId())
                 .set(updatedEvent);
+    }
+
+    public void addMessage(String chatId, String messageText, String senderId, ChatRecyclerViewAdapter chatRecyclerViewAdapter, ChatViewModel mViewModel) {
+        Timestamp now = Timestamp.now();
+        db.collection(CHAT_COLLECTION_DIR).document(chatId).update("most_recent_message", messageText);
+        db.collection(CHAT_COLLECTION_DIR).document(chatId).update("most_recent_message_time", now);
+
+        //It does not like when I put it into a message object and try to add it
+        HashMap<String, Object> newMsg = new HashMap<>();
+        newMsg.put("message_text", messageText);
+        newMsg.put("sender", senderId);
+        newMsg.put("time_sent", now);
+        db.collection(CHAT_COLLECTION_DIR).document(chatId).collection(MESSAGE_COLLECTION_DIR)
+                .add(newMsg)
+                .addOnSuccessListener(new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        Log.d("chat page", "new message has been successfully created in the DB");
+                        List<Message> listOfMessages = mViewModel.getListOfMessages();
+                        Message m = new Message(messageText, senderId, now);
+                        listOfMessages.add(m);
+                        mViewModel.setListOfMessages(listOfMessages);
+
+                        chatRecyclerViewAdapter.notifyDataSetChanged();
+                    }
+                })
+                .addOnFailureListener(e ->Log.d("chat page", "failed to create new message"));
+
+
     }
 
     /**

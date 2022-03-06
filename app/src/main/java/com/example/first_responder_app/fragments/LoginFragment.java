@@ -3,6 +3,8 @@ package com.example.first_responder_app.fragments;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +15,9 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +44,8 @@ import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentLoginBinding;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -47,8 +54,11 @@ public class LoginFragment extends Fragment {
 
     private LoginViewModel mViewModel;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-    private List<UsersDataModel> listOfUser;
+    private boolean checkExist;
+    private long last_text_edit = 0;
+    private UsersDataModel user;
+    private final Handler handler = new Handler();
+    private FragmentLoginBinding binding;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
@@ -64,42 +74,87 @@ public class LoginFragment extends Fragment {
             drawerLocker.setDrawerLocked(true);
         }
 
+        Context context = getActivity();
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentLoginBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        assert navHostFragment != null;
         NavController navController = navHostFragment.getNavController();
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        //get user info for comparison
-        listOfUser = new ArrayList<>();
-        //TODO: change it to query single entry instead of entire user list
-        populateUserList();
+        //check whether user finished typing and query the data
+        binding.loginUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-        //switch to Home fragment upon clicking it
-        //also if you have any other code relates to onCreateView just add it from here
-        binding.loginSubmit.setOnClickListener(v -> {
-
-            if (listOfUser.size() == 0) {
-                binding.loginLog.setText(R.string.emtpyDbMsg);
-                binding.loginLog.setVisibility(View.VISIBLE);
             }
-            mViewModel.setUsername(binding.loginUsername.getText().toString());
-            mViewModel.setPassword(binding.loginPassword.getText().toString());
-            if (checkUsernameExists(mViewModel.getUsername())) {
-                if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
-                    NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-                    Navigation.findNavController(binding.getRoot()).navigate(action);
-                    Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                last_text_edit = System.currentTimeMillis();
+                handler.removeCallbacks(input_finish_checker);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mViewModel.setUsername(binding.loginUsername.getText().toString());
+                if (binding.loginPassword.getText().length() > 0){
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(input_finish_checker, 500);
+                }
+            }
+        });
+        binding.loginPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                last_text_edit = System.currentTimeMillis();
+                handler.removeCallbacks(input_finish_checker);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mViewModel.setPassword(binding.loginPassword.getText().toString());
+                if (binding.loginPassword.getText().length() > 0){
+                    last_text_edit = System.currentTimeMillis();
+                    handler.postDelayed(input_finish_checker, 500);
+                }
+            }
+        });
+
+        binding.loginSubmit.setOnClickListener(v -> {
+            if (mViewModel.getUsername() == null || mViewModel.getPassword() == null){
+                binding.loginLog.setText(R.string.loginFailMsg);
+                binding.loginLog.setVisibility(View.VISIBLE);
+                Log.d("testing", "login failed: wrong username/password");
+            }
+            else {
+                if (checkUsernameExists(mViewModel.getUsername())) {
+                    if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
+                        //TODO: make the sharedpreference not permanent 
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString("savedUsername", mViewModel.getUsername());
+                        editor.putString("savedPassword", mViewModel.getPassword());
+                        editor.apply();
+                        NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+                        Navigation.findNavController(binding.getRoot()).navigate(action);
+                        Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
+                    } else {
+                        binding.loginLog.setText(R.string.loginFailMsg);
+                        binding.loginLog.setVisibility(View.VISIBLE);
+                        Log.d("testing", "login failed: wrong username/password");
+                    }
                 } else {
                     binding.loginLog.setText(R.string.loginFailMsg);
                     binding.loginLog.setVisibility(View.VISIBLE);
                     Log.d("testing", "login failed: wrong username/password");
                 }
-            } else {
-                binding.loginLog.setText(R.string.loginFailMsg);
-                binding.loginLog.setVisibility(View.VISIBLE);
-                Log.d("testing", "login failed: wrong username/password");
             }
         });
 
@@ -109,6 +164,22 @@ public class LoginFragment extends Fragment {
         });
 
         return binding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String usernameQuickLogin = sharedPref.getString("savedUsername", null);
+        String passwordQuickLogin = sharedPref.getString("savedPassword", null);
+        Log.d("testing", "usernameQuick: " + usernameQuickLogin);
+        Log.d("testing", "pwQuick: " + passwordQuickLogin);
+        if (usernameQuickLogin != null && passwordQuickLogin != null){
+            populateUserList(usernameQuickLogin);
+            Log.d("lastLogin", Calendar.getInstance().getTime().toString());
+            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        }
     }
 
     @Override
@@ -127,46 +198,38 @@ public class LoginFragment extends Fragment {
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
     }
 
-    // TODO: Do not read in all users? Needs to be fixed!
-    private void populateUserList() {
+    private final Runnable input_finish_checker = new Runnable() {
+        public void run() {
+            if (System.currentTimeMillis() > (last_text_edit + 250)) {
+                populateUserList(mViewModel.getUsername());
+            }
+        }
+    };
 
-        db.collection("users").get().addOnCompleteListener(usersTask -> {
+    private void populateUserList(String usernameInput) {
+        db.collection("users").whereEqualTo("username", usernameInput).get().addOnCompleteListener(usersTask -> {
             Log.d(TAG, "READ DATABASE - LOGIN FRAGMENT");
             if (usersTask.isSuccessful()) {
                 for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
-                    UsersDataModel usersDataModel = userDoc.toObject(UsersDataModel.class);
-
-                    listOfUser.add(usersDataModel);
+                    user = userDoc.toObject(UsersDataModel.class);
+                    checkExist = true;
                 }
             } else {
                 Log.d(TAG, "db get failed in Login page " + usersTask.getException());
+                checkExist = false;
             }
         });
     }
 
-    //check if username is valid
+    //check if username is valid & fetch user info
     private boolean checkUsernameExists(String username) {
-        for (int i = 0; i < listOfUser.size(); i++) {
-            if (listOfUser.get(i).getUsername().equals(username)) {
-                return true;
-            }
-        }
-        return false;
+        Log.d(TAG, "fetch user info + validates input: ");
+        return checkExist;
     }
 
     //check if password matches the record in db
     private boolean checkPwMatch(String username, String pw){
-        for (int i = 0; i < listOfUser.size(); i++){
-            if (listOfUser.get(i).getUsername().equals(username)){
-                if (listOfUser.get(i).getPassword().equals(pw)){
-                    ActiveUser activeUser = ((ActiveUser)getActivity());
-                    if(activeUser != null){
-                        activeUser.setActive(listOfUser.get(i));
-                    }
-                    return true;
-                }
-            }
-        }
-        return false;
+        return pw.equals(user.getPassword());
     }
+
 }

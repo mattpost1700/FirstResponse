@@ -12,7 +12,7 @@
             android:menuCategory = "secondary"
             android:title="@string/events" />
         <item
-            android:id="@+id/chatFragment"
+            android:id="@+id/chatGroupFragment"
             android:icon="@drawable/chat_icon"
             android:menuCategory = "secondary"
             android:title="@string/chat" />
