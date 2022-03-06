@@ -175,10 +175,32 @@ public class LoginFragment extends Fragment {
         Log.d("testing", "usernameQuick: " + usernameQuickLogin);
         Log.d("testing", "pwQuick: " + passwordQuickLogin);
         if (usernameQuickLogin != null && passwordQuickLogin != null){
-            populateUserList(usernameQuickLogin);
-            Log.d("lastLogin", Calendar.getInstance().getTime().toString());
-            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-            Navigation.findNavController(binding.getRoot()).navigate(action);
+
+            db.collection("users").whereEqualTo("username", usernameQuickLogin).whereEqualTo("password", passwordQuickLogin).get().addOnCompleteListener(usersTask -> {
+                Log.d(TAG, "READ DATABASE - LOGIN FRAGMENT");
+                if (usersTask.isSuccessful()) {
+                    for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
+                        user = userDoc.toObject(UsersDataModel.class);
+                        checkExist = true;
+
+                        if(user.getPassword().equals(passwordQuickLogin)) {
+                            ActiveUser activeUser = ((ActiveUser)getActivity());
+                            activeUser.setActive(user);
+
+                            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+                            Navigation.findNavController(binding.getRoot()).navigate(action);
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "db get failed in Login page " + usersTask.getException());
+                    checkExist = false;
+                }
+            });
+
+//            populateUserList(usernameQuickLogin);
+//            Log.d("lastLogin", Calendar.getInstance().getTime().toString());
+//            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+//            Navigation.findNavController(binding.getRoot()).navigate(action);
         }
     }
 
