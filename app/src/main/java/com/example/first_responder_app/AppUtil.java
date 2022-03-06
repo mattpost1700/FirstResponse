@@ -26,4 +26,8 @@ public class AppUtil {
 
         return new Timestamp(date);
     }
+
+    public static Long numOfMinutesToMilliSeconds(int minutes) {
+        return ((long) minutes) * 60000;
+    }
 }

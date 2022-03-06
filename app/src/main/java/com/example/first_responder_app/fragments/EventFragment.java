@@ -2,44 +2,48 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
-
-import com.example.first_responder_app.dataModels.IncidentDataModel;
-import com.example.first_responder_app.recyclerViews.EventRecyclerViewAdapter;
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
+import com.example.first_responder_app.recyclerViews.EventRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.EventViewModel;
-import com.example.first_responder_app.R;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -74,7 +78,7 @@ public class EventFragment extends Fragment {
 
         //initialize vars as well as fetching userID
         participants = new ArrayList<>();
-        ActiveUser activeUser = (ActiveUser)getActivity();
+        ActiveUser activeUser = (ActiveUser) getActivity();
         UsersDataModel user = activeUser.getActive();
         userID = user.getDocumentId();
 
@@ -104,7 +108,7 @@ public class EventFragment extends Fragment {
         //addParticipatingEventListener();
 
         binding.signUp.setOnClickListener(v -> {
-            if (binding.signUp.getText().equals("Withdraw")){
+            if (binding.signUp.getText().equals("Withdraw")) {
                 eventInfo.getParticipants().remove(userID);
 
                 db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR)
@@ -117,8 +121,7 @@ public class EventFragment extends Fragment {
                             updateUI(true);
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
-            }
-            else {
+            } else {
                 eventInfo.getParticipants().add(userID);
 
                 db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR)
@@ -131,23 +134,31 @@ public class EventFragment extends Fragment {
                             updateUI(true);
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
+
+//                // Calendar intent
+//                Calendar cal = Calendar.getInstance();
+//                Intent intent = new Intent(Intent.ACTION_EDIT);
+//                long startTime = eventInfo.getEvent_time().toDate().toInstant().toEpochMilli();
+//                intent.putExtra("beginTime", startTime);
+//                //intent.putExtra("allDay", true);
+//                intent.putExtra("endTime", startTime + AppUtil.numOfMinutesToMilliSeconds(eventInfo.getDuration_in_minutes()));
+//                intent.putExtra("title", "A Test Event from android app");
+//                startActivity(intent);
             }
         });
 
         return binding.getRoot();
     }
 
-
     // WIP
     private void addParticipatingEventListener() {
-        if(eventListener != null) return;
+        if (eventListener != null) return;
         eventListener = db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR).document(eventInfo.getDocumentId()).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
 
-            if(error != null) {
+            if (error != null) {
                 Log.w(TAG, "Listening failed for firestore incident collection");
-            }
-            else {
+            } else {
                 populateParticipantListFromDB();
             }
         });
@@ -160,7 +171,7 @@ public class EventFragment extends Fragment {
             binding.signUp.setText("Sign up");
         }
 
-        if(checkDB) populateParticipantListFromDB();
+        if (checkDB) populateParticipantListFromDB();
 
         binding.eventEventTitle.setText(eventInfo.getTitle());
         binding.eventEventDescription.setText(eventInfo.getDescription());
@@ -169,14 +180,14 @@ public class EventFragment extends Fragment {
     }
 
     private void populateParticipantListFromDB() {
-        if (eventInfo.getParticipants().size() != 0){
+        if (eventInfo.getParticipants().size() != 0) {
             isAnyParticipants = true;
-            int upper = Math.floorDiv(eventInfo.getParticipantsSize(),10);
-            for (int i = 0; i < upper; i++){
-                populateParticipantList(i*10, i*10+10);
+            int upper = Math.floorDiv(eventInfo.getParticipantsSize(), 10);
+            for (int i = 0; i < upper; i++) {
+                populateParticipantList(i * 10, i * 10 + 10);
             }
-            populateParticipantList((eventInfo.getParticipantsSize() - eventInfo.getParticipantsSize()%10), eventInfo.getParticipantsSize());
-        } else{
+            populateParticipantList((eventInfo.getParticipantsSize() - eventInfo.getParticipantsSize() % 10), eventInfo.getParticipantsSize());
+        } else {
             checkParticipantsEmpty();
         }
     }
@@ -186,21 +197,21 @@ public class EventFragment extends Fragment {
         db.collection("users")
                 .whereIn(FieldPath.documentId(), eventInfo.getParticipants().subList(startIdx, endIdx))
                 .get().addOnCompleteListener(participantTask -> {
-                Log.d(TAG, "READ DATABASE - EVENT FRAGMENT");
+            Log.d(TAG, "READ DATABASE - EVENT FRAGMENT");
 
-                if (participantTask.isSuccessful()){
-                        List<UsersDataModel> tempList = new ArrayList<>();
-                        for (QueryDocumentSnapshot userDoc: participantTask.getResult()){
-                            UsersDataModel userData = userDoc.toObject(UsersDataModel.class);
-                            tempList.add(userData);
-                        }
-                        participants.addAll(tempList);
-                        eventRecyclerViewAdapter.notifyDataSetChanged();
-                        checkParticipantsEmpty();
+            if (participantTask.isSuccessful()) {
+                List<UsersDataModel> tempList = new ArrayList<>();
+                for (QueryDocumentSnapshot userDoc : participantTask.getResult()) {
+                    UsersDataModel userData = userDoc.toObject(UsersDataModel.class);
+                    tempList.add(userData);
+                }
+                participants.addAll(tempList);
+                eventRecyclerViewAdapter.notifyDataSetChanged();
+                checkParticipantsEmpty();
 
-                } else{
-                    Log.w(TAG, "populateParticipantList: Participant data failed to query", participantTask.getException());
-                    }
+            } else {
+                Log.w(TAG, "populateParticipantList: Participant data failed to query", participantTask.getException());
+            }
         });
 
     }
@@ -211,11 +222,11 @@ public class EventFragment extends Fragment {
      */
     private void checkParticipantsEmpty() {
         Log.d(TAG, "checkParticipantsEmpty: " + participants.size());
-        if(participants.size() == 0){
+        if (participants.size() == 0) {
 
             binding.eventEventRecycler.setVisibility(View.GONE);
             binding.eventNoneText.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             binding.eventEventRecycler.setVisibility(View.VISIBLE);
             binding.eventNoneText.setVisibility(View.GONE);
         }
@@ -229,7 +240,7 @@ public class EventFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        if(eventListener != null) eventListener.remove();
+        if (eventListener != null) eventListener.remove();
         eventListener = null;
 
         super.onDestroyView();

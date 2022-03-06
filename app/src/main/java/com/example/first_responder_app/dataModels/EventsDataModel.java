@@ -41,7 +41,8 @@ public class EventsDataModel implements Serializable {
 
     public EventsDataModel() {}
 
-    public EventsDataModel(Timestamp created_at, String fire_department_id, String intended_group_id, String user_created_id, List<String> participants, Timestamp event_time, String title, String description, String location, int duration_in_minutes) {
+    public EventsDataModel(String documentId, Timestamp created_at, String fire_department_id, String intended_group_id, String user_created_id, List<String> participants, Timestamp event_time, String title, String description, String location, int duration_in_minutes) {
+        this.documentId = documentId;
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.intended_group_id = intended_group_id;
