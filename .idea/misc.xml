@@ -63,6 +63,8 @@
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_icon.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_round.xml" value="0.1" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/drawable/responder_row_background.xml" value="0.19" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/responder_row_layout.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/fragment_announcement.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/fragment_announcement_new.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/fragment_event_group.xml" value="0.23229166666666667" />

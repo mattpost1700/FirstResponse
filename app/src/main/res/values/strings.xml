@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">first_responder_app</string>
+    <string name="app_name">First Response</string>
     <string name="submit">Login</string>
     <string name="incidents">Incidents</string>
     <string name="home_responding">Responding</string>
