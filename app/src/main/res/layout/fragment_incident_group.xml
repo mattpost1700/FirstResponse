@@ -36,12 +36,12 @@
                 android:layout_marginStart="20dp"
                 />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/sort_incidents_button"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/ic_baseline_sort_24"
-
+                android:backgroundTint="?attr/colorPrimaryVariant"
 
                 app:layout_constraintBottom_toBottomOf="@id/incidents_text_view"
                 app:layout_constraintStart_toEndOf="@id/incidents_text_view"
