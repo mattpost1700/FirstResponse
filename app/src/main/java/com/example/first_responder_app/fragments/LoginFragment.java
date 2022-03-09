@@ -137,11 +137,12 @@ public class LoginFragment extends Fragment {
             else {
                 if (checkUsernameExists(mViewModel.getUsername())) {
                     if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
-                        //TODO: make the sharedpreference not permanent 
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putString("savedUsername", mViewModel.getUsername());
                         editor.putString("savedPassword", mViewModel.getPassword());
                         editor.apply();
+                        ActiveUser activeUser = ((ActiveUser)getActivity());
+                        activeUser.setActive(user);
                         NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
                         Navigation.findNavController(binding.getRoot()).navigate(action);
                         Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
@@ -182,8 +183,8 @@ public class LoginFragment extends Fragment {
                     for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
                         user = userDoc.toObject(UsersDataModel.class);
                         checkExist = true;
-
                         if(user.getPassword().equals(passwordQuickLogin)) {
+                            Log.d(TAG, "onStart: LOGIN");
                             ActiveUser activeUser = ((ActiveUser)getActivity());
                             activeUser.setActive(user);
 

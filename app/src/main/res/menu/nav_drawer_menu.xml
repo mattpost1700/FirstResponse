@@ -38,6 +38,11 @@
             android:icon="@drawable/preferences_icon"
             android:menuCategory = "secondary"
             android:title="@string/preferences"/>
+        <item
+            android:id="@+id/loginFragment"
+            android:icon="@drawable/preferences_icon"
+            android:menuCategory = "secondary"
+            android:title="@string/logout" />
     </group>
 
 </menu>
