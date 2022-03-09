@@ -141,6 +141,8 @@ public class LoginFragment extends Fragment {
                         editor.putString("savedUsername", mViewModel.getUsername());
                         editor.putString("savedPassword", mViewModel.getPassword());
                         editor.apply();
+                        ActiveUser activeUser = ((ActiveUser)getActivity());
+                        activeUser.setActive(user);
                         NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
                         Navigation.findNavController(binding.getRoot()).navigate(action);
                         Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
@@ -182,6 +184,7 @@ public class LoginFragment extends Fragment {
                         user = userDoc.toObject(UsersDataModel.class);
                         checkExist = true;
                         if(user.getPassword().equals(passwordQuickLogin)) {
+                            Log.d(TAG, "onStart: LOGIN");
                             ActiveUser activeUser = ((ActiveUser)getActivity());
                             activeUser.setActive(user);
 

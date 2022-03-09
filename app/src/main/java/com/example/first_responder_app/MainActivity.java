@@ -214,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.loginFragment:
+                setActive(null);
                 SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
@@ -234,6 +235,12 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 break;
             case R.id.preferencesFragment:
                 navController.navigate(R.id.preferencesFragment);
+                break;
+            case R.id.incidentGroupFragment:
+                navController.navigate(R.id.incidentGroupFragment);
+                break;
+            case R.id.respondingFragment:
+                navController.navigate(R.id.respondingFragment);
                 break;
         }
         //close navigation drawer
@@ -284,6 +291,20 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
      */
     @Override
     public void setActive(UsersDataModel user) {
+        Log.d(TAG, "setActive: " + user);
+        if(user == null){
+            this.activeUser = null;
+            if(userListener != null){
+                userListener.remove();
+                userListener = null;
+            }
+            if(incidentListener != null){
+                incidentListener.remove();
+                incidentListener = null;
+            }
+            stopETA();
+            return;
+        }
 
         this.activeUser = user;
         NavigationView navView = findViewById(R.id.navView);
