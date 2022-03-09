@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.FragmentManager;
@@ -20,7 +21,10 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
 import androidx.fragment.app.Fragment;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -65,7 +69,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements DrawerLocker, ActiveUser {
+public class MainActivity extends AppCompatActivity implements DrawerLocker, ActiveUser, NavigationView.OnNavigationItemSelectedListener{
     ActionBarDrawerToggle toggle;
     Toolbar toolbar;
     DrawerLayout drawer;
@@ -144,6 +148,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
             NavigationView navView = findViewById(R.id.navView);
             NavigationUI.setupWithNavController(navView, navController);
+            navView.setNavigationItemSelectedListener(this);
 
 
             //Setup Nav Drawer user click event
@@ -159,7 +164,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
                 }
             });
+
         }
+
 
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
@@ -195,6 +202,44 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     *
+     * @param item
+     * set up the drawer onClick listener
+     * also handles the logout from here
+     * @return
+     */
+    @SuppressLint("NonConstantResourceId")
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.loginFragment:
+                SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.clear();
+                editor.apply();
+                navController.navigate(R.id.loginFragment);
+                break;
+            case R.id.homeFragment:
+                navController.navigate(R.id.homeFragment);
+                break;
+            case R.id.eventGroupFragment:
+                navController.navigate(R.id.eventGroupFragment);
+                break;
+            case R.id.announcementFragment:
+                navController.navigate(R.id.announcementFragment);
+                break;
+            case R.id.chatGroupFragment:
+                navController.navigate(R.id.chatGroupFragment);
+                break;
+            case R.id.preferencesFragment:
+                navController.navigate(R.id.preferencesFragment);
+                break;
+        }
+        //close navigation drawer
+        closeNavDrawer();
+        return true;
+    }
 
 
     @Override

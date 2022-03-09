@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/drawable/home_icon.xml" value="0.3675" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/announcement_row_layout.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/chat_fragment.xml" value="0.17831813576494426" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_announcement.xml" value="0.3619791666666667" />
@@ -14,7 +15,7 @@
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_home.xml" value="0.33" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_incident.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_incident_group.xml" value="0.36666666666666664" />
-        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_login.xml" value="0.18854166666666666" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_login.xml" value="0.33" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_responding.xml" value="0.21195652173913043" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/fragment_user.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/incident_row_layout.xml" value="0.36666666666666664" />
@@ -28,6 +29,8 @@
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/row_layout_event.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/row_layout_eventgroup.xml" value="0.36666666666666664" />
         <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/layout/their_message.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/menu/appbar_menu.xml" value="0.36666666666666664" />
+        <entry key="..\:/Assignment/CMPSC488/test/app/src/main/res/menu/nav_drawer_menu.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1435" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/circle.xml" value="0.1435" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/drawable/ic_send_black_24dp.xml" value="0.1435" />
@@ -63,8 +66,6 @@
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_icon.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_round.xml" value="0.1" />
-        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/drawable/responder_row_background.xml" value="0.19" />
-        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/responder_row_layout.xml" value="0.18177083333333333" />
         <entry key="app/src/main/res/layout/fragment_announcement.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/fragment_announcement_new.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/fragment_event_group.xml" value="0.23229166666666667" />

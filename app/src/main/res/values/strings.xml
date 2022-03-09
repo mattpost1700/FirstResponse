@@ -87,6 +87,7 @@
     <string name="incident_type">Incident Type</string>
     <string name="officer_report">Officer Report</string>
     <string name="address">Address</string>
+    <string name="logout">Logout</string>
 
     <!-- Strings related to login -->
 </resources>
