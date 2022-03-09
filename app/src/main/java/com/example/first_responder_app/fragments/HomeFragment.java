@@ -466,14 +466,30 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
             respondersRecyclerViewAdapter.notifyDataSetChanged();
             return true;
         }
-        else if(id == R.id.eta_menu_item) { // TODO: Make get ETA work
+        else if(id == R.id.eta_menu_item) {
             respondersList.sort((o1, o2) -> {
-                if (o1 == null || o1.getResponding_time() == null) {
-                    return -1;
-                } else if (o2 == null || o2.getResponding_time() == null) {
+                try {
+                    String o1IncidentId = o1.getResponses().get(o1.getResponses().size() - 1);
+                    String o2IncidentId = o1.getResponses().get(o2.getResponses().size() - 1);
+                    String o1Eta = "";
+                    String o2Eta = "";
+
+                    for(IncidentDataModel incident : listOfIncidentDataModel) {
+                        if(o1IncidentId.equals(incident.getDocumentId())) {
+                            o1Eta = incident.getEta().get(o1.getDocumentId());
+                        }
+                        if(o2IncidentId.equals(incident.getDocumentId())) {
+                            o2Eta = incident.getEta().get(o1.getDocumentId());
+                        }
+                    }
+
+                    Integer o1EtaInt = Integer.parseInt(o1Eta.substring(0, o1Eta.indexOf(" ")));
+                    Integer o2EtaInt = Integer.parseInt(o2Eta.substring(0, o2Eta.indexOf(" ")));
+
+                    return o1EtaInt.compareTo(o2EtaInt);
+                }
+                catch (Exception e) { // Bad catch
                     return 1;
-                } else {
-                    return o1.getResponding_time().compareTo(o2.getResponding_time());
                 }
             });
             respondersRecyclerViewAdapter.notifyDataSetChanged();
