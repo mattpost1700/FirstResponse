@@ -19,8 +19,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 
 import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.R;
@@ -40,7 +42,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RespondingFragment extends Fragment {
+public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<UsersDataModel> listOfRespondingDataModel;
@@ -79,6 +81,13 @@ public class RespondingFragment extends Fragment {
             NavDirections action = RespondingFragmentDirections.actionRespondingFragmentToUserFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         };
+
+        binding.sortRespondersButton.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            popupMenu.setOnMenuItemClickListener(this);
+            popupMenu.inflate(R.menu.user_popup_menu);
+            popupMenu.show();
+        });
 
         // Recycler view
         RecyclerView respondingRecyclerView = binding.respondingRecyclerView;
@@ -186,7 +195,6 @@ public class RespondingFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-
     /**
      * Check if a specific incident is active
      *
@@ -211,5 +219,64 @@ public class RespondingFragment extends Fragment {
         if(respondingListener != null) respondingListener.remove();
         incidentListener = null;
         respondingListener = null;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.name_menu_item) {
+            listOfRespondingDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getFull_name() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getFull_name() == null) {
+                    return 1;
+                } else {
+                    return o1.getFull_name().compareTo(o2.getFull_name());
+                }
+            });
+            respondingRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.rank_menu_item) {
+            listOfRespondingDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getRank_id() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getRank_id() == null) {
+                    return 1;
+                } else {
+                    return o1.getRank_id().compareTo(o2.getRank_id());
+                }
+            });
+            respondingRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.response_time_menu_item) {
+            listOfRespondingDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getResponding_time() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getResponding_time() == null) {
+                    return 1;
+                } else {
+                    return o1.getResponding_time().compareTo(o2.getResponding_time());
+                }
+            });
+            respondingRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.eta_menu_item) { // TODO: Make get ETA work
+            listOfRespondingDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getResponding_time() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getResponding_time() == null) {
+                    return 1;
+                } else {
+                    return o1.getResponding_time().compareTo(o2.getResponding_time());
+                }
+            });
+            respondingRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        return false;
     }
 }

@@ -18,8 +18,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.databinding.FragmentIncidentGroupBinding;
@@ -35,7 +37,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IncidentGroupFragment extends Fragment {
+public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<IncidentDataModel> listOfIncidentDataModel;
@@ -72,6 +74,13 @@ public class IncidentGroupFragment extends Fragment {
             NavDirections action = IncidentGroupFragmentDirections.actionIncidentGroupFragmentToIncidentFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         };
+
+        binding.sortIncidentsButton.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            popupMenu.setOnMenuItemClickListener(this);
+            popupMenu.inflate(R.menu.incident_popup_menu);
+            popupMenu.show();
+        });
 
         // Recycler view
         RecyclerView incidentRecyclerView = binding.incidentsGroupRecyclerView;
@@ -159,5 +168,38 @@ public class IncidentGroupFragment extends Fragment {
         super.onDestroyView();
         if(incidentListener != null) incidentListener.remove();
         incidentListener = null;
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.time_menu_item) {
+            listOfIncidentDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getCreated_at() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getCreated_at() == null) {
+                    return 1;
+                } else {
+                    return o1.getCreated_at().compareTo(o2.getCreated_at());
+                }
+            });
+            incidentGroupRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.incident_type_menu_item) {
+            listOfIncidentDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getIncident_type() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getIncident_type() == null) {
+                    return 1;
+                } else {
+                    return o1.getIncident_type().compareTo(o2.getIncident_type());
+                }
+            });
+            incidentGroupRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        return false;
     }
 }
