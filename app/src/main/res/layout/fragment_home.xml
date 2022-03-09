@@ -63,6 +63,18 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintStart_toStartOf="parent" />
 
+                        <Button
+                            android:id="@+id/sort_incidents_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/ic_baseline_sort_24"
+
+
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_bias="0.476" />
+
                         <androidx.appcompat.widget.AppCompatButton
                             android:id="@+id/view_all_incidents"
                             android:layout_width="wrap_content"
@@ -73,8 +85,9 @@
                             android:paddingVertical="5dp"
                             android:text="@string/view_all"
                             android:textSize="12sp"
+
+                            app:layout_constraintEnd_toStartOf="@id/sort_incidents_button"
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -118,6 +131,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
                         app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
@@ -125,15 +139,26 @@
                             android:id="@+id/view_all_responders"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
+                            android:layout_marginBottom="4dp"
                             android:background="@drawable/standard_button_secondary"
-                            android:textColor="?attr/colorOnSecondary"
                             android:minHeight="48dp"
                             android:paddingVertical="5dp"
                             android:text="@string/view_all"
+                            android:textColor="?attr/colorOnSecondary"
                             android:textSize="12sp"
+
+                            app:layout_constraintStart_toEndOf="@id/sort_responders_button"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <Button
+                            android:id="@+id/sort_responders_button"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/ic_baseline_sort_24"
+
                             app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent" />
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
                         <TextView
                             android:id="@+id/home_responding"

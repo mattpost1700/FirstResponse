@@ -6,8 +6,10 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,11 +53,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 //TODO, haven't implement anything
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -99,6 +103,20 @@ public class HomeFragment extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
+        binding.sortIncidentsButton.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            popupMenu.setOnMenuItemClickListener(this);
+            popupMenu.inflate(R.menu.incident_popup_menu);
+            popupMenu.show();
+        });
+
+        binding.sortRespondersButton.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(getContext(), view);
+            popupMenu.setOnMenuItemClickListener(this);
+            popupMenu.inflate(R.menu.user_popup_menu);
+            popupMenu.show();
+        });
+
         final SwipeRefreshLayout pullToRefresh = bindingView.findViewById(R.id.homeSwipeRefreshLayout);
         pullToRefresh.setOnRefreshListener(() -> {
             refreshData(); // your code
@@ -129,7 +147,6 @@ public class HomeFragment extends Fragment {
                     }
                 });
 
-
         saveRanksCollection();
 
         RespondersRecyclerViewAdapter.ResponderClickListener responderClickListener = (view, position) -> {
@@ -145,12 +162,10 @@ public class HomeFragment extends Fragment {
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
-
             IncidentViewModel incidentViewModel = new ViewModelProvider(requireActivity()).get(IncidentViewModel.class);
             incidentViewModel.setIncidentDataModel(incident);
             NavDirections action = HomeFragmentDirections.actionHomeFragmentToIncidentFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
-
         };
 
         // RecyclerViews
@@ -285,7 +300,6 @@ public class HomeFragment extends Fragment {
         return false;
     }
 
-
     /**
      * Displays the active incidents
      */
@@ -373,7 +387,6 @@ public class HomeFragment extends Fragment {
         // TODO: Use the ViewModel
     }
 
-
     @Override
     public void onDestroyView() {
         if(incidentListener != null) incidentListener.remove();
@@ -382,5 +395,90 @@ public class HomeFragment extends Fragment {
         responderListener = null;
 
         super.onDestroyView();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.time_menu_item) {
+            listOfIncidentDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getCreated_at() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getCreated_at() == null) {
+                    return 1;
+                } else {
+                    return o1.getCreated_at().compareTo(o2.getCreated_at());
+                }
+            });
+            incidentRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.incident_type_menu_item) {
+            listOfIncidentDataModel.sort((o1, o2) -> {
+                if (o1 == null || o1.getIncident_type() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getIncident_type() == null) {
+                    return 1;
+                } else {
+                    return o1.getIncident_type().compareTo(o2.getIncident_type());
+                }
+            });
+            incidentRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.name_menu_item) {
+            respondersList.sort((o1, o2) -> {
+                if (o1 == null || o1.getFull_name() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getFull_name() == null) {
+                    return 1;
+                } else {
+                    return o1.getFull_name().compareTo(o2.getFull_name());
+                }
+            });
+            respondersRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.rank_menu_item) {
+            respondersList.sort((o1, o2) -> {
+                if (o1 == null || o1.getRank_id() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getRank_id() == null) {
+                    return 1;
+                } else {
+                    return o1.getRank_id().compareTo(o2.getRank_id());
+                }
+            });
+            respondersRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.response_time_menu_item) {
+            respondersList.sort((o1, o2) -> {
+                if (o1 == null || o1.getResponding_time() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getResponding_time() == null) {
+                    return 1;
+                } else {
+                    return o1.getResponding_time().compareTo(o2.getResponding_time());
+                }
+            });
+            respondersRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if(id == R.id.eta_menu_item) { // TODO: Make get ETA work
+            respondersList.sort((o1, o2) -> {
+                if (o1 == null || o1.getResponding_time() == null) {
+                    return -1;
+                } else if (o2 == null || o2.getResponding_time() == null) {
+                    return 1;
+                } else {
+                    return o1.getResponding_time().compareTo(o2.getResponding_time());
+                }
+            });
+            respondersRecyclerViewAdapter.notifyDataSetChanged();
+            return true;
+        }
+        return false;
     }
 }

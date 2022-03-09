@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/name_menu_item"
+        android:title="Name"/>
+    <item android:id="@+id/rank_menu_item"
+        android:title="Rank"/>
+    <item android:id="@+id/response_time_menu_item"
+        android:title="Response Time"/>
+    <item android:id="@+id/eta_menu_item"
+        android:title="ETA"/>
+</menu>

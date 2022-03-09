@@ -22,6 +22,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="14dp">
 
+
             <TextView
                 android:id="@+id/responding_label_text_view"
                 android:layout_width="wrap_content"
@@ -34,6 +35,16 @@
                 android:fontFamily="@font/anton_regular"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/sort_responders_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_baseline_sort_24"
+
+                app:layout_constraintBottom_toBottomOf="@+id/responding_label_text_view"
+                app:layout_constraintStart_toEndOf="@id/responding_label_text_view"
+                app:layout_constraintTop_toTopOf="@+id/responding_label_text_view" />
 
 
             <androidx.recyclerview.widget.RecyclerView
