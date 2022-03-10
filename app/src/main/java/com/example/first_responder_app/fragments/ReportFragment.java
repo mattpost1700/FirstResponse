@@ -1,25 +1,29 @@
 package com.example.first_responder_app.fragments;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
+import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.fragment.NavHostFragment;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
-import com.example.first_responder_app.databinding.FragmentIncidentBinding;
+import com.example.first_responder_app.dataModels.ReportDataModel;
 import com.example.first_responder_app.databinding.FragmentReportBinding;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.ReportViewModel;
 
 public class ReportFragment extends Fragment {
@@ -32,8 +36,7 @@ public class ReportFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_report, container, false);
         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         View bindingView = binding.getRoot();
@@ -43,13 +46,44 @@ public class ReportFragment extends Fragment {
 
         setText();
 
-        return inflater.inflate(R.layout.fragment_report, container, false);
+        binding.floatingActionButton.setOnClickListener(view -> {
+            // Send to db
+            ActiveUser activeUser = (ActiveUser) getActivity();
+            //String fire_department_id, String incident_id, String user_created_id, String address, String units, String box_number, String incident_type, String narrative) {
+
+            ReportDataModel report = null;
+            try {
+                report = new ReportDataModel("TEST_FIRE_DEPT_ID",
+                        incident.getDocumentId(),
+                        activeUser.getActive().getDocumentId(),
+                        binding.addressTextView.getText().toString(),
+                        binding.unitsTextView.getText().toString(),
+                        binding.boxNumberTextView.getText().toString(),
+                        binding.incidentTypeTextView.getText().toString(),
+                        binding.reportOfficerText.getText().toString());
+            } catch (NullPointerException nullPointerException) {
+                report = null;
+                Toast.makeText(getActivity(), "You must fill out the whole form", Toast.LENGTH_SHORT).show();
+            }
+
+            if(report != null) {
+                FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.REPORTS_COLLECTION_DIR).add(report)
+                        .addOnSuccessListener(documentReference -> {
+                            Log.d(TAG, "onCreateView: added " + documentReference);
+                            Toast.makeText(getActivity(), "Report saved!", Toast.LENGTH_SHORT).show();
+
+                            NavDirections action = ReportFragmentDirections.actionReportFragmentToIncidentFragment();
+                            Navigation.findNavController(binding.getRoot()).navigate(action);
+                        })
+                        .addOnFailureListener(e -> Log.e(TAG, "onCreateView: Failed to upload document!", e));
+            }
+        });
+
+        return bindingView;
     }
 
 
-
-    private void setText(){
-        //TODO: Figure out why this doesn't work
+    private void setText() {
         Log.d("TAG", "setText: " + incident.getIncident_type());
         binding.addressTextView.setText(incident.getLocation());
         Log.d("TAG", "setText: " + binding.addressTextView.getText().toString());
@@ -57,5 +91,4 @@ public class ReportFragment extends Fragment {
         binding.incidentTypeTextView.setText(incident.getIncident_type());
         binding.reportIncidentDate.setText("test");
     }
-
 }

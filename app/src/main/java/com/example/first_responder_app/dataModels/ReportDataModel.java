@@ -19,26 +19,39 @@ public class ReportDataModel implements Serializable {
     private String user_created_id;
 
     // Object params
-    private String type_name;
+    private String address;
+    private String units;
+    private String box_number;
+    private String incident_type;
+    private String narrative;
 
     /** Constructors **/
 
     public ReportDataModel() {}
 
-    public ReportDataModel(Timestamp created_at, String fire_department_id, String incident_id, String user_created_id, String type_name) {
+    public ReportDataModel(String documentId, Timestamp created_at, String fire_department_id, String incident_id, String user_created_id, String address, String units, String box_number, String incident_type, String narrative) {
+        this.documentId = documentId;
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.incident_id = incident_id;
         this.user_created_id = user_created_id;
-        this.type_name = type_name;
+        this.address = address;
+        this.units = units;
+        this.box_number = box_number;
+        this.incident_type = incident_type;
+        this.narrative = narrative;
     }
 
-    public ReportDataModel(String fire_department_id, String incident_id, String user_created_id, String type_name) {
+    public ReportDataModel(String fire_department_id, String incident_id, String user_created_id, String address, String units, String box_number, String incident_type, String narrative) {
         this.created_at = Timestamp.now();
         this.fire_department_id = fire_department_id;
         this.incident_id = incident_id;
         this.user_created_id = user_created_id;
-        this.type_name = type_name;
+        this.address = address;
+        this.units = units;
+        this.box_number = box_number;
+        this.incident_type = incident_type;
+        this.narrative = narrative;
     }
 
     /** Setters **/
@@ -63,8 +76,24 @@ public class ReportDataModel implements Serializable {
         this.user_created_id = user_created_id;
     }
 
-    public void setType_name(String type_name) {
-        this.type_name = type_name;
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public void setUnits(String units) {
+        this.units = units;
+    }
+
+    public void setBox_number(String box_number) {
+        this.box_number = box_number;
+    }
+
+    public void setIncident_type(String incident_type) {
+        this.incident_type = incident_type;
+    }
+
+    public void setNarrative(String narrative) {
+        this.narrative = narrative;
     }
 
     /** Getters **/
@@ -89,7 +118,23 @@ public class ReportDataModel implements Serializable {
         return user_created_id;
     }
 
-    public String getType_name() {
-        return type_name;
+    public String getAddress() {
+        return address;
+    }
+
+    public String getUnits() {
+        return units;
+    }
+
+    public String getBox_number() {
+        return box_number;
+    }
+
+    public String getIncident_type() {
+        return incident_type;
+    }
+
+    public String getNarrative() {
+        return narrative;
     }
 }

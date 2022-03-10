@@ -167,8 +167,8 @@
         android:label="report_fragment"
         tools:layout="@layout/fragment_report" >
         <action
-            android:id="@+id/action_reportFragment_to_incidentGroupFragment"
-            app:destination="@id/incidentGroupFragment" />
+            android:id="@+id/action_reportFragment_to_incidentFragment"
+            app:destination="@id/incidentFragment" />
     </fragment>
     <fragment
         android:id="@+id/preferencesFragment"
