@@ -1,54 +1,38 @@
 package com.example.first_responder_app.fragments;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
+import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import androidx.appcompat.widget.Toolbar;
+import android.widget.Toast;
 
-import com.example.first_responder_app.MainActivity;
-import com.example.first_responder_app.dataModels.IncidentDataModel;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+
+import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.databinding.FragmentLoginBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldPath;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.LoginViewModel;
-import com.example.first_responder_app.R;
-import com.example.first_responder_app.databinding.FragmentLoginBinding;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import static android.content.ContentValues.TAG;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class LoginFragment extends Fragment {
 
@@ -65,9 +49,7 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //lock drawer on login page
         DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
         if(drawerLocker != null){
@@ -188,8 +170,13 @@ public class LoginFragment extends Fragment {
                             ActiveUser activeUser = ((ActiveUser)getActivity());
                             activeUser.setActive(user);
 
-                            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-                            Navigation.findNavController(binding.getRoot()).navigate(action);
+                            if(FirestoreDatabase.getInstance().setActiveUser(user)) {
+                                NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+                                Navigation.findNavController(binding.getRoot()).navigate(action);
+                            } else {
+                                // User cannot make good queries
+                                Toast.makeText(getContext(), "User does not have a department", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }
                 } else {

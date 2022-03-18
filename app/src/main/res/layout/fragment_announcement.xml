@@ -10,60 +10,68 @@
             type="com.example.first_responder_app.viewModels.AnnouncementViewModel" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
 
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/announcementSwipeRefreshLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/home_announcement"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:fontFamily="@font/anton_regular"
-            android:text="@string/announcement"
-            android:textSize="35sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAnnoun"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:requiresFadingEdge="vertical"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/home_announcement" />
+            android:layout_height="match_parent"
+            >
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/new_announcement_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/standard_button_primary"
-            android:text="@string/create"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="12sp"
-            android:layout_marginEnd="20dp"
-            app:layout_constraintBottom_toTopOf="@+id/rvAnnoun"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/home_announcement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:fontFamily="@font/anton_regular"
+                android:text="@string/announcement"
+                android:textSize="35sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
 
-        <TextView
-            android:id="@+id/announcement_none_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no_announcements"
-            android:textSize="18sp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/rvAnnoun"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.16000003" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAnnoun"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:requiresFadingEdge="vertical"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/home_announcement" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/new_announcement_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/standard_button_primary"
+                android:text="@string/create"
+                android:textColor="?attr/colorOnPrimary"
+                android:textSize="12sp"
+                android:layout_marginEnd="20dp"
+                app:layout_constraintBottom_toTopOf="@+id/rvAnnoun"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/announcement_none_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_announcements"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/rvAnnoun"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.16000003" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
 </layout>

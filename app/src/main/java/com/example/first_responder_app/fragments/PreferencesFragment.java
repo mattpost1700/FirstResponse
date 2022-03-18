@@ -1,21 +1,13 @@
 package com.example.first_responder_app.fragments;
 
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.preference.ListPreference;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.viewModels.PreferencesViewModel;
 
 public class PreferencesFragment extends PreferenceFragmentCompat {
 

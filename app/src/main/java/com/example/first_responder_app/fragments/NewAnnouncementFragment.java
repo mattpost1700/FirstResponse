@@ -1,39 +1,32 @@
 package com.example.first_responder_app.fragments;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.NotificationService;
-import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
+import com.example.first_responder_app.R;
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentAnnouncementNewBinding;
 import com.example.first_responder_app.viewModels.NewAnnouncementViewModel;
-import com.example.first_responder_app.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.json.JSONException;
-
-import java.util.ArrayList;
 
 public class NewAnnouncementFragment extends Fragment {
 
@@ -42,17 +35,23 @@ public class NewAnnouncementFragment extends Fragment {
     FirestoreDatabase firestoreDatabase = new FirestoreDatabase();
     private NewAnnouncementViewModel mViewModel;
 
+    private UsersDataModel activeUser;
+
     public static NewAnnouncementFragment newInstance() {
         return new NewAnnouncementFragment();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentAnnouncementNewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_announcement_new, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
+
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
 
         binding.announcementCreateConfirm.setOnClickListener(v -> {
             mViewModel.setAnnounTitle(binding.newAnnounTitle.getText().toString());

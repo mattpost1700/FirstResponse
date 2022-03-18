@@ -1,34 +1,29 @@
 package com.example.first_responder_app.fragments;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.NotificationService;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentEventNewBinding;
 import com.example.first_responder_app.viewModels.NewEventViewModel;
-import com.example.first_responder_app.R;
 
 import org.json.JSONException;
-
-import java.util.ArrayList;
 
 public class NewEventFragment extends Fragment {
 
@@ -41,11 +36,9 @@ public class NewEventFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         FragmentEventNewBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event_new, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         // TODO: navCont created for side bar(still need to be implemented)
         NavController navController = navHostFragment.getNavController();
         //switch to Home fragment upon clicking it
@@ -84,7 +77,7 @@ public class NewEventFragment extends Fragment {
             }
             else {
                 try {
-                    firestoreDatabase.addEvent("US-East", title, description, new ArrayList<String>());
+                    firestoreDatabase.addEvent("US-East", title, description);
                     try {
                         _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
                     } catch (JSONException e) {
