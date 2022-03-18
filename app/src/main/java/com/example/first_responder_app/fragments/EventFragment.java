@@ -126,8 +126,7 @@ public class EventFragment extends Fragment {
             pullToRefresh.setRefreshing(false);
         });
 
-        // TODO: add background listener if there's an update
-        //addParticipatingEventListener();
+        addParticipatingEventListener();
 
         binding.signUp.setOnClickListener(v -> {
             if (binding.signUp.getText().equals("Withdraw")) {
@@ -139,13 +138,6 @@ public class EventFragment extends Fragment {
                         .addOnSuccessListener(documentReference -> {
                             isParticipating = false;
 
-                            for(int i = 0; i<participants.size(); i++){
-                                if(participants.get(i).getDocumentId().equals(userID)){
-                                    participants.remove(i);
-                                    eventRecyclerViewAdapter.notifyDataSetChanged();
-                                }
-                            }
-                            checkParticipantsEmpty();
                             binding.signUp.setText("Sign Up");
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
@@ -157,21 +149,7 @@ public class EventFragment extends Fragment {
                         .set(eventInfo)
                         .addOnSuccessListener(documentReference -> {
                             isParticipating = true;
-
-                            db.collection("users").document(userID).get().addOnCompleteListener(task -> {
-                                if(task.isSuccessful()){
-                                    DocumentSnapshot snapshot = task.getResult();
-                                    UsersDataModel u = snapshot.toObject(UsersDataModel.class);
-                                    participants.add(u);
-                                    eventRecyclerViewAdapter.notifyDataSetChanged();
-                                    checkParticipantsEmpty();
-                                    binding.signUp.setText("Withdraw");
-
-                                }else{
-                                    Log.d(TAG, task.getException() + "");
-                                }
-                            });
-
+                            binding.signUp.setText("Withdraw");
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
 
@@ -190,15 +168,27 @@ public class EventFragment extends Fragment {
         return binding.getRoot();
     }
 
-    // WIP
     private void addParticipatingEventListener() {
         if (eventListener != null) return;
         eventListener = db.collection(FirestoreDatabase.EVENTS_COLLECTION_DIR).document(eventInfo.getDocumentId()).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
 
-            if (error != null) {
+            if (error != null || value == null) {
                 Log.w(TAG, "Listening failed for firestore incident collection");
             } else {
+                eventInfo = value.toObject(EventsDataModel.class);
+                participants.clear();
+
+                ActiveUser a = (ActiveUser) getActivity();
+                UsersDataModel u = a.getActive();
+                if(u != null){
+                    if(eventInfo.getParticipants().contains(u.getDocumentId())){
+                        binding.signUp.setText("Withdraw");
+                    }else{
+                        binding.signUp.setText("Sign Up");
+                    }
+                }
+
                 populateParticipantListFromDB();
             }
         });
@@ -267,6 +257,7 @@ public class EventFragment extends Fragment {
     }
 
     private void populateParticipantListFromDB() {
+        participants.clear();
         if (eventInfo.getParticipants().size() != 0) {
             isAnyParticipants = true;
             int upper = Math.floorDiv(eventInfo.getParticipantsSize(), 10);
