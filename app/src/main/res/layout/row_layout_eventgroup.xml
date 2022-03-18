@@ -22,13 +22,13 @@
             android:textColor="?attr/colorOnPrimary"
             android:paddingVertical="5dp"
             android:textSize="20sp"
-            app:layout_constraintEnd_toStartOf="@+id/announcement_time"
+            app:layout_constraintEnd_toStartOf="@+id/row_layout_event_time"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Title" />
 
         <TextView
-            android:id="@+id/announcement_time"
+            android:id="@+id/row_layout_event_time"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="3/2/22 12:23"
@@ -39,6 +39,16 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/row_layout_event_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textColor="?attr/colorOnPrimary"
+            app:layout_constraintEnd_toStartOf="@+id/row_layout_event_time"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rowlayout_eventGroup_title" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

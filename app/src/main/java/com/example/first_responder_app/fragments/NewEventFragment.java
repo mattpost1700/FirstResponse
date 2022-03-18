@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,9 +22,15 @@ import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.NotificationService;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentEventNewBinding;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.NewEventViewModel;
+import com.google.firebase.Timestamp;
 
 import org.json.JSONException;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class NewEventFragment extends Fragment {
 
@@ -71,20 +78,32 @@ public class NewEventFragment extends Fragment {
 
             String title = binding.newEventTitle.getText().toString();
             String description = binding.newEventDescription.getText().toString();
-            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description)){
+            String location = binding.newEventLocation.getText().toString();
+            String eventDate = binding.newEventDate.getText().toString();
+            String eventTime = binding.newEventTime.getText().toString();
+            String duration = binding.newEventDurationText.getText().toString();
+
+            if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || location.equals("") || eventDate.equals("MM/DD/YYYY") || eventTime.equals("HH:MM") || duration.equals("")){
                 binding.newEventLog.setText(R.string.event_title_description_is_empty);
                 binding.newEventLog.setVisibility(View.VISIBLE);
             }
             else {
                 try {
-                    firestoreDatabase.addEvent("US-East", title, description);
-                    try {
-                        _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+
+                    Date d = new SimpleDateFormat("MM/dd/yyyy hh:mm aa", Locale.getDefault()).parse(eventDate + " " + eventTime);
+
+                    ActiveUser a = (ActiveUser)getActivity();
+                    firestoreDatabase.setActiveUser(a.getActive());
+
+                    firestoreDatabase.addEvent(location, title, description, d, Integer.parseInt(duration));
+//                    try {
+//                        _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
                     Navigation.findNavController(binding.getRoot()).navigate(action);
                 } catch (Exception e) {
+                    Toast.makeText(requireContext(), "Error Creating Event", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }

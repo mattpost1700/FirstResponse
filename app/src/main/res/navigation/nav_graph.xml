@@ -107,6 +107,9 @@
         <action
             android:id="@+id/action_eventFragment_to_eventGroupFragment"
             app:destination="@id/eventGroupFragment" />
+        <action
+            android:id="@+id/action_eventFragment_to_userFragment"
+            app:destination="@id/userFragment" />
     </fragment>
     <fragment
         android:id="@+id/newEventFragment"

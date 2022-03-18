@@ -110,6 +110,7 @@ public class EventGroupFragment extends Fragment{
                     EventsDataModel eventDataModel = eventDoc.toObject(EventsDataModel.class);
                     temp.add(eventDataModel);
                 }
+                Log.d(TAG, "populateEventList: " + temp.size());
                 listOfEvents.clear();
                 listOfEvents.addAll(temp);
                 checkEventsEmpty();

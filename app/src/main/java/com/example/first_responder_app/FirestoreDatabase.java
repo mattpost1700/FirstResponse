@@ -23,6 +23,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,9 +90,8 @@ public class FirestoreDatabase {
     }
 
     // TODO: Add event correctly
-    public void addEvent(String location, String title, String description) {
-        int duration = 1;
-        Timestamp eventTime = Timestamp.now();
+    public void addEvent(String location, String title, String description, Date date, int duration) {
+        Timestamp eventTime = new Timestamp(date);
         EventsDataModel newEvent = new EventsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), eventTime, title, description, location, duration);
 
 

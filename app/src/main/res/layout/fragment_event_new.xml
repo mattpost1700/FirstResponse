@@ -172,6 +172,35 @@ tools:context=".fragments.NewAnnouncementFragment">
                 app:layout_constraintStart_toStartOf="@+id/event_description_text"
                 app:layout_constraintTop_toBottomOf="@+id/event_time_text" />
 
+
+            <TextView
+                android:id="@+id/new_event_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/new_event_duration_text"
+                android:text="@string/duration_minutes"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/newEventTime" />
+
+            <EditText
+                android:id="@+id/new_event_duration_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="25dp"
+                android:minHeight="48dp"
+                android:text=""
+                android:inputType="number"
+                android:autofillHints=""
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/event_description_text"
+                app:layout_constraintTop_toBottomOf="@+id/new_event_duration" />
+
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/event_create_confirm"
                 android:layout_width="0dp"
@@ -182,13 +211,13 @@ tools:context=".fragments.NewAnnouncementFragment">
                 android:textColor="?attr/colorOnPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/newEventTime" />
+                app:layout_constraintTop_toBottomOf="@id/new_event_duration_text" />
 
             <TextView
                 android:id="@+id/new_event_log"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="15dp"
                 android:text="@string/invalid_entry"
                 android:textColor="#FF0000"
                 android:textSize="20sp"

@@ -46,8 +46,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO, haven't implement anything
-
 public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -155,7 +153,6 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
-            Log.d(TAG, "onCreateView: clicked (from incident listener)!");
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 

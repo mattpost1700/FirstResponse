@@ -26,7 +26,7 @@
     <string name="unavailable">Unavailable</string>
     <string name="station">Station</string>
     <string name="eta_label">ETA:&#160;</string>
-    <string name="event_title_description_is_empty">Event Title/Description is empty</string>
+    <string name="event_title_description_is_empty">Please fill out all the fields</string>
     <string name="type_of_call">Type of Call:&#160;</string>
     <string name="responding_label">Responding:&#160;</string>
     <string name="received_label">Received Time:&#160;</string>
@@ -92,6 +92,10 @@
     <string name="create_a_department">Create a department</string>
     <string name="no_reports_filed">No Reports Filed</string>
     <string name="reports">Reports</string>
+    <string name="created_by">Created by:&#160;</string>
+    <string name="time">Time:</string>
+    <string name="duration">Duration:</string>
+    <string name="duration_minutes">Duration (Minutes):</string>
 
     <!-- Strings related to login -->
 </resources>
