@@ -2,32 +2,36 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.example.first_responder_app.recyclerViews.EventGroupRecyclerViewAdapter;
-import com.example.first_responder_app.dataModels.EventsDataModel;
-import com.example.first_responder_app.databinding.FragmentEventGroupBinding;
+import com.example.first_responder_app.AppUtil;
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.dataModels.EventsDataModel;
+import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.databinding.FragmentEventGroupBinding;
+import com.example.first_responder_app.recyclerViews.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -41,23 +45,29 @@ public class EventGroupFragment extends Fragment{
     private EventGroupRecyclerViewAdapter eventGroupRecyclerViewAdapter;
     private String userID;
     FragmentEventGroupBinding binding;
+
+    private UsersDataModel activeUser;
+
     public static EventGroupFragment newInstance() {
         return new EventGroupFragment();
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_event_group, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
+
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
 
         listOfEvents = new ArrayList<>();
         populateEventList();
-
 
         EventGroupRecyclerViewAdapter.ItemClickListener eventClickListener = ((view, position, data) -> {
             //passing data to event
@@ -73,6 +83,12 @@ public class EventGroupFragment extends Fragment{
         eventGroupRecyclerViewAdapter.setClickListener(eventClickListener);
         eventGroupRecyclerView.setAdapter(eventGroupRecyclerViewAdapter);
 
+        final SwipeRefreshLayout pullToRefresh = binding.eventSwipeRefreshLayout;
+        pullToRefresh.setOnRefreshListener(() -> {
+            populateEventList();
+            pullToRefresh.setRefreshing(false);
+        });
+
         binding.newEventButton.setOnClickListener(v -> {
             NavDirections action = EventGroupFragmentDirections.actionEventGroupFragmentToNewEventFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
@@ -82,7 +98,10 @@ public class EventGroupFragment extends Fragment{
     }
 
     private void populateEventList(){
-        db.collection("events").get().addOnCompleteListener(eventTask -> {
+        db.collection("events")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                .get().addOnCompleteListener(eventTask -> {
             Log.d(TAG, "READ DATABASE - EVENT GROUP FRAGMENT");
 
             if (eventTask.isSuccessful()) {

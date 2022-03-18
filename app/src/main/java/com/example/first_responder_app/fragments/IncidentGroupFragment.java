@@ -2,33 +2,34 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.example.first_responder_app.AppUtil;
+import com.example.first_responder_app.FirestoreDatabase;
+import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentIncidentGroupBinding;
 import com.example.first_responder_app.recyclerViews.IncidentGroupRecyclerViewAdapter;
-import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.IncidentGroupViewModel;
-import com.example.first_responder_app.R;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -49,6 +50,8 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
 
     private IncidentGroupViewModel mViewModel;
 
+    private UsersDataModel activeUser;
+
     public static IncidentGroupFragment newInstance() {
         return new IncidentGroupFragment();
     }
@@ -58,6 +61,12 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_incident_group, container, false);
 
         listOfIncidentDataModel = new ArrayList<>();
+
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
 
         final SwipeRefreshLayout pullToRefresh = binding.incidentGroupSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
@@ -114,7 +123,9 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
      */
     private void addIncidentEventListener() {
         if(incidentListener != null) return;
-        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        incidentListener = db.collection("incident")
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
+                .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
 
             if(error != null) {
@@ -136,7 +147,9 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
     }
 
     private void refreshData() {
-        db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+        db.collection("incident")
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
+                .whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
             Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
 
             if (incidentTask.isSuccessful()) {

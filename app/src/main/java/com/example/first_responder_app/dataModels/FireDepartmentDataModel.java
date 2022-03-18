@@ -4,8 +4,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 
 public class FireDepartmentDataModel implements Serializable {
 
@@ -18,19 +16,22 @@ public class FireDepartmentDataModel implements Serializable {
 
     // Object params
     private String location;
+    private String name;
 
     /** Constructors **/
 
     public FireDepartmentDataModel() {}
 
-    public FireDepartmentDataModel(Timestamp created_at, String location) {
+    public FireDepartmentDataModel(Timestamp created_at, String location, String name) {
         this.created_at = created_at;
         this.location = location;
+        this.name = name;
     }
 
-    public FireDepartmentDataModel(String location) {
+    public FireDepartmentDataModel(String location, String name) {
         this.created_at = Timestamp.now();
         this.location = location;
+        this.name = name;
     }
 
     /** Setters **/
@@ -47,6 +48,10 @@ public class FireDepartmentDataModel implements Serializable {
         this.location = location;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /** Getters **/
 
     public String getDocumentId() {
@@ -59,5 +64,9 @@ public class FireDepartmentDataModel implements Serializable {
 
     public String getLocation() {
         return location;
+    }
+
+    public String getName() {
+        return name;
     }
 }

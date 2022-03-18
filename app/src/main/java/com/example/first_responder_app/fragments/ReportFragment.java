@@ -18,18 +18,21 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.ReportDataModel;
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentReportBinding;
-import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.ReportViewModel;
 
 public class ReportFragment extends Fragment {
 
     private IncidentDataModel incident;
     FragmentReportBinding binding;
+
+    private UsersDataModel activeUser;
 
     public static ReportFragment newInstance() {
         return new ReportFragment();
@@ -41,6 +44,12 @@ public class ReportFragment extends Fragment {
         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         View bindingView = binding.getRoot();
 
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
+
         ReportViewModel mViewModel = new ViewModelProvider(requireActivity()).get(ReportViewModel.class);
         incident = mViewModel.getIncidentDataModel();
 
@@ -48,14 +57,13 @@ public class ReportFragment extends Fragment {
 
         binding.floatingActionButton.setOnClickListener(view -> {
             // Send to db
-            ActiveUser activeUser = (ActiveUser) getActivity();
             //String fire_department_id, String incident_id, String user_created_id, String address, String units, String box_number, String incident_type, String narrative) {
 
             ReportDataModel report = null;
             try {
-                report = new ReportDataModel("TEST_FIRE_DEPT_ID",
+                report = new ReportDataModel(activeUser.getFire_department_id(),
                         incident.getDocumentId(),
-                        activeUser.getActive().getDocumentId(),
+                        activeUser.getDocumentId(),
                         binding.addressTextView.getText().toString(),
                         binding.unitsTextView.getText().toString(),
                         binding.boxNumberTextView.getText().toString(),

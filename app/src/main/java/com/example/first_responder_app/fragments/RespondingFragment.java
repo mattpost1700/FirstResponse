@@ -2,37 +2,33 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.PopupMenu;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.first_responder_app.AppUtil;
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentRespondingBinding;
-import com.example.first_responder_app.databinding.FragmentUserBinding;
-import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.RespondersGroupRecyclerViewAdapter;
-import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.RespondingViewModel;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -54,6 +50,8 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
 
     FragmentRespondingBinding binding;
 
+    private UsersDataModel activeUser;
+
     private RespondingViewModel mViewModel;
 
     public static RespondingFragment newInstance() {
@@ -66,6 +64,13 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
 
         listOfRespondingDataModel = new ArrayList<>();
         listOfIncidentDataModel = new ArrayList<>();
+
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
+
 
         final SwipeRefreshLayout pullToRefresh = binding.respondingSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
@@ -118,7 +123,9 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
 
     private void addResponderEventListener() {
         if(respondingListener != null) return;
-        respondingListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
+        respondingListener = db.collection("users")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
 
             if(error != null) {
@@ -143,7 +150,9 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
 
     private void addIncidentEventListener(){
         if(incidentListener != null) return;
-        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        incidentListener = db.collection("incident")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
 
             if(error != null) {
@@ -164,7 +173,9 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
     }
 
     private void refreshData() {
-        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).get().addOnCompleteListener(userTask -> {
+        db.collection("users")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).get().addOnCompleteListener(userTask -> {
             Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
 
             if(userTask.isSuccessful()) {

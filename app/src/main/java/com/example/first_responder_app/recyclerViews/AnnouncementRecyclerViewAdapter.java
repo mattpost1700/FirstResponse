@@ -4,7 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +17,9 @@ import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<AnnouncementRecyclerViewAdapter.ViewHolder>{
 
@@ -46,6 +47,8 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
         AnnouncementsDataModel announ = mData.get(position);
         holder.title.setText(announ.getTitle());
         holder.des.setText(announ.getDescription());
+        String dateString = new SimpleDateFormat("MM/dd h:mm aa", Locale.getDefault()).format(announ.getCreated_at().toDate());
+        holder.annoucementTime.setText(dateString);
     }
 
     // total number of rows
@@ -60,6 +63,7 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
         TextView title;
         TextView des;
         TextView author;
+        TextView annoucementTime;
         LinearLayout layout;
 
         ViewHolder(View itemView) {
@@ -67,6 +71,7 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
             title = itemView.findViewById(R.id.rowlayout_announcement_announTitle);
             des = itemView.findViewById(R.id.rowlayout_announcement_announDes);
             author = itemView.findViewById(R.id.rowlayout_announcement_author);
+            annoucementTime = itemView.findViewById(R.id.announcement_time);
             layout = (LinearLayout) itemView;
             itemView.setOnClickListener(this);
         }

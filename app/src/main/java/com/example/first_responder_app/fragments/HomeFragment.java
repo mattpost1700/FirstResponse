@@ -3,7 +3,6 @@ package com.example.first_responder_app.fragments;
 import static android.content.ContentValues.TAG;
 
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,11 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-
-import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -31,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.first_responder_app.AppUtil;
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
@@ -39,22 +34,16 @@ import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.HomeViewModel;
-import com.example.first_responder_app.R;
-import com.example.first_responder_app.databinding.FragmentHomeBinding;
-
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 //TODO, haven't implement anything
@@ -76,7 +65,9 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
 
     private ListenerRegistration incidentListener;
     private ListenerRegistration responderListener;
-    
+
+    private UsersDataModel activeUser;
+
     public static HomeFragment newInstance() {
         return new HomeFragment();
     }
@@ -91,6 +82,12 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
         NavController navController = navHostFragment.getNavController();
         //switch to Home fragment upon clicking it
         //also if you have any other code relates to onCreateView just add it from here
+
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
 
         //Setup click listeners for the view all incidents and view all responders buttons
         binding.viewAllIncidents.setOnClickListener(view -> {
@@ -233,7 +230,9 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
      */
     private void addIncidentEventListener() {
         if(incidentListener != null) return;
-        incidentListener = db.collection("incident").whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+        incidentListener = db.collection("incident")
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
+                .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
 
             if(error != null) {
@@ -260,7 +259,9 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
      */
     private void addResponderEventListener() {
         if(responderListener != null) return;
-        responderListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
+        responderListener = db.collection("users")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addResponderEventListener)");
 
             if(error != null) {
@@ -304,7 +305,9 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
      * Displays the active incidents
      */
     private void populateIncidents() {
-        db.collection("incident").whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+        db.collection("incident")
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
+                .whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateIncidents)");
 
             if (incidentTask.isSuccessful()) {
@@ -324,8 +327,10 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
     }
 
     public void populateResponders() {
-
-        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).get().addOnCompleteListener(userTask -> {
+        db.collection("users")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereGreaterThanOrEqualTo(FirestoreDatabase.FIELD_RESPONDING_TIME, AppUtil.earliestTime(requireContext()))
+                .get().addOnCompleteListener(userTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateResponders)");
 
             if(userTask.isSuccessful()) {
@@ -351,7 +356,9 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
      * Saves the ranks collection for quick lookup.
      */
     private void saveRanksCollection() {
-        db.collection("ranks").get().addOnCompleteListener(rankTask -> {
+        db.collection("ranks")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .get().addOnCompleteListener(rankTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (saveRanksCollection)");
 
             if (rankTask.isSuccessful()) {

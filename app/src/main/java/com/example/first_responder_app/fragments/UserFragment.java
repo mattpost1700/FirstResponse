@@ -97,7 +97,11 @@ public class UserFragment extends Fragment {
             StorageReference ref = FirestoreDatabase.profilePictureRef.child(user.getRemote_path_to_profile_picture());
             ref.getFile(localFile)
                     .addOnSuccessListener(bytes -> {
-                        profilePictureImageView.setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                        try {
+                            profilePictureImageView.setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                        } catch (Exception e) {
+                            Log.d(TAG, "onCreateView: No profile picture found");
+                        }
                     })
                     .addOnFailureListener(e -> {
                         Log.w(TAG, "getUserProfile: Could not load profile picture!", e);

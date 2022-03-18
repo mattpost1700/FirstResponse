@@ -3,12 +3,13 @@ package com.example.first_responder_app;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
+import com.example.first_responder_app.dataModels.EventsDataModel;
+import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.messaging.Message;
@@ -17,17 +18,11 @@ import com.example.first_responder_app.viewModels.ChatViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
-import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
-import com.example.first_responder_app.dataModels.EventsDataModel;
-import com.example.first_responder_app.dataModels.IncidentDataModel;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.UserDataReader;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,13 +41,40 @@ public class FirestoreDatabase {
     public static final String MESSAGE_COLLECTION_DIR = "messages";
     public static final String REPORTS_COLLECTION_DIR = "reports";
     public static final String GROUPS_COLLECTION_DIR = "groups";
+    public static final String FIRE_DEPARTMENT_COLLECTION_DIR = "fire_department";
     public static final String PROFILE_PICTURE_STORAGE_DIRECTORY = "profile_pictures/";
+
+    // Fields
+    public static final String FIELD_FIRE_DEPARTMENT_ID = "fire_department_id";
+    public static final String FIELD_FIRE_DEPARTMENTS = "fire_departments";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_RESPONDING_TIME = "responding_time";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
     private static FirebaseStorage storage = FirebaseStorage.getInstance();
 
     public static StorageReference profilePictureRef = storage.getReference().child(PROFILE_PICTURE_STORAGE_DIRECTORY);
+
+    private UsersDataModel activeUser;
+    private String activeUserFireDepartmentId;
+
+    // TODO: Add safety for bad data in database. Can crash app
+
+    /**
+     * Sets the active user
+     *
+     * @param user The logged in user
+     * @return If the user is valid for the queries
+     */
+    public boolean setActiveUser(UsersDataModel user) {
+        if(user != null && user.getFire_department_id() != null) {
+            this.activeUser = user;
+            this.activeUserFireDepartmentId = user.getFire_department_id();
+            return true;
+        }
+        return false;
+    }
 
     public static FirestoreDatabase getInstance(){
         return instance;
@@ -66,20 +88,22 @@ public class FirestoreDatabase {
         return storage;
     }
 
-    public void addEvent(String location, String title, String description, ArrayList<String> participants) {
-        EventsDataModel newEvent = new EventsDataModel(title, description, location, participants);
+    // TODO: Add event correctly
+    public void addEvent(String location, String title, String description) {
+        int duration = 1;
+        Timestamp eventTime = Timestamp.now();
+        EventsDataModel newEvent = new EventsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), eventTime, title, description, location, duration);
 
 
-        db.collection(EVENTS_COLLECTION_DIR)
+            db.collection(EVENTS_COLLECTION_DIR)
                 .add(newEvent)
                 .addOnSuccessListener(documentReference -> Log.d("new event page", "new event has been successfully created in the DB"))
                 .addOnFailureListener(e -> Log.d("new event page", "failed to create new event"));
     }
 
+    // TODO: Add group id
     public void addAnnouncement(String title, String description) {
-
-        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(title, description);
-
+        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), title, description);
 
         db.collection(ANNOUNCEMENTS_COLLECTION_DIR)
                 .add(newAnnoun)

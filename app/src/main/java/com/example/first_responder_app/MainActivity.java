@@ -28,6 +28,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -35,27 +36,32 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.databinding.FragmentHomeBinding;
-import com.example.first_responder_app.fragments.HomeFragment;
-import com.example.first_responder_app.fragments.HomeFragmentDirections;
 import com.example.first_responder_app.fragments.IncidentFragment;
-import com.example.first_responder_app.fragments.LoginFragment;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.UserViewModel;
@@ -64,9 +70,10 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -94,9 +101,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         setContentView(R.layout.activity_main);
 
         setupAppBar();
-
-
-
 
         if(savedInstanceState != null){
             Log.d(TAG, "onCreate: ");
@@ -135,8 +139,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
 
         //setup navigation for drawer
-        NavHostFragment navHostFragment =
-                (NavHostFragment) this.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) this.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
         navController = null;
         if(navHostFragment != null) {
@@ -170,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             });
 
         }
-
 
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
@@ -301,8 +303,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public void closeNavDrawer(){
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         drawerLayout.closeDrawers();
-
-
     }
 
 
@@ -361,7 +361,27 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     System.out.print("Current data: null");
                 }
             });
+        }
 
+        // Download profile pic
+        try {
+            final File localFile = File.createTempFile("Images", "bmp");
+            StorageReference ref = FirestoreDatabase.profilePictureRef.child(activeUser.getRemote_path_to_profile_picture());
+            ref.getFile(localFile)
+                    .addOnSuccessListener(bytes -> {
+                        try {
+                            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                        } catch (Exception e) {
+                            Log.d(TAG, "onCreateView: No profile picture found");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
+                    });
+        } catch (IOException e) {
+            Log.e(TAG, "onCreateView: Failed creating temp file", e);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "onCreate: Cannot get user", e);
         }
     }
 
