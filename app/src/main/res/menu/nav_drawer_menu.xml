@@ -40,7 +40,7 @@
             android:title="@string/preferences"/>
         <item
             android:id="@+id/loginFragment"
-            android:icon="@drawable/preferences_icon"
+            android:icon="@drawable/ic_baseline_exit_to_app_24"
             android:menuCategory = "secondary"
             android:title="@string/logout" />
     </group>
