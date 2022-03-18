@@ -26,6 +26,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -42,6 +43,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,7 +64,9 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -91,9 +95,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         setContentView(R.layout.activity_main);
 
         setupAppBar();
-
-
-
 
         if(savedInstanceState != null){
             Log.d(TAG, "onCreate: ");
@@ -172,35 +173,35 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         icon = toolbar.getNavigationIcon();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.appbar_menu, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.action_user:
-                if(activeUser != null) {
-                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-                    userViewModel.setUserDataModel(activeUser);
-                    navController.navigate(R.id.userFragment);
-                }else
-                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
-                break;
-            default:
-                if(toggle.onOptionsItemSelected(item)){
-                    return true;
-                }
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.appbar_menu, menu);
+//
+//        return super.onCreateOptionsMenu(menu);
+//    }
+//
+//
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        switch(item.getItemId()){
+//            case R.id.action_user:
+//                if(activeUser != null) {
+//                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+//                    userViewModel.setUserDataModel(activeUser);
+//                    navController.navigate(R.id.userFragment);
+//                }else
+//                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
+//                break;
+//            default:
+//                if(toggle.onOptionsItemSelected(item)){
+//                    return true;
+//                }
+//                break;
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     /**
      *
@@ -280,8 +281,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public void closeNavDrawer(){
         DrawerLayout drawerLayout = findViewById(R.id.drawerLayout);
         drawerLayout.closeDrawers();
-
-
     }
 
 
@@ -340,7 +339,27 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     System.out.print("Current data: null");
                 }
             });
+        }
 
+        // Download profile pic
+        try {
+            final File localFile = File.createTempFile("Images", "bmp");
+            StorageReference ref = FirestoreDatabase.profilePictureRef.child(activeUser.getRemote_path_to_profile_picture());
+            ref.getFile(localFile)
+                    .addOnSuccessListener(bytes -> {
+                        try {
+                            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                        } catch (Exception e) {
+                            Log.d(TAG, "onCreateView: No profile picture found");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
+                    });
+        } catch (IOException e) {
+            Log.e(TAG, "onCreateView: Failed creating temp file", e);
+        } catch (NullPointerException e) {
+            Log.e(TAG, "onCreate: Cannot get user", e);
         }
     }
 
