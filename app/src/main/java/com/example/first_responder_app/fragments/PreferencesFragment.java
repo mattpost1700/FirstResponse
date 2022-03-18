@@ -2,6 +2,7 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
