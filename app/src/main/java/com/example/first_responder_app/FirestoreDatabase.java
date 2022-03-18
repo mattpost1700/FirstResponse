@@ -42,10 +42,13 @@ public class FirestoreDatabase {
     public static final String REPORTS_COLLECTION_DIR = "reports";
     public static final String GROUPS_COLLECTION_DIR = "groups";
     public static final String FIRE_DEPARTMENT_COLLECTION_DIR = "fire_department";
+    public static final String PROFILE_PICTURE_STORAGE_DIRECTORY = "profile_pictures/";
+
+    // Fields
     public static final String FIELD_FIRE_DEPARTMENT_ID = "fire_department_id";
+    public static final String FIELD_FIRE_DEPARTMENTS = "fire_departments";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_RESPONDING_TIME = "responding_time";
-    public static final String PROFILE_PICTURE_STORAGE_DIRECTORY = "profile_pictures/";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();

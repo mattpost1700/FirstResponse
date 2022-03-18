@@ -231,7 +231,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
     private void addIncidentEventListener() {
         if(incidentListener != null) return;
         incidentListener = db.collection("incident")
-                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
                 .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addIncidentEventListener)");
 
@@ -306,7 +306,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
      */
     private void populateIncidents() {
         db.collection("incident")
-                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
                 .whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateIncidents)");
 
@@ -327,7 +327,6 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
     }
 
     public void populateResponders() {
-
         db.collection("users")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
                 .whereGreaterThanOrEqualTo(FirestoreDatabase.FIELD_RESPONDING_TIME, AppUtil.earliestTime())
