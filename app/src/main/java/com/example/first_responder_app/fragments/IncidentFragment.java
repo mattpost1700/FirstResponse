@@ -7,11 +7,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.location.Address;
@@ -57,7 +61,9 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.color.MaterialColors;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 
 import java.io.IOException;
@@ -66,7 +72,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class IncidentFragment extends Fragment implements OnMapReadyCallback {
+public class IncidentFragment extends DialogFragment implements OnMapReadyCallback {
 
     private MapView mMapView;
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
@@ -84,6 +90,8 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     String id;
     IncidentDataModel incident;
     ListenerRegistration listenerRegistration;
+    CharSequence[] responderArr;
+    List<UsersDataModel> responderList;
 
     private IncidentViewModel mViewModel;
     private View bindingView;
@@ -102,7 +110,6 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         bindingView = binding.getRoot();
 
 
-
         context = getContext();
         Log.d(TAG, "onCreateView: " + bindingView.findViewById(R.id.incident_button_layout));
 
@@ -119,12 +126,11 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         mViewModel = new ViewModelProvider(requireActivity()).get(IncidentViewModel.class);
         incident = mViewModel.getIncidentDataModel();
+        responderList = new ArrayList<>();
 
         Log.d(TAG, "onCreate: " + getActivity().findViewById(R.id.incident_button_layout));
 
         initializeIncident(incident);
-
-
 
 
         //TODO: Check if user has permissions to file report (If not hide FAB)
@@ -134,6 +140,20 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
             NavDirections action = IncidentFragmentDirections.actionIncidentFragmentToReportFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
+        //setup the dialog upon clicking the responder count icon
+        populateRespondersListFromDB();
+        binding.incidentRespondingCount.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Responders")
+                    .setItems(responderArr, (dialogInterface, i) -> {
+                    });
+
+            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
 
 
@@ -152,22 +172,22 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      *
      * @param incident The incident to be displayed
      */
-    public void initializeIncident(IncidentDataModel incident){
+    public void initializeIncident(IncidentDataModel incident) {
 
         setTextViews(incident);
 
         Map<String, String> status = incident.getStatus();
 
         //Get active user id
-        ActiveUser activeUser = (ActiveUser)getActivity();
-        if(activeUser != null){
+        ActiveUser activeUser = (ActiveUser) getActivity();
+        if (activeUser != null) {
             UsersDataModel user = activeUser.getActive();
-            if(user != null) active_id = user.getDocumentId();
+            if (user != null) active_id = user.getDocumentId();
         }
 
 
         //Highlight active button
-        if(status != null && status.containsKey(active_id)){
+        if (status != null && status.containsKey(active_id)) {
             setActiveButton(status.get(active_id));
         }
 
@@ -177,8 +197,8 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             Log.d(TAG, "READ DATABASE - INCIDENT FRAGMENT");
 
             if (typeTask.isSuccessful()) {
-                String t = (String)typeTask.getResult().get("type_name");
-                ((TextView)bindingView.findViewById(R.id.incident_type_chip)).setText(t);
+                String t = (String) typeTask.getResult().get("type_name");
+                ((TextView) bindingView.findViewById(R.id.incident_type_chip)).setText(t);
             } else {
                 Log.d(TAG, "Error getting documents: ", typeTask.getException());
             }
@@ -192,7 +212,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
         setupLocationListener();
 
-        if(listenerRegistration == null) {
+        if (listenerRegistration == null) {
             //Ensure that the incident data is updated if database is updated
             docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
             listenerRegistration = docRef.addSnapshotListener((snapshot, e) -> {
@@ -227,12 +247,49 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    /**
+     * Setup the responder data and display it
+     *
+     *
+     */
+    private void populateRespondersListFromDB() {
+        if (incident.getResponding().size() != 0) {
+            int upper = Math.floorDiv(incident.getResponding().size(), 10);
+            for (int i = 0; i < upper; i++) {
+                populateResponders(i * 10, i * 10 + 10);
+            }
+            populateResponders((incident.getResponding().size() - incident.getResponding().size() % 10), incident.getResponding().size());
+        }
+    }
 
+    public void populateResponders(int startIdx, int endIdx) {
+        FirestoreDatabase.getInstance().getDb()
+                .collection("users")
+                .whereIn(FieldPath.documentId(), incident.getResponding().subList(startIdx, endIdx))
+                .get().addOnCompleteListener(responderTask -> {
+                    Log.d(TAG, "READ DATABASE - EVENT FRAGMENT");
+
+                    if (responderTask.isSuccessful()) {
+                        List<UsersDataModel> tempList = new ArrayList<>();
+                        for (QueryDocumentSnapshot userDoc : responderTask.getResult()) {
+                            UsersDataModel userData = userDoc.toObject(UsersDataModel.class);
+                            tempList.add(userData);
+                        }
+                        responderList.addAll(tempList);
+                        responderArr = new CharSequence[responderList.size()];
+                        for (int i = 0; i < responderList.size(); i++){
+                            responderArr[i] = responderList.get(i).getFull_name();
+                        }
+                    } else {
+                        Log.w(TAG, "populateResponderList: Responder data failed to query", responderTask.getException());
+                    }
+                });
+    }
 
     /**
      * Sets up the location listener used to calculate ETA
      */
-    public void setupLocationListener(){
+    public void setupLocationListener() {
         Log.d(TAG, "setupLocationListener: ");
         //Ask for permissions if needed
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -248,23 +305,22 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
-
     /**
      * Set the active button
      *
      * @param s Button text
      */
-    public void setActiveButton(String s){
-        if(bindingView != null && bindingView.findViewById(R.id.incident_button_layout) != null) {
+    public void setActiveButton(String s) {
+        if (bindingView != null && bindingView.findViewById(R.id.incident_button_layout) != null) {
             LinearLayout linearLayout = bindingView.findViewById(R.id.incident_button_layout);
             int count = linearLayout.getChildCount();
 
             for (int i = 0; i < count; i++) {
                 Chip b = (Chip) linearLayout.getChildAt(i);
-                if (s != null && s.equals((String)b.getText()) && context != null) {
+                if (s != null && s.equals((String) b.getText()) && context != null) {
                     b.setChipBackgroundColor(ColorStateList.valueOf(MaterialColors.getColor(context, R.attr.colorSecondaryVariant, context.getResources().getColor(R.color.colorSecondaryDark))));
                     b.setTextColor(MaterialColors.getColor(context, R.attr.colorOnSecondary, context.getResources().getColor(R.color.white)));
-                }else if(context != null){
+                } else if (context != null) {
                     b.setChipBackgroundColor(ColorStateList.valueOf(MaterialColors.getColor(context, R.attr.colorPrimaryDark, context.getResources().getColor(R.color.colorPrimaryDark))));
                     b.setTextColor(MaterialColors.getColor(context, R.attr.colorOnPrimary, context.getResources().getColor(R.color.white)));
                 }
@@ -277,11 +333,10 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      * Set value to null if you don't want to update
      *
      * @param incidentDataModel The incident to use to update the text views
-     *
      */
     @SuppressLint("SetTextI18n")
-    public void setTextViews(IncidentDataModel incidentDataModel){
-        if(incidentDataModel == null) return;
+    public void setTextViews(IncidentDataModel incidentDataModel) {
+        if (incidentDataModel == null) return;
 
         String addr = incidentDataModel.getLocation();
         Integer responding = incidentDataModel.getResponding().size();
@@ -291,26 +346,26 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         units = units.replace("]", "");
         String[] unitsArr = units.split(", ");
 
-        if(bindingView != null) {
+        if (bindingView != null) {
             if (addr != null) {
                 TextView addrText = ((TextView) bindingView.findViewById(R.id.incident_address_tv));
-                if(addrText != null) addrText.setText(addr);
+                if (addrText != null) addrText.setText(addr);
             }
             if (responding != null) {
                 TextView respText = ((TextView) bindingView.findViewById(R.id.incident_responding_count));
-                if(respText != null) respText.setText(responding.toString());
+                if (respText != null) respText.setText(responding.toString());
             }
             if (time != null) {
                 TextView recText = ((TextView) bindingView.findViewById(R.id.incident_received_time_chip));
-                if(recText != null) recText.setText(time);
+                if (recText != null) recText.setText(time);
             }
             if (unitsArr != null) {
                 ChipGroup chipGroup = bindingView.findViewById(R.id.incident_chip_group);
-                if(chipGroup.getChildCount() == 0) {
+                if (chipGroup.getChildCount() == 0) {
                     for (int i = 0; i < unitsArr.length; i++) {
                         TextView chip = new TextView(context);
                         chip.setText(unitsArr[i]);
-                        chip.setPadding(25,15,25,15);
+                        chip.setPadding(25, 15, 25, 15);
                         chip.setBackground(ContextCompat.getDrawable(context, R.drawable.chip_background));
                         int id = View.generateViewId();
                         Log.d(TAG, "setTextViews: " + id);
@@ -324,19 +379,19 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
 
     /**
      * Update the ETA text view of the IncidentFragment
+     *
      * @param text The text used to update the text view
      */
-    public void setEtaText(String text){
+    public void setEtaText(String text) {
         TextView etaText = null;
-        if(bindingView != null) {
-            etaText = ((TextView)bindingView.findViewById(R.id.incident_eta_chip));
+        if (bindingView != null) {
+            etaText = ((TextView) bindingView.findViewById(R.id.incident_eta_chip));
 
-            if(etaText != null){
+            if (etaText != null) {
                 etaText.setText(text);
             }
         }
     }
-
 
 
     /**
@@ -345,7 +400,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      * @param addr The address string to convert to an Address object
      * @return The Address object
      */
-    public Address addrToCoords(String addr){
+    public Address addrToCoords(String addr) {
 
         //Get coordinates from address
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
@@ -356,19 +411,19 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
             Log.w("Invalid", "Invalid address");
             return null;
         }
-        if(addresses.size() > 0){
+        if (addresses.size() > 0) {
             return addresses.get(0);
-        }else{
+        } else {
             return null;
         }
     }
 
 
-    public void setRespondingButtonClickListener(){
-        if(bindingView != null){
+    public void setRespondingButtonClickListener() {
+        if (bindingView != null) {
             LinearLayout buttons = bindingView.findViewById(R.id.incident_button_layout);
             int size = buttons.getChildCount();
-            for(int i = 0; i < size; i++){
+            for (int i = 0; i < size; i++) {
                 buttons.getChildAt(i).setOnClickListener(this::respondingButtonClicked);
             }
         }
@@ -379,27 +434,27 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
      *
      * @param b the button that was clicked
      */
-    public void respondingButtonClicked(View b){
-        Log.d(TAG, "respondingButtonClicked: " + ((Button)b).getText());
+    public void respondingButtonClicked(View b) {
+        Log.d(TAG, "respondingButtonClicked: " + ((Button) b).getText());
 
 
         String text = ((Button) b).getText().toString();
         String id = incidentDataModel.getDocumentId();
 
         //Get active user id
-        ActiveUser active = (ActiveUser)getActivity();
+        ActiveUser active = (ActiveUser) getActivity();
         UsersDataModel activeUser = null;
-        if(active != null){
+        if (active != null) {
             activeUser = active.getActive();
         }
 
 
-        if(activeUser == null && context != null){
+        if (activeUser == null && context != null) {
             Toast.makeText(context, "You must be logged in", Toast.LENGTH_LONG).show();
-        }else if(activeUser != null){
+        } else if (activeUser != null) {
 
             List<String> responses = activeUser.getResponses();
-            if(!AppUtil.timeIsWithin(activeUser.getResponding_time())){
+            if (!AppUtil.timeIsWithin(activeUser.getResponding_time())) {
                 responses = new ArrayList<>();
             }
 
@@ -408,7 +463,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, responses);
                 setActiveButton(text);
 
-            }else {
+            } else {
                 FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, responses);
                 setActiveButton(text);
             }
@@ -420,15 +475,15 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public void onLocationChanged(final Location location) {
             LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-            LatLng destination = new LatLng(0,0);
-            if(incidentAddress != null){
+            LatLng destination = new LatLng(0, 0);
+            if (incidentAddress != null) {
                 destination = new LatLng(incidentAddress.getLatitude(), incidentAddress.getLongitude());
             }
 
 
             eta = new ETA();
             eta.setListener(s -> setEtaText(s));
-            eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins="  + loc.latitude + "%2C" + loc.longitude);
+            eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins=" + loc.latitude + "%2C" + loc.longitude);
 
         }
 
@@ -453,12 +508,14 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     public void onDestroyView() {
         super.onDestroyView();
 
-        if(listenerRegistration != null) listenerRegistration.remove();
+        if (listenerRegistration != null) listenerRegistration.remove();
         listenerRegistration = null;
 
-        if(mLocationManager != null)mLocationManager.removeUpdates(mLocationListener);
+        if (mLocationManager != null) mLocationManager.removeUpdates(mLocationListener);
 
-        if(eta != null){ eta.removeListener(); }
+        if (eta != null) {
+            eta.removeListener();
+        }
     }
 
     @Override
@@ -499,7 +556,7 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(@NonNull GoogleMap map) {
 
 
-        if(incidentAddress != null) {
+        if (incidentAddress != null) {
             double longitude = incidentAddress.getLongitude();
             double latitude = incidentAddress.getLatitude();
 
@@ -518,24 +575,36 @@ public class IncidentFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        // Use the Builder class for convenient dialog construction
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("responderListDialog")
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+        // Create the AlertDialog object and return it
+        return builder.create();
+    }
 
     @Override
     public void onPause() {
-        if(mMapView != null) mMapView.onPause();
+        if (mMapView != null) mMapView.onPause();
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        if(mMapView != null) mMapView.onDestroy();
+        if (mMapView != null) mMapView.onDestroy();
         super.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        if(mMapView != null) mMapView.onLowMemory();
+        if (mMapView != null) mMapView.onLowMemory();
     }
 
 
