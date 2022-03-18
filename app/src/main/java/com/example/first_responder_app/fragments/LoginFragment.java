@@ -110,6 +110,14 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        binding.loginCreateAccountFab.setOnClickListener(v -> {
+            // TODO: Create an account fragment/login
+        });
+
+        binding.loginCreateDepartmentFab.setOnClickListener(v -> {
+            // TODO: Create a department
+        });
+
         binding.loginSubmit.setOnClickListener(v -> {
             if (mViewModel.getUsername() == null || mViewModel.getPassword() == null){
                 binding.loginLog.setText(R.string.loginFailMsg);
@@ -159,7 +167,10 @@ public class LoginFragment extends Fragment {
         Log.d("testing", "pwQuick: " + passwordQuickLogin);
         if (usernameQuickLogin != null && passwordQuickLogin != null){
 
-            db.collection("users").whereEqualTo("username", usernameQuickLogin).whereEqualTo("password", passwordQuickLogin).get().addOnCompleteListener(usersTask -> {
+            db.collection("users")
+                    .whereEqualTo("username", usernameQuickLogin)
+                    .whereEqualTo("password", passwordQuickLogin)
+                    .get().addOnCompleteListener(usersTask -> {
                 Log.d(TAG, "READ DATABASE - LOGIN FRAGMENT");
                 if (usersTask.isSuccessful()) {
                     for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {

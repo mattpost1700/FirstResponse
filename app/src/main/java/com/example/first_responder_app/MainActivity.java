@@ -2,26 +2,7 @@ package com.example.first_responder_app;
 
 import static android.content.ContentValues.TAG;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.core.view.GravityCompat;
-import androidx.core.view.MenuCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
 import android.Manifest;
-import androidx.fragment.app.Fragment;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -34,28 +15,32 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import com.example.first_responder_app.DirectionAPI.ETA;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
-import com.example.first_responder_app.databinding.FragmentHomeBinding;
-import com.example.first_responder_app.fragments.HomeFragment;
-import com.example.first_responder_app.fragments.HomeFragmentDirections;
 import com.example.first_responder_app.fragments.IncidentFragment;
-import com.example.first_responder_app.fragments.LoginFragment;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.UserViewModel;
@@ -68,7 +53,6 @@ import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -132,8 +116,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
 
         //setup navigation for drawer
-        NavHostFragment navHostFragment =
-                (NavHostFragment) this.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) this.getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
 
         navController = null;
         if(navHostFragment != null) {
@@ -168,40 +151,10 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
         }
 
-
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.appbar_menu, menu);
-//
-//        return super.onCreateOptionsMenu(menu);
-//    }
-//
-//
-//    @Override
-//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-//        switch(item.getItemId()){
-//            case R.id.action_user:
-//                if(activeUser != null) {
-//                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-//                    userViewModel.setUserDataModel(activeUser);
-//                    navController.navigate(R.id.userFragment);
-//                }else
-//                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
-//                break;
-//            default:
-//                if(toggle.onOptionsItemSelected(item)){
-//                    return true;
-//                }
-//                break;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
 
     /**
      *

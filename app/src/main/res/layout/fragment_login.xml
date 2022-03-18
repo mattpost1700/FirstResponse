@@ -54,6 +54,49 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/login_password" />
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/loginSmallButtonHolderLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintTop_toBottomOf="@id/login_submit"
+            app:layout_constraintStart_toStartOf="@+id/login_submit"
+            app:layout_constraintEnd_toEndOf="@+id/login_submit">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/loginCreateAccountFab"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:textAllCaps="false"
+
+                android:background="@drawable/standard_button_primary"
+                android:backgroundTint="?attr/colorSecondaryVariant"
+                android:textColor="?attr/colorOnSecondary"
+                android:text="@string/create_an_account"
+
+                app:layout_constraintStart_toStartOf="@id/loginSmallButtonHolderLayout"
+                app:layout_constraintTop_toTopOf="@id/loginSmallButtonHolderLayout"
+                app:layout_constraintEnd_toStartOf="@id/loginCreateDepartmentFab"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/loginCreateDepartmentFab"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:textAllCaps="false"
+
+                android:background="@drawable/standard_button_primary"
+                android:backgroundTint="?attr/colorSecondaryVariant"
+                android:textColor="?attr/colorOnPrimary"
+                android:text="@string/create_a_department"
+
+                app:layout_constraintEnd_toEndOf="@id/loginSmallButtonHolderLayout"
+                app:layout_constraintTop_toTopOf="@id/loginSmallButtonHolderLayout"
+                app:layout_constraintStart_toEndOf="@id/loginCreateAccountFab"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:id="@+id/login_log"
             android:layout_width="wrap_content"
@@ -63,10 +106,10 @@
             android:textColor="#FF0000"
             android:textSize="20sp"
             android:visibility="invisible"
+
             app:layout_constraintEnd_toEndOf="@+id/login_submit"
-            app:layout_constraintHorizontal_bias="0.466"
             app:layout_constraintStart_toStartOf="@+id/login_submit"
-            app:layout_constraintTop_toBottomOf="@+id/login_submit" />
+            app:layout_constraintTop_toBottomOf="@+id/loginSmallButtonHolderLayout" />
 
         <TextView
             android:id="@+id/appTitle"
