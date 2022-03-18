@@ -175,4 +175,27 @@
         android:name="com.example.first_responder_app.fragments.PreferencesFragment"
         android:label="preferences_fragment"
         tools:layout="@layout/preferences_fragment" />
+    <fragment
+        android:id="@+id/reportGroupFragment"
+        android:name="com.example.first_responder_app.fragments.ReportGroupFragment"
+        android:label="report_group_fragment"
+        tools:layout="@layout/report_group_fragment" >
+        <action
+            android:id="@+id/action_reportGroupFragment_to_editReport"
+            app:destination="@id/editReport" />
+        <action
+            android:id="@+id/action_reportGroupFragment_to_editReport2"
+            app:destination="@id/editReport" />
+        <action
+            android:id="@+id/action_reportGroupFragment_to_editReport3"
+            app:destination="@id/editReport" />
+    </fragment>
+    <fragment
+        android:id="@+id/editReport"
+        android:name="com.example.first_responder_app.fragments.EditReport"
+        android:label="EditReport" >
+        <action
+            android:id="@+id/action_editReport_to_reportGroupFragment"
+            app:destination="@id/reportGroupFragment" />
+    </fragment>
 </navigation>

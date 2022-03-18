@@ -7,16 +7,6 @@
             android:menuCategory = "secondary"
             android:title="@string/home" />
         <item
-            android:id="@+id/incidentGroupFragment"
-            android:icon="@drawable/ic_baseline_warning_24"
-            android:menuCategory = "secondary"
-            android:title="@string/incidents" />
-        <item
-            android:id="@+id/respondingFragment"
-            android:icon="@drawable/ic_baseline_directions_run_24"
-            android:menuCategory = "secondary"
-            android:title="@string/responding" />
-        <item
             android:id="@+id/eventGroupFragment"
             android:icon="@drawable/event_icon"
             android:menuCategory = "secondary"
@@ -31,7 +21,26 @@
             android:icon="@drawable/announcement_icon"
             android:menuCategory = "secondary"
             android:title="@string/announcements" />
+
     </group>
+    <group android:id="@+id/archive_group">
+        <item
+            android:id="@+id/incidentGroupFragment"
+            android:icon="@drawable/ic_baseline_warning_24"
+            android:menuCategory = "secondary"
+            android:title="@string/incidents" />
+        <item
+            android:id="@+id/respondingFragment"
+            android:icon="@drawable/ic_baseline_directions_run_24"
+            android:menuCategory = "secondary"
+            android:title="@string/responding" />
+        <item
+            android:id="@+id/reportGroupFragment"
+            android:icon="@drawable/ic_baseline_edit_note_24"
+            android:menuCategory = "secondary"
+            android:title="@string/reports" />
+    </group>
+
     <group android:id="@+id/preferences_group">
         <item
             android:id="@+id/preferencesFragment"

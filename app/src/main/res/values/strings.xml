@@ -90,6 +90,8 @@
     <string name="logout">Logout</string>
     <string name="create_an_account">Create an account</string>
     <string name="create_a_department">Create a department</string>
+    <string name="no_reports_filed">No Reports Filed</string>
+    <string name="reports">Reports</string>
 
     <!-- Strings related to login -->
 </resources>

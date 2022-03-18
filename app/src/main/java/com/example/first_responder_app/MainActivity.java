@@ -267,6 +267,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             case R.id.respondingFragment:
                 navController.navigate(R.id.respondingFragment);
                 break;
+            case R.id.reportGroupFragment:
+                navController.navigate((R.id.reportGroupFragment));
+                break;
         }
         //close navigation drawer
         closeNavDrawer();
@@ -361,28 +364,33 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
                     // Download profile pic
                     try {
-                        final File localFile = File.createTempFile("Images", "bmp");
-                        StorageReference ref = FirestoreDatabase.profilePictureRef.child(activeUser.getRemote_path_to_profile_picture());
-                        ref.getFile(localFile)
-                                .addOnSuccessListener(bytes -> {
-                                    try {
-                                        ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
-                                    } catch (Exception e) {
-                                        Log.d(TAG, "onCreateView: No profile picture found");
-                                    }
-                                })
-                                .addOnFailureListener(e -> {
-                                    Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
-                                });
-                    } catch (IOException e) {
-                        Log.e(TAG, "onCreateView: Failed creating temp file", e);
-                    } catch (NullPointerException e) {
-                        Log.e(TAG, "onCreate: Cannot get user", e);
+                        if (activeUser.getRemote_path_to_profile_picture() != null) {
+                            final File localFile = File.createTempFile("Images", "bmp");
+                            StorageReference ref = FirestoreDatabase.profilePictureRef.child(activeUser.getRemote_path_to_profile_picture());
+                            ref.getFile(localFile)
+                                    .addOnSuccessListener(bytes -> {
+                                        try {
+                                            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                                        } catch (Exception e) {
+                                            Log.d(TAG, "onCreateView: No profile picture found");
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
+                                    });
+                        }
+                        } catch(IOException e){
+                            Log.e(TAG, "onCreateView: Failed creating temp file", e);
+                        } catch(NullPointerException e){
+                            Log.e(TAG, "onCreate: Cannot get user", e);
+                        } catch(IllegalArgumentException e){
+                            Log.e(TAG, "onCreate: User has no image", e);
+                        }
+
+                    } else{
+                        System.out.print("Current data: null");
                     }
 
-                } else {
-                    System.out.print("Current data: null");
-                }
             });
         }
 
