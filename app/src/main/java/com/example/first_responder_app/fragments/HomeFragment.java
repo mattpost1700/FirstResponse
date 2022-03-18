@@ -260,7 +260,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
      */
     private void addResponderEventListener() {
         if(responderListener != null) return;
-        responderListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+        responderListener = db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addResponderEventListener)");
 
             if(error != null) {
@@ -325,7 +325,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
 
     public void populateResponders() {
 
-        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
+        db.collection("users").whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).get().addOnCompleteListener(userTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateResponders)");
 
             if(userTask.isSuccessful()) {

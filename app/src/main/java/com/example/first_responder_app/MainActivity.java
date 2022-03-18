@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -21,6 +22,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import android.Manifest;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -87,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        updateTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -113,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             }
         }
     }
+
 
     /**
      * Setup the appbar for the application
@@ -171,6 +175,23 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         //save the navigation icon to use later
         icon = toolbar.getNavigationIcon();
     }
+
+    public void updateTheme(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = prefs.getString("theme", "Light");
+
+        switch(theme){
+            case "light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+        }
+    }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(@NonNull Menu menu) {
@@ -329,7 +350,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     activeUser = snapshot.toObject(UsersDataModel.class);
 
 
-                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time())) {
+                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), this)) {
                         setActiveUserRespondingAddr();
                     } else {
                         stopETA();

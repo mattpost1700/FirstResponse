@@ -1,5 +1,7 @@
 package com.example.first_responder_app.recyclerViews;
 
+import static android.content.ContentValues.TAG;
+
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 
@@ -56,12 +59,14 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         TextView des;
+        TextView author;
         LinearLayout layout;
 
         ViewHolder(View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.rowlayout_announcement_announTitle);
             des = itemView.findViewById(R.id.rowlayout_announcement_announDes);
+            author = itemView.findViewById(R.id.rowlayout_announcement_author);
             layout = (LinearLayout) itemView;
             itemView.setOnClickListener(this);
         }
@@ -69,8 +74,22 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+
+            if(author.getText().toString().equals("") && mData.get(getAdapterPosition()).getUser_created_id() != null) {
+                FirestoreDatabase.getInstance().getDb().collection("users").document(mData.get(getAdapterPosition()).getUser_created_id()).get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String first = (String) task.getResult().get("first_name");
+                        String last = (String) task.getResult().get("last_name");
+                        author.setText("-" + first + " " + last);
+                    } else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
+                });
+            }
+
             if (des.getVisibility()== View.GONE){
                 des.setVisibility(View.VISIBLE);
+                author.setVisibility(View.VISIBLE);
             } else {
 
                 int height = layout.getHeight();
@@ -85,7 +104,7 @@ public class AnnouncementRecyclerViewAdapter extends RecyclerView.Adapter<Announ
 
 
                 des.setVisibility(View.GONE);
-
+                author.setVisibility(View.GONE);
             }
         }
     }
