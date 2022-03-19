@@ -63,8 +63,7 @@ public class LoginFragment extends Fragment {
 
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_login, container, false);
-        NavHostFragment navHostFragment =
-                (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
         NavController navController = navHostFragment.getNavController();
         sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -118,7 +117,8 @@ public class LoginFragment extends Fragment {
         });
 
         binding.loginCreateDepartmentFab.setOnClickListener(v -> {
-            // TODO: Create a department
+            NavDirections action = LoginFragmentDirections.actionLoginFragmentToCreateDepartmentFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
         binding.loginSubmit.setOnClickListener(v -> {
