@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,10 +25,8 @@ import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentUserBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
-import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 
@@ -117,7 +114,8 @@ public class UserFragment extends Fragment {
     private void setText(FragmentUserBinding binding){
         binding.userFullNameTv.setText(user.getFull_name());
         binding.userRankTv.setText(HomeFragment.getRank(user.getRank_id()) == null ? "Unable to get rank" : HomeFragment.getRank(user.getRank_id()).getRank_name());
-        binding.userPhoneNumberTv.setText("" + user.getPhone_number());
+        binding.userPhoneNumberTv.setText(user.getPhone_number());
+        binding.userEmailAddressTv.setText(user.getEmail());
     }
 
     @Override
