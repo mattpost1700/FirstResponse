@@ -40,6 +40,18 @@
             app:layout_constraintTop_toBottomOf="@+id/rowlayout_announcement_announTitle"
             tools:text="content--------------------------------------------------------------" />
 
+        <TextView
+            android:id="@+id/rowlayout_announcement_author"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/colorOnPrimary"
+            android:lineSpacingMultiplier="0.7"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@+id/rowlayout_announcement_announTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rowlayout_announcement_announDes"
+            tools:text="" />
+
     <TextView
         android:id="@+id/announcement_time"
         android:layout_width="0dp"

@@ -23,6 +23,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKeys;
 
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
@@ -43,6 +45,7 @@ public class LoginFragment extends Fragment {
     private UsersDataModel user;
     private final Handler handler = new Handler();
     private FragmentLoginBinding binding;
+    private SharedPreferences sharedPref;
 
     public static LoginFragment newInstance() {
         return new LoginFragment();
@@ -64,7 +67,7 @@ public class LoginFragment extends Fragment {
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         assert navHostFragment != null;
         NavController navController = navHostFragment.getNavController();
-        SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+        sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
         //check whether user finished typing and query the data
         binding.loginUsername.addTextChangedListener(new TextWatcher() {
@@ -127,10 +130,23 @@ public class LoginFragment extends Fragment {
             else {
                 if (checkUsernameExists(mViewModel.getUsername())) {
                     if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putString("savedUsername", mViewModel.getUsername());
-                        editor.putString("savedPassword", mViewModel.getPassword());
-                        editor.apply();
+                        //wraps the shared preferences and auto encrypts keys and values using a two-schemed method
+                        try {
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString("savedUsername", mViewModel.getUsername());
+                            editor.putString("savedPassword", mViewModel.getPassword());
+                            editor.apply();
+                            String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+                            sharedPref = EncryptedSharedPreferences.create(
+                                    "secret_shared_prefs",
+                                    masterKeyAlias,
+                                    context,
+                                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                            );
+                        } catch (Exception e){
+                            Log.d("Login Encryption: ", "Encryption failed");
+                        }
                         ActiveUser activeUser = ((ActiveUser)getActivity());
                         activeUser.setActive(user);
                         NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();

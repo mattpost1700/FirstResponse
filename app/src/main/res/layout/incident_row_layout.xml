@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -19,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="20sp"
                 android:textColor="?attr/colorOnSecondary"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/incident_row_type"
                 app:layout_constraintEnd_toStartOf="@+id/incident_row_time_text_view"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -29,12 +30,22 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="15dp"
-                android:textSize="14sp"
                 android:textColor="?attr/colorOnSecondary"
+                android:textSize="14sp"
 
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/incident_row_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipBackgroundColor="?attr/colorPrimaryDark"
+                android:textColor="?attr/colorOnPrimary"
+                android:text="Type of Call"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/incident_row_address_text_view" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

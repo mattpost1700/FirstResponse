@@ -27,6 +27,11 @@ import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentReportBinding;
 import com.example.first_responder_app.viewModels.ReportViewModel;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class ReportFragment extends Fragment {
 
     private IncidentDataModel incident;
@@ -92,11 +97,12 @@ public class ReportFragment extends Fragment {
 
 
     private void setText() {
-        Log.d("TAG", "setText: " + incident.getIncident_type());
         binding.addressTextView.setText(incident.getLocation());
-        Log.d("TAG", "setText: " + binding.addressTextView.getText().toString());
-        binding.unitsTextView.setText(incident.getUnits() + "");
+        if(incident.getUnits() != null)
+            binding.unitsTextView.setText(incident.getUnits().toString().substring(1, incident.getUnits().toString().length()-1));
         binding.incidentTypeTextView.setText(incident.getIncident_type());
-        binding.reportIncidentDate.setText("test");
+        Date created = new Date();
+        String date = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault()).format(created);
+        binding.reportIncidentDate.setText(date);
     }
 }

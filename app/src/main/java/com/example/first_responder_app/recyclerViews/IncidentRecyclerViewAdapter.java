@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
+import com.google.android.material.chip.Chip;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,7 +43,7 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
 
         holder.incidentAddressTextView.setText(incident.getLocation());
         holder.incidentTimeTextView.setText(dateString);
-
+        holder.incidentTypeChip.setText(incident.getIncident_type());
     }
 
     @Override
@@ -53,11 +54,13 @@ public class IncidentRecyclerViewAdapter extends RecyclerView.Adapter<IncidentRe
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView incidentAddressTextView;
         TextView incidentTimeTextView;
+        Chip incidentTypeChip;
 
         ViewHolder(View itemView) {
             super(itemView);
             incidentAddressTextView = itemView.findViewById(R.id.incident_row_address_text_view);
             incidentTimeTextView = itemView.findViewById(R.id.incident_row_time_text_view);
+            incidentTypeChip = itemView.findViewById(R.id.incident_row_type);
             itemView.setOnClickListener(this);
         }
 

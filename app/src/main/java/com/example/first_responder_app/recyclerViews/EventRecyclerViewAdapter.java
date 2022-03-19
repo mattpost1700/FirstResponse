@@ -2,6 +2,7 @@ package com.example.first_responder_app.recyclerViews;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,13 +39,9 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull EventRecyclerViewAdapter.ViewHolder holder, int position) {
-        if (isAnyParticipants) {
-            holder.participantName.setText(mData.get(position).getFull_name());
-            holder.participantID = mData.get(position).getDocumentId();
-        }
-        else {
-            holder.participantName.setText("No participant for now");
-        }
+        Log.d("TAG", "onBindViewHolder: ");
+        holder.participantName.setText(mData.get(position).getFull_name());
+        holder.participantID = mData.get(position).getDocumentId();
     }
 
     // total number of rows

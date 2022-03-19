@@ -46,8 +46,6 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO, haven't implement anything
-
 public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickListener {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -155,7 +153,6 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
         };
 
         IncidentRecyclerViewAdapter.IncidentClickListener incidentClickListener = (view, position) -> {
-            Log.d(TAG, "onCreateView: clicked (from incident listener)!");
 
             IncidentDataModel incident = listOfIncidentDataModel.get(position);
 
@@ -261,7 +258,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
         if(responderListener != null) return;
         responderListener = db.collection("users")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addResponderEventListener)");
 
             if(error != null) {
@@ -329,7 +326,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
     public void populateResponders() {
         db.collection("users")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .whereGreaterThanOrEqualTo(FirestoreDatabase.FIELD_RESPONDING_TIME, AppUtil.earliestTime())
+                .whereGreaterThanOrEqualTo(FirestoreDatabase.FIELD_RESPONDING_TIME, AppUtil.earliestTime(requireContext()))
                 .get().addOnCompleteListener(userTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateResponders)");
 

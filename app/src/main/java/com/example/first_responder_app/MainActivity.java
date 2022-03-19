@@ -2,7 +2,28 @@ package com.example.first_responder_app;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
 import android.Manifest;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,6 +37,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -75,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        updateTheme();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -98,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             }
         }
     }
+
 
     /**
      * Setup the appbar for the application
@@ -155,6 +180,52 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         icon = toolbar.getNavigationIcon();
     }
 
+    public void updateTheme(){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = prefs.getString("theme", "Light");
+
+        switch(theme){
+            case "light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+        }
+    }
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.appbar_menu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.action_user:
+                if(activeUser != null) {
+                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    userViewModel.setUserDataModel(activeUser);
+                    navController.navigate(R.id.userFragment);
+                }else
+                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
+                break;
+            default:
+                if(toggle.onOptionsItemSelected(item)){
+                    return true;
+                }
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      *
@@ -195,6 +266,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 break;
             case R.id.respondingFragment:
                 navController.navigate(R.id.respondingFragment);
+                break;
+            case R.id.reportGroupFragment:
+                navController.navigate((R.id.reportGroupFragment));
                 break;
         }
         //close navigation drawer
@@ -270,50 +344,57 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         //Ensure that the active user data is updated if database is updated
         if(userListener == null) {
             DocumentReference docRef = FirestoreDatabase.getInstance().getDb().collection("users").document(user.getDocumentId());
-            userListener = docRef.addSnapshotListener((snapshot, e) -> {
+            userListener = docRef.addSnapshotListener((snapshot, err) -> {
                 Log.d(TAG, "READ DATABASE - MAIN ACTIVITY");
 
-                if (e != null) {
-                    System.err.println("Listen failed: " + e);
+                if (err != null) {
+                    System.err.println("Listen failed: " + err);
                     return;
                 }
                 if (snapshot != null && snapshot.exists()) {
                     activeUser = snapshot.toObject(UsersDataModel.class);
 
 
-                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time())) {
+                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), this)) {
                         setActiveUserRespondingAddr();
                     } else {
                         stopETA();
                     }
 
 
-                } else {
-                    System.out.print("Current data: null");
-                }
+                    // Download profile pic
+                    try {
+                        if (activeUser.getRemote_path_to_profile_picture() != null) {
+                            final File localFile = File.createTempFile("Images", "bmp");
+                            StorageReference ref = FirestoreDatabase.profilePictureRef.child(activeUser.getRemote_path_to_profile_picture());
+                            ref.getFile(localFile)
+                                    .addOnSuccessListener(bytes -> {
+                                        try {
+                                            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                                        } catch (Exception e) {
+                                            Log.d(TAG, "onCreateView: No profile picture found");
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
+                                    });
+                        }
+                        } catch(IOException e){
+                            Log.e(TAG, "onCreateView: Failed creating temp file", e);
+                        } catch(NullPointerException e){
+                            Log.e(TAG, "onCreate: Cannot get user", e);
+                        } catch(IllegalArgumentException e){
+                            Log.e(TAG, "onCreate: User has no image", e);
+                        }
+
+                    } else{
+                        System.out.print("Current data: null");
+                    }
+
             });
         }
 
-        // Download profile pic
-        try {
-            final File localFile = File.createTempFile("Images", "bmp");
-            StorageReference ref = FirestoreDatabase.profilePictureRef.child(activeUser.getRemote_path_to_profile_picture());
-            ref.getFile(localFile)
-                    .addOnSuccessListener(bytes -> {
-                        try {
-                            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
-                        } catch (Exception e) {
-                            Log.d(TAG, "onCreateView: No profile picture found");
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
-                    });
-        } catch (IOException e) {
-            Log.e(TAG, "onCreateView: Failed creating temp file", e);
-        } catch (NullPointerException e) {
-            Log.e(TAG, "onCreate: Cannot get user", e);
-        }
+
     }
 
     /**

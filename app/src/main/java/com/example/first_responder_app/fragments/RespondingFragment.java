@@ -125,7 +125,7 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
         if(respondingListener != null) return;
         respondingListener = db.collection("users")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).addSnapshotListener((value, error) -> {
+                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
 
             if(error != null) {
@@ -175,7 +175,7 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
     private void refreshData() {
         db.collection("users")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime()).get().addOnCompleteListener(userTask -> {
+                .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).get().addOnCompleteListener(userTask -> {
             Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
 
             if(userTask.isSuccessful()) {

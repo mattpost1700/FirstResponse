@@ -454,7 +454,7 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
         } else if (activeUser != null) {
 
             List<String> responses = activeUser.getResponses();
-            if (!AppUtil.timeIsWithin(activeUser.getResponding_time())) {
+            if (!AppUtil.timeIsWithin(activeUser.getResponding_time(), requireContext())) {
                 responses = new ArrayList<>();
             }
 
