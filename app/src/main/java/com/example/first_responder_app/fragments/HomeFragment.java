@@ -31,6 +31,7 @@ import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
+import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.recyclerViews.IncidentRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.RespondersRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.HomeViewModel;
@@ -72,6 +73,11 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
+        if(drawerLocker != null){
+            drawerLocker.setDrawerLocked(false);
+        }
+
         FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         bindingView = binding.getRoot();

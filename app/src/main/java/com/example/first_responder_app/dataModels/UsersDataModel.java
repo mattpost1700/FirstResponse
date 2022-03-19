@@ -69,12 +69,10 @@ public class UsersDataModel implements Serializable {
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
     }
 
-    public UsersDataModel(String fire_department_id, String rank_id, String group_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name, Timestamp responding_time, String remote_path_to_profile_picture) {
+    public UsersDataModel(String fire_department_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name) {
         this.created_at = Timestamp.now();
         this.fire_department_id = fire_department_id;
-        this.rank_id = rank_id;
         this.responses = new ArrayList<>();
-        this.group_id = group_id;
         this.email = email;
         this.address = address;
         this.username = username;
@@ -82,8 +80,6 @@ public class UsersDataModel implements Serializable {
         this.phone_number = phone_number;
         this.first_name = first_name;
         this.last_name = last_name;
-        this.responding_time = responding_time;
-        this.remote_path_to_profile_picture = remote_path_to_profile_picture;
     }
 
     /** Setters **/

@@ -113,7 +113,8 @@ public class LoginFragment extends Fragment {
         });
 
         binding.loginCreateAccountFab.setOnClickListener(v -> {
-            // TODO: Create an account fragment/login
+            NavDirections action = LoginFragmentDirections.actionLoginFragmentToCreateUserFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
         binding.loginCreateDepartmentFab.setOnClickListener(v -> {
@@ -211,22 +212,7 @@ public class LoginFragment extends Fragment {
                     checkExist = false;
                 }
             });
-
-//            populateUserList(usernameQuickLogin);
-//            Log.d("lastLogin", Calendar.getInstance().getTime().toString());
-//            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-//            Navigation.findNavController(binding.getRoot()).navigate(action);
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        //unlock drawer when leaving login page
-        DrawerLocker drawerLocker = ((DrawerLocker)getActivity());
-        if(drawerLocker != null){
-            drawerLocker.setDrawerLocked(false);
-        }
-        super.onDestroyView();
     }
 
     @Override
