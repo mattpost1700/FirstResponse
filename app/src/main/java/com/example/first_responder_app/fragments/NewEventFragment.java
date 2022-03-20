@@ -1,6 +1,8 @@
 package com.example.first_responder_app.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -82,6 +84,21 @@ public class NewEventFragment extends Fragment {
             String eventDate = binding.newEventDate.getText().toString();
             String eventTime = binding.newEventTime.getText().toString();
             String duration = binding.newEventDurationText.getText().toString();
+
+            //sends the event that includes the following:
+            //title, location, description, duration
+            Intent intent = new Intent(Intent.ACTION_INSERT);
+            intent.setData(CalendarContract.Events.CONTENT_URI);
+            intent.putExtra(CalendarContract.Events.TITLE, title);
+            intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
+            intent.putExtra(CalendarContract.Events.DESCRIPTION, description);
+            intent.putExtra(CalendarContract.Events.DURATION, duration);
+
+            if (intent.resolveActivity(requireContext().getPackageManager()) != null){
+                startActivity(intent);
+            } else {
+                Log.d("EVENT INTENT: ", "Event setup Failed");
+            }
 
             if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || location.equals("") || eventDate.equals("MM/DD/YYYY") || eventTime.equals("HH:MM") || duration.equals("")){
                 binding.newEventLog.setText(R.string.event_title_description_is_empty);

@@ -42,6 +42,7 @@ import com.example.first_responder_app.recyclerViews.EventRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.EventViewModel;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.viewModels.UserViewModel;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -130,6 +131,7 @@ public class EventFragment extends Fragment {
 
         addParticipatingEventListener();
 
+
         binding.signUp.setOnClickListener(v -> {
             if (binding.signUp.getText().equals("Withdraw")) {
                 eventInfo.getParticipants().remove(userID);
@@ -155,12 +157,14 @@ public class EventFragment extends Fragment {
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
 
+                //sends the event that includes the following:
+                //title, location, description, duration
                 Intent intent = new Intent(Intent.ACTION_INSERT);
                 intent.setData(CalendarContract.Events.CONTENT_URI);
                 intent.putExtra(CalendarContract.Events.TITLE, eventInfo.getTitle());
-                //intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventInfo.getLocation());
+                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventInfo.getLocation());
                 intent.putExtra(CalendarContract.Events.DESCRIPTION, eventInfo.getDescription());
-                intent.putExtra(CalendarContract.Events.ALL_DAY, true);
+                intent.putExtra(CalendarContract.Events.DURATION, eventInfo.getDuration_in_minutes());
                 if (intent.resolveActivity(requireContext().getPackageManager()) != null){
                     startActivity(intent);
                 } else {
