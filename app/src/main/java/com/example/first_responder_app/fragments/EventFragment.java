@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +55,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 
 public class EventFragment extends Fragment {
@@ -152,6 +154,18 @@ public class EventFragment extends Fragment {
                             binding.signUp.setText("Withdraw");
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
+
+                Intent intent = new Intent(Intent.ACTION_INSERT);
+                intent.setData(CalendarContract.Events.CONTENT_URI);
+                intent.putExtra(CalendarContract.Events.TITLE, eventInfo.getTitle());
+                //intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventInfo.getLocation());
+                intent.putExtra(CalendarContract.Events.DESCRIPTION, eventInfo.getDescription());
+                intent.putExtra(CalendarContract.Events.ALL_DAY, true);
+                if (intent.resolveActivity(requireContext().getPackageManager()) != null){
+                    startActivity(intent);
+                } else {
+                    Log.d("EVENT INTENT: ", "Event setup Failed");
+                }
 
 //                // Calendar intent
 //                Calendar cal = Calendar.getInstance();
