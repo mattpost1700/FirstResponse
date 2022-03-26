@@ -49,6 +49,7 @@ import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.RefreshETAs;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentIncidentBinding;
 import com.example.first_responder_app.viewModels.ReportViewModel;
@@ -95,6 +96,7 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
     List<UsersDataModel> responderList;
 
     private IncidentViewModel mViewModel;
+    private UserViewModel mUserViewModel;
     private View bindingView;
 
 
@@ -143,14 +145,17 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
-        //setup the dialog upon clicking the responder count icon
+        //setup the dialog upon clicking the responder count icon, clicking on individual item will redirect to their profile page
         populateRespondersListFromDB();
         binding.incidentRespondingCount.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Responders")
                     .setItems(responderArr, (dialogInterface, i) -> {
+                        mUserViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
+                        mUserViewModel.setUserDataModel(responderList.get(i));
+                        NavDirections action = IncidentFragmentDirections.actionIncidentFragmentToUserFragment();
+                        Navigation.findNavController(binding.getRoot()).navigate(action);
                     });
-
             builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
             });
             AlertDialog dialog = builder.create();
