@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -33,6 +34,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     private ListPreference mListPreference;
     private PreferencesViewModel mViewModel;
 
+    SharedPreferences.OnSharedPreferenceChangeListener listener;
+    PreferencesFragmentBinding binding;
+
     @Override
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -43,11 +47,18 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
     @NonNull
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        PreferencesFragmentBinding binding = DataBindingUtil.inflate(inflater, R.layout.preferences_fragment, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.preferences_fragment, container, false);
 
 
+        return super.onCreateView(inflater, container, savedInstanceState);
 
-        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 Log.d(TAG, "onSharedPreferenceChanged: ");
                 switch(key){
@@ -60,15 +71,18 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(binding.getRoot().getContext());
         prefs.registerOnSharedPreferenceChangeListener(listener);
+    }
 
-        return super.onCreateView(inflater, container, savedInstanceState);
-
+    @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(binding.getRoot().getContext());
+        prefs.unregisterOnSharedPreferenceChangeListener(listener);
     }
 
     public void updateTheme(Context c){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
         String theme = prefs.getString("theme", "Light");
-
         switch(theme){
             case "light":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -76,6 +90,9 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             case "dark":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 break;
+            case "system":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+            break;
         }
     }
 }

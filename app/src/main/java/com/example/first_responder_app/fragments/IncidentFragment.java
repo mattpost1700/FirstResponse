@@ -47,6 +47,7 @@ import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
+import com.example.first_responder_app.interfaces.RefreshETAs;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentIncidentBinding;
@@ -192,18 +193,6 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
         }
 
 
-        //Find the type of the incident
-        FirestoreDatabase.getInstance().getDb().collection("incident_types").document(incident.getIncident_type()).get().addOnCompleteListener(typeTask -> {
-            Log.d(TAG, "READ DATABASE - INCIDENT FRAGMENT");
-
-            if (typeTask.isSuccessful()) {
-                String t = (String) typeTask.getResult().get("type_name");
-                ((TextView) bindingView.findViewById(R.id.incident_type_chip)).setText(t);
-            } else {
-                Log.d(TAG, "Error getting documents: ", typeTask.getException());
-            }
-        });
-
         setRespondingButtonClickListener();
 
         //Get the Address object of the incident
@@ -237,6 +226,7 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
                         }
 
                         //Get the Address object of the incident
+
                         incidentAddress = addrToCoords(incidentDataModel.getLocation());
                     }
 
@@ -342,6 +332,7 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
         Integer responding = incidentDataModel.getResponding().size();
         String time = incidentDataModel.getCreated_at().toDate().toString();
         String units = incidentDataModel.getUnits().toString();
+        String type = incidentDataModel.getIncident_type();
         units = units.replace("[", "");
         units = units.replace("]", "");
         String[] unitsArr = units.split(", ");
@@ -373,6 +364,10 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
                         chipGroup.addView(chip);
                     }
                 }
+            }
+
+            if(type != null){
+                ((TextView) bindingView.findViewById(R.id.incident_type_chip)).setText(type);
             }
         }
     }
@@ -460,11 +455,14 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
 
             //TODO: remove hardcoded string
             if (text.equals("Unavailable")) {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, responses);
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, false, responses, null);
                 setActiveButton(text);
 
             } else {
-                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, responses);
+                FirestoreDatabase.getInstance().responding(activeUser.getDocumentId(), incidentDataModel, text, true, responses, () -> {
+                    RefreshETAs refreshETAs = (RefreshETAs) getActivity();
+                    refreshETAs.refresh();
+                });
                 setActiveButton(text);
             }
         }

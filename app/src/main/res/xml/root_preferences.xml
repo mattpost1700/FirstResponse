@@ -3,7 +3,7 @@
     <PreferenceCategory app:title="Look &amp; Feel">
 
         <ListPreference
-            app:defaultValue="light"
+            app:defaultValue="system"
             app:entries="@array/theme_entries"
             app:entryValues="@array/theme_values"
             app:key="theme"

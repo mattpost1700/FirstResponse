@@ -154,7 +154,7 @@ public class FirestoreDatabase {
      * @param status The response that the user gave
      * @param available Whether the user is available or not
      */
-    public void responding(String user_id, IncidentDataModel incident, String status, boolean available, List<String> responding){
+    public void responding(String user_id, IncidentDataModel incident, String status, boolean available, List<String> responding, UpdateStatus update){
         Log.d(TAG, "responding: ");
 
         //Update status map
@@ -168,11 +168,18 @@ public class FirestoreDatabase {
         if(statusList.get(user_id) != null && statusList.get(user_id).equals(status)){
             removeStatus(incident_id, statusList, incident.getEta(),incident.getResponding(), user_id, available, responding);
         }else {
-            updateStatus(incident_id, statusList, incident.getEta(), user_id, status, incident.getResponding(), available, responding);
+            updateStatus(incident_id, statusList, incident.getEta(), user_id, status, incident.getResponding(), available, responding, update);
         }
 
         db.collection("users").document(user_id).update("responding_time", Timestamp.now());
     }
+
+
+
+    public interface UpdateStatus{
+        public void update();
+    }
+
     /**
      * Update the status of a user
      *
@@ -183,7 +190,7 @@ public class FirestoreDatabase {
      * @param responding The list of responding users
      * @param available If the user is available
      */
-    private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available, List<String> responses){
+    private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available, List<String> responses, UpdateStatus update){
 
         //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
         boolean previouslyResponding = statusList.containsKey(user_id) && !statusList.get(user_id).toString().equals("Unavailable");
@@ -191,10 +198,9 @@ public class FirestoreDatabase {
         if(eta == null){
             eta = new HashMap<>();
         }
-        if(!previouslyResponding){
-            eta.remove(user_id);
-        }
 
+        //remove current eta it will be updated again later in MainActivity
+        eta.remove(user_id);
 
         statusList.put(user_id, status);
 
@@ -223,6 +229,9 @@ public class FirestoreDatabase {
         updates.put("eta", eta);
         updates.put("responding", responding);
         db.collection("incident").document(incident_id).update(updates);
+        if(update != null)
+            update.update();
+
     }
 
     /**

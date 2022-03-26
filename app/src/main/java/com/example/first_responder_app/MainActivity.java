@@ -28,6 +28,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -61,11 +62,13 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.first_responder_app.DirectionAPI.ETA;
+import com.example.first_responder_app.dataModels.FireDepartmentDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.fragments.IncidentFragment;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
+import com.example.first_responder_app.interfaces.RefreshETAs;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
@@ -79,8 +82,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements DrawerLocker, ActiveUser, NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements DrawerLocker, ActiveUser, RefreshETAs, NavigationView.OnNavigationItemSelectedListener{
     ActionBarDrawerToggle toggle;
     Toolbar toolbar;
     DrawerLayout drawer;
@@ -89,9 +93,12 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     LocationManager mLocationManager;
     List<Address> incidentAddr;
     List<IncidentDataModel> respIncident;
+    List<IncidentDataModel> prevRespIncident;
     NavController navController;
     ListenerRegistration incidentListener;
     ListenerRegistration userListener;
+    String fireDeptAddr;
+
 
     final int ACCESS_LOCATION_FRAGMENT = 101;
     final int ACCESS_LOCATION_MAIN = 102;
@@ -181,6 +188,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     }
 
     public void updateTheme(){
+
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String theme = prefs.getString("theme", "Light");
 
@@ -190,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 break;
             case "dark":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "system":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
     }
@@ -355,11 +367,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                     activeUser = snapshot.toObject(UsersDataModel.class);
 
 
-                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), this)) {
-                        setActiveUserRespondingAddr();
-                    } else {
-                        stopETA();
-                    }
+                    //Find the address of the department and determine where they are responding
+                    setRespAddr();
+
+
+
 
 
                     // Download profile pic
@@ -407,6 +419,31 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     }
 
 
+
+    public void setRespAddr(){
+
+        FirestoreDatabase.getInstance().getDb().collection("fire_department").document(activeUser.getFire_department_id()).get().addOnCompleteListener(task -> {
+           if(task.isSuccessful()){
+
+               FireDepartmentDataModel department = task.getResult().toObject(FireDepartmentDataModel.class);
+               if(department != null)
+                fireDeptAddr = department.getLocation();
+
+               Log.d(TAG, "setDeptAddr: " + fireDeptAddr);
+
+
+               if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), this)) {
+                   setActiveUserRespondingAddr();
+               } else {
+                   stopETA();
+               }
+           }else{
+               Log.d(TAG, "Error getting department address");
+           }
+        });
+    }
+
+
     public void setActiveUserRespondingAddr(){
         if(incidentListener == null) {
             incidentListener = FirestoreDatabase.getInstance().getDb().collection("incident").whereArrayContains("responding", activeUser.getDocumentId()).whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
@@ -426,10 +463,35 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
                     for (int i = 0; i < temp.size(); i++) {
                         respIncident.add(temp.get(i));
-                        String addr = temp.get(i).getLocation();
+
+                        String addr = "";
+
+                        Map<String, String> responses = temp.get(i).getStatus();
+                        String response = responses.get(activeUser.getDocumentId());
+
+                        Log.d(TAG, "setActiveUserRespondingAddr: " + response);
+
+                        if(response != null && response.equals("Scene")) {
+                            addr = temp.get(i).getLocation();
+                        }else if(response != null && response.equals("Station")){
+                            Log.d(TAG, "setActiveUserRespondingAddr: " + fireDeptAddr);
+                            addr = fireDeptAddr;
+                        }
+
                         incidentAddr.add(addrToCoords(addr));
+
+
                     }
                     Log.d(TAG, "setActiveUserRespondingAddr: " + respIncident.size());
+
+                    if(prevRespIncident != null && respIncident.size() == prevRespIncident.size()){
+                        Log.d(TAG, "setActiveUserRespondingAddr: EQUAL");
+                    }else{
+                        Log.d(TAG, "setActiveUserRespondingAddr: NOT EQUAL");
+                        stopETA();
+                    }
+
+                    prevRespIncident = respIncident;
 
                     if (mLocationManager == null) updateETA();
 
@@ -548,6 +610,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         }
 
 
+
         private final LocationListener mLocationListener = new LocationListener() {
             @Override
             public void onLocationChanged(final Location location) {
@@ -586,6 +649,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             }
         };
 
+    @Override
+    public void refresh() {
+        stopETA();
+        updateETA();
+    }
 }
 
 
