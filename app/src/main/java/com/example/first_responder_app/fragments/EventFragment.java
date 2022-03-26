@@ -99,8 +99,6 @@ public class EventFragment extends Fragment {
         eventInfo = mViewModel.getEventDetail();
         isParticipating = eventInfo.getParticipants().contains(user.getDocumentId());
 
-        populateParticipantListFromDB();
-
 
         EventRecyclerViewAdapter.ItemClickListener listener = (view, pos) -> {
             UsersDataModel u = participants.get(pos);
@@ -124,7 +122,7 @@ public class EventFragment extends Fragment {
 
         final SwipeRefreshLayout pullToRefresh = binding.eventRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
-            participants = new ArrayList<>();
+            participants.clear();
             updateUI(true);
             pullToRefresh.setRefreshing(false);
         });
@@ -195,7 +193,6 @@ public class EventFragment extends Fragment {
                 Log.w(TAG, "Listening failed for firestore incident collection");
             } else {
                 eventInfo = value.toObject(EventsDataModel.class);
-                participants.clear();
 
                 ActiveUser a = (ActiveUser) getActivity();
                 UsersDataModel u = a.getActive();
@@ -275,6 +272,7 @@ public class EventFragment extends Fragment {
     }
 
     private void populateParticipantListFromDB() {
+        Log.d(TAG, "populateParticipantListFromDB: ");
         participants.clear();
         if (eventInfo.getParticipants().size() != 0) {
             isAnyParticipants = true;
@@ -290,6 +288,7 @@ public class EventFragment extends Fragment {
 
     private void populateParticipantList(int startIdx, int endIdx) {
         Log.d(TAG, "populateParticipantList: ");
+        participants.clear();
         db.collection("users")
                 .whereIn(FieldPath.documentId(), eventInfo.getParticipants().subList(startIdx, endIdx))
                 .get().addOnCompleteListener(participantTask -> {
@@ -303,6 +302,7 @@ public class EventFragment extends Fragment {
                 }
                 participants.addAll(tempList);
                 checkParticipantsEmpty();
+                Log.d(TAG, "populateParticipantList: " + participants.size());
                 eventRecyclerViewAdapter.notifyDataSetChanged();
 
             } else {
