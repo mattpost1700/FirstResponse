@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,28 +26,17 @@ public class IncidentDataModel implements Serializable {
     private String location;
     private List<String> units;
     private String box_number;
+    private boolean is_fire;
+    private boolean is_ems;
 
     /** Constructors **/
 
-    /**
-     * @deprecated Uses old data model
-     */
-    public IncidentDataModel(List<String> units, List<String> responding, Timestamp created_at, boolean incident_complete, String location, String incident_type, Map<String, String> eta, Map<String, String> status) {
-        this.units = units;
-        this.responding = responding;
-        this.created_at = created_at;
-        this.incident_complete = incident_complete;
-        this.location = location;
-        this.incident_type = incident_type;
-        this.eta = eta;
-        this.status = status;
-    }
-
     public IncidentDataModel() {}
 
-    public IncidentDataModel(Timestamp created_at, List<String> fire_department_id, Map<String, String> eta, List<String> responding, Map<String, String> status, String incident_type, boolean incident_complete, String location, List<String> units, String box_number) {
+    public IncidentDataModel(String documentId, Timestamp created_at, List<String> fire_departments, Map<String, String> eta, List<String> responding, Map<String, String> status, String incident_type, boolean incident_complete, String location, List<String> units, String box_number, boolean is_fire, boolean is_ems) {
+        this.documentId = documentId;
         this.created_at = created_at;
-        this.fire_departments = fire_department_id;
+        this.fire_departments = fire_departments;
         this.eta = eta;
         this.responding = responding;
         this.status = status;
@@ -57,16 +45,8 @@ public class IncidentDataModel implements Serializable {
         this.location = location;
         this.units = units;
         this.box_number = box_number;
-    }
-
-    public IncidentDataModel(List<String> fire_department_id, String incident_type, boolean incident_complete, String location, List<String> units, String box_number) {
-        this.created_at = Timestamp.now();
-        this.fire_departments = fire_department_id;
-        this.responding = new ArrayList<>();
-        this.incident_complete = incident_complete;
-        this.location = location;
-        this.units = units;
-        this.box_number = box_number;
+        this.is_fire = is_fire;
+        this.is_ems = is_ems;
     }
 
     /** Setters **/
@@ -115,6 +95,14 @@ public class IncidentDataModel implements Serializable {
         this.box_number = box_number;
     }
 
+    public void setIs_fire(boolean is_fire) {
+        this.is_fire = is_fire;
+    }
+
+    public void setIs_ems(boolean is_ems) {
+        this.is_ems = is_ems;
+    }
+
     /** Getters **/
 
     public String getDocumentId() {
@@ -159,5 +147,13 @@ public class IncidentDataModel implements Serializable {
 
     public String getBox_number() {
         return box_number;
+    }
+
+    public boolean isIs_fire() {
+        return is_fire;
+    }
+
+    public boolean isIs_ems() {
+        return is_ems;
     }
 }

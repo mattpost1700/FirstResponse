@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class UsersDataModel implements Serializable {
@@ -30,29 +29,15 @@ public class UsersDataModel implements Serializable {
     private String last_name;
     private Timestamp responding_time;
     private String remote_path_to_profile_picture;
+    private boolean is_admin;
 
 
     /** Constructors **/
 
-    /**
-     * @deprecated Uses old data model
-     */
-    public UsersDataModel(String address, String first_name, String last_name, String password, String phone_number, String rank_id, String username, Timestamp responding_time, String remote_path_to_profile_picture, List<String> responses) {
-        this.address = address;
-        this.first_name = first_name;
-        this.last_name = last_name;
-        this.password = password;
-        this.phone_number = phone_number;
-        this.rank_id = rank_id;
-        this.username = username;
-        this.responding_time = responding_time;
-        this.remote_path_to_profile_picture = remote_path_to_profile_picture;
-        this.responses = responses;
-    }
-
     public UsersDataModel() {}
 
-    public UsersDataModel(Timestamp created_at, String fire_department_id, String rank_id, List<String> responses, String group_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name, Timestamp responding_time, String remote_path_to_profile_picture) {
+    public UsersDataModel(String documentId, Timestamp created_at, String fire_department_id, String rank_id, List<String> responses, String group_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name, Timestamp responding_time, String remote_path_to_profile_picture, boolean is_admin) {
+        this.documentId = documentId;
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.rank_id = rank_id;
@@ -67,19 +52,7 @@ public class UsersDataModel implements Serializable {
         this.last_name = last_name;
         this.responding_time = responding_time;
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
-    }
-
-    public UsersDataModel(String fire_department_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name) {
-        this.created_at = Timestamp.now();
-        this.fire_department_id = fire_department_id;
-        this.responses = new ArrayList<>();
-        this.email = email;
-        this.address = address;
-        this.username = username;
-        this.password = password;
-        this.phone_number = phone_number;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.is_admin = is_admin;
     }
 
     /** Setters **/
@@ -144,6 +117,10 @@ public class UsersDataModel implements Serializable {
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
     }
 
+    public void setIs_admin(boolean is_admin) {
+        this.is_admin = is_admin;
+    }
+
     /** Getters **/
 
     public String getDocumentId() {
@@ -204,6 +181,10 @@ public class UsersDataModel implements Serializable {
 
     public String getRemote_path_to_profile_picture() {
         return remote_path_to_profile_picture;
+    }
+
+    public boolean isIs_admin() {
+        return is_admin;
     }
 
     /** Helpers **/
