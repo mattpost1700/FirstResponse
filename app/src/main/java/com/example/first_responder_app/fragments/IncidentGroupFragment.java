@@ -33,6 +33,7 @@ import com.example.first_responder_app.viewModels.IncidentGroupViewModel;
 import com.example.first_responder_app.viewModels.IncidentViewModel;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -125,7 +126,8 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
         if(incidentListener != null) return;
         incidentListener = db.collection("incident")
                 .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
-                .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                .addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
 
             if(error != null) {
@@ -149,7 +151,8 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
     private void refreshData() {
         db.collection("incident")
                 .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
-                .whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                .get().addOnCompleteListener(incidentTask -> {
             Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
 
             if (incidentTask.isSuccessful()) {
