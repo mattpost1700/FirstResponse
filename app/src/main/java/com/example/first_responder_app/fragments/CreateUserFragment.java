@@ -85,6 +85,7 @@ public class CreateUserFragment extends Fragment {
         user.setPhone_number(binding.createUserPhoneNumberEditText.getText().toString());
         user.setAddress(binding.createUserAddressEditText.getText().toString());
         user.setFire_department_id(binding.createUserFireDepartmentIdEditText.getText().toString());
+        user.setIs_admin(true);
     }
 
     private boolean validInput() {
