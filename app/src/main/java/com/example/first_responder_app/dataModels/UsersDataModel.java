@@ -2,6 +2,7 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -78,6 +79,12 @@ public class UsersDataModel implements Serializable {
         this.username = username;
         this.password = password;
         this.phone_number = phone_number;
+        this.first_name = first_name;
+        this.last_name = last_name;
+    }
+
+    public UsersDataModel(String id, String first_name, String last_name) {
+        this.documentId = id;
         this.first_name = first_name;
         this.last_name = last_name;
     }

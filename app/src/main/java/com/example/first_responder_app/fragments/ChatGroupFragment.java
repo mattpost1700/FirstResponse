@@ -97,6 +97,11 @@ public class ChatGroupFragment extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
+        binding.addChatTextView.setOnClickListener(v -> {
+            NavDirections action = ChatGroupFragmentDirections.actionChatGroupFragmentToNewChatFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
+
         return binding.getRoot();
 
     }

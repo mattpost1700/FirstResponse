@@ -45,6 +45,14 @@ public class Chat implements Comparable<Chat> {
         this.mostRecentMessage = mostRecentMessage;
     }
 
+    public Timestamp getMostRecentMessageTime() {
+        return mostRecentMessageTime;
+    }
+
+    public void setMostRecentMessageTime(Timestamp mostRecentMessageTime) {
+        this.mostRecentMessageTime = mostRecentMessageTime;
+    }
+
     public ArrayList<String> getMembers() {
         return members;
     }
@@ -63,10 +71,7 @@ public class Chat implements Comparable<Chat> {
 
     @Override
     public int compareTo(Chat c) {
-        if (getMostRecentMessage() == null || c.getMostRecentMessage() == null) {
-            return 0;
-        }
-        return getMostRecentMessage().compareTo(c.getMostRecentMessage());
+        return getMostRecentMessageTime().compareTo(c.getMostRecentMessageTime());
     }
 
 }

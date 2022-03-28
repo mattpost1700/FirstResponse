@@ -5,10 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
+import androidx.preference.PreferenceManager;
 
 import com.example.first_responder_app.MainActivity;
 import com.example.first_responder_app.R;
@@ -29,23 +31,42 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean bypassDND = prefs.getBoolean("bypass", true);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "n")
-                .setSmallIcon(R.drawable.circle)
-                .setContentTitle("N")
-                //.setContentText(eventTitle)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                //.setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .setOnlyAlertOnce(true)
-                .setContentIntent(pendingIntent);
+        NotificationCompat.Builder builder;
+        if (bypassDND == true) {
+            builder = new NotificationCompat.Builder(getApplicationContext(), "n")
+                    .setSmallIcon(R.drawable.circle)
+                    .setContentTitle("N")
+                    .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
+                    .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setCategory(NotificationCompat.CATEGORY_ALARM)
+                    .setContentIntent(pendingIntent);
+        } else {
+            builder = new NotificationCompat.Builder(getApplicationContext(), "n")
+                    .setSmallIcon(R.drawable.circle)
+                    .setContentTitle("N")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true)
+                    .setOnlyAlertOnce(true)
+                    .setContentIntent(pendingIntent);
+        }
+
 
         builder = builder.setContent(getRemoteView(title, msg));
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel("n", "e", NotificationManager.IMPORTANCE_HIGH);
+
+            if (bypassDND == true) {
+                //channel.setBypassDnd(true);
+                channel.canBypassDnd();
+            }
 
             notificationManager.createNotificationChannel(channel);
         }

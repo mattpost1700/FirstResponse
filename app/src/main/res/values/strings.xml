@@ -96,6 +96,9 @@
     <string name="time">Time:</string>
     <string name="duration">Duration:</string>
     <string name="duration_minutes">Duration (Minutes):</string>
+    <string name="plus">+</string>
+    <string name="leave_chat">Leave Chat</string>
+    <string name="write_a_message">Write a message</string>
 
     <!-- Strings related to login -->
 </resources>
