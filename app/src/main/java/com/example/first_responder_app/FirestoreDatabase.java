@@ -12,9 +12,11 @@ import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
+import com.example.first_responder_app.messaging.Chat;
 import com.example.first_responder_app.messaging.Message;
 import com.example.first_responder_app.recyclerViews.ChatRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.ChatViewModel;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -50,6 +52,7 @@ public class FirestoreDatabase {
     public static final String FIELD_FIRE_DEPARTMENTS = "fire_departments";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_RESPONDING_TIME = "responding_time";
+    public static final String FIELD_RANK_ID = "rank_id";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();
@@ -102,7 +105,8 @@ public class FirestoreDatabase {
     }
 
     // TODO: Add group id
-    public void addAnnouncement(String title, String description) {
+    public void addAnnouncement(String title, String description, UsersDataModel user) {
+        setActiveUser(user);
         AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), title, description);
 
         db.collection(ANNOUNCEMENTS_COLLECTION_DIR)
@@ -142,6 +146,40 @@ public class FirestoreDatabase {
                     }
                 })
                 .addOnFailureListener(e ->Log.d("chat page", "failed to create new message"));
+
+
+    }
+
+    public void addChat(String chatName, List<UsersDataModel> userModelMembers) {
+        Timestamp now = Timestamp.now();
+
+        List<String> stringMembers = userModelMembersToStringMembers(userModelMembers);
+
+        //It does not like when I put it into a chat object and try to add it
+        HashMap<String, Object> newChat = new HashMap<>();
+        newChat.put("chat_name", chatName);
+        newChat.put("members", stringMembers);
+        newChat.put("most_recent_message", "");
+        newChat.put("most_recent_message_time", now);
+
+        db.collection(CHAT_COLLECTION_DIR)
+                .add(newChat)
+                .addOnSuccessListener(new OnSuccessListener() {
+                    @Override
+                    public void onSuccess(Object o) {
+                        Log.d("new chat page", "new chat has been successfully created in the DB");
+                    }
+                })
+                .addOnFailureListener(e ->Log.d("chat page", "failed to create new message"));
+
+
+    }
+
+    public void removeUserFromChat(String userId, String chatId, List<String> listOfMembers) {
+        listOfMembers.removeIf(item -> item.split("/")[1].equals(userId));
+
+
+        db.collection(CHAT_COLLECTION_DIR).document(chatId).update("members", listOfMembers);
 
 
     }
@@ -294,7 +332,7 @@ public class FirestoreDatabase {
                         "last_name", lastName,
                         "address", address,
                         "phone_number", phoneNum,
-                        "rank", rank)
+                        FIELD_RANK_ID, rank)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -351,5 +389,14 @@ public class FirestoreDatabase {
         Pattern allowedPhonePatterns = Pattern.compile("^(\\+\\d{1,3}( )?)?((\\(\\d{1,3}\\))|\\d{1,3})[- .]?\\d{3,4}[- .]?\\d{4}$");
 
         return allowedPhonePatterns.matcher(phone).matches();
+    }
+
+    private List<String> userModelMembersToStringMembers(List<UsersDataModel> userModelMembers) {
+        ArrayList<String> stringMembers = new ArrayList<String>();
+        for (UsersDataModel u : userModelMembers) {
+            String memberName = u.getFull_name() + "/" + u.getDocumentId();
+            stringMembers.add(memberName);
+        }
+        return stringMembers;
     }
 }

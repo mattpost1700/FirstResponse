@@ -1,7 +1,12 @@
 package com.example.first_responder_app;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
+
+import androidx.preference.PreferenceManager;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -19,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class NotificationService {
-    String serverKey = BuildConfig.SERVER_KEY;
+    private String serverKey = BuildConfig.SERVER_KEY;
 
     public void notifyPostReq(Context context, String topic, String notifTitle, String notifBody) throws JSONException {
         RequestQueue queue = Volley.newRequestQueue(context);

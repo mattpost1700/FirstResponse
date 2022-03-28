@@ -34,7 +34,16 @@
                 android:layout_height="wrap_content"
                 android:text="@string/chat"
                 android:textSize="28sp"
+                android:padding="10dp"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/add_chat_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/plus"
+                android:textSize="40sp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
 

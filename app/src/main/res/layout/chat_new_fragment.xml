@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.NewChatFragment">
+
+    <data>
+        <variable
+            name="viewModel"
+            type="com.example.first_responder_app.viewModels.NewChatViewModel" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:id="@+id/createUserScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.2">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp">
+
+
+                <TextView
+                    android:id="@+id/newChatChatNameLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/anton_regular"
+                    android:text="Chat Name"
+                    android:textSize="24sp"
+
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <EditText
+                    android:id="@+id/newChatChatNameEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints=""
+                    android:inputType="text"
+                    android:minHeight="48dp"
+                    android:text=""
+
+                    app:layout_constraintStart_toStartOf="@+id/newChatChatNameLabel"
+                    app:layout_constraintTop_toBottomOf="@+id/newChatChatNameLabel" />
+
+
+                <TextView
+                    android:id="@+id/newChatUsersLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/anton_regular"
+                    android:text="Users"
+                    android:textSize="24sp"
+
+                    app:layout_constraintStart_toStartOf="@+id/newChatChatNameEditText"
+                    app:layout_constraintTop_toBottomOf="@+id/newChatChatNameEditText" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/newChatSmallButtonHolderLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    app:layout_constraintTop_toBottomOf="@id/newChatUsersLabel"
+                    app:layout_constraintStart_toStartOf="@+id/newChatUsersLabel"
+                    app:layout_constraintEnd_toEndOf="@+id/newChatUsersLabel">
+
+                    <EditText
+                        android:id="@+id/newChatUsersEditText"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:autofillHints=""
+                        android:inputType="text"
+                        android:minHeight="48dp"
+                        android:text=""
+
+                        app:layout_constraintStart_toStartOf="@+id/newChatSmallButtonHolderLayout"
+                        app:layout_constraintTop_toTopOf="@+id/newChatSmallButtonHolderLayout" />
+
+
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/newChatAddUserFab"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:textAllCaps="false"
+
+                        android:background="@drawable/standard_button_primary"
+                        android:backgroundTint="?attr/colorSecondaryVariant"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:text="Add"
+
+                        app:layout_constraintEnd_toEndOf="@id/newChatSmallButtonHolderLayout"
+                        app:layout_constraintTop_toTopOf="@id/newChatSmallButtonHolderLayout"
+                        app:layout_constraintStart_toEndOf="@id/newChatUsersEditText"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/newChatErrorMsg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/defaultmsg"
+                    android:textColor="#FF0000"
+                    android:textSize="20sp"
+                    android:gravity="center"
+                    android:visibility="invisible"
+
+                    app:layout_constraintTop_toBottomOf="@+id/newChatSmallButtonHolderLayout" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/new_chat_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2"
+                    android:divider="#fff"
+                    app:layout_constraintTop_toBottomOf="@id/newChatErrorMsg" />
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/new_chat_create_confirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/standard_button_primary"
+            android:text="@string/create"
+            android:textColor="?attr/colorOnPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/createUserScrollView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
