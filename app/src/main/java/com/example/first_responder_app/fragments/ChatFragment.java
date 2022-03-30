@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -90,6 +92,14 @@ public class ChatFragment extends Fragment {
         //chatRecyclerViewAdapter.setClickListener(chatClickListener);
         chatRecyclerView.setAdapter(chatRecyclerViewAdapter);
 
+        chatRecyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View view, int i, int i1, int i2, int i3, int i4, int i5, int i6, int i7) {
+                chatRecyclerView.removeOnLayoutChangeListener(this);
+                chatRecyclerView.scrollToPosition(chatRecyclerView.getAdapter().getItemCount() - 1);
+            }
+        });
+
 
 
         binding.sendButton.setOnClickListener(v -> {
@@ -102,6 +112,13 @@ public class ChatFragment extends Fragment {
             if (!msg.equals("") && user != null) {
                 firestoreDatabase.addMessage(c.getId(), msg, user.getDocumentId(), chatRecyclerViewAdapter, mViewModel);
             }
+
+        });
+
+        binding.leaveChat.setOnClickListener(v -> {
+            firestoreDatabase.removeUserFromChat(user.getDocumentId(), c.getId(), listOfMembers);
+            NavDirections action = ChatFragmentDirections.actionChatFragmentToChatGroupFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
 
         });
 

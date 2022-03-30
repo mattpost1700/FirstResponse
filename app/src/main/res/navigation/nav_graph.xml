@@ -146,12 +146,29 @@
         <action
             android:id="@+id/action_chatGroupFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_chatGroupFragment_to_newChatFragment"
+            app:destination="@id/newChatFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/newChatFragment"
+        android:name="com.example.first_responder_app.fragments.NewChatFragment"
+        android:label="chat_new_fragment"
+        tools:layout="@layout/chat_new_fragment">
+        <action
+            android:id="@+id/action_newChatFragment_to_chatGroupFragment"
+            app:destination="@id/chatGroupFragment" />
     </fragment>
     <fragment
         android:id="@+id/chatFragment"
         android:name="com.example.first_responder_app.fragments.ChatFragment"
         android:label="chat_fragment"
-        tools:layout="@layout/chat_fragment" />
+        tools:layout="@layout/chat_fragment">
+        <action
+            android:id="@+id/action_chatFragment_to_chatGroupFragment"
+            app:destination="@id/chatGroupFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/editUserFragment"
         android:name="com.example.first_responder_app.fragments.EditUserFragment"

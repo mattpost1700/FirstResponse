@@ -2,6 +2,7 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.Serializable;
 import java.util.List;
@@ -53,6 +54,12 @@ public class UsersDataModel implements Serializable {
         this.responding_time = responding_time;
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
         this.is_admin = is_admin;
+    }
+
+    public UsersDataModel(String id, String first_name, String last_name) {
+        this.documentId = id;
+        this.first_name = first_name;
+        this.last_name = last_name;
     }
 
     /** Setters **/

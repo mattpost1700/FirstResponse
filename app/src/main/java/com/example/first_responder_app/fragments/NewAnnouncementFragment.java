@@ -64,7 +64,7 @@ public class NewAnnouncementFragment extends Fragment {
             }
             else {
                 try {
-                    firestoreDatabase.addAnnouncement(mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
+                    firestoreDatabase.addAnnouncement(mViewModel.getAnnounTitle(), mViewModel.getAnnounDes(), activeUser);
                     try {
                         _notificationService.notifyPostReq(getContext(), "announcements", mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
                     } catch (JSONException e) {
