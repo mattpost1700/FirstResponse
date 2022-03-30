@@ -12,13 +12,15 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="ETA">
-    <ListPreference
-        app:defaultValue="30"
-        app:entries="@array/respond_entries"
-        app:entryValues="@array/respond_values"
-        app:key="respond_time"
-        app:title="Responding Timeout"
-        app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="30"
+            app:entries="@array/respond_entries"
+            app:entryValues="@array/respond_values"
+            app:key="respond_time"
+            app:title="Responding Timeout"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Notifications">
@@ -26,6 +28,14 @@
         <SwitchPreferenceCompat
             app:key="bypass"
             app:title="Bypass Do Not Disturb" />
+
+        <SwitchPreferenceCompat
+            app:key="fireNotificationPrefKey"
+            app:title="Fire notifications" />
+
+        <SwitchPreferenceCompat
+            app:key="EMSNotificationPrefKey"
+            app:title="EMS notifications" />
 
 
     </PreferenceCategory>

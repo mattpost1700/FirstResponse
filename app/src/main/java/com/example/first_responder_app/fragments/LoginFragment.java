@@ -33,6 +33,7 @@ import com.example.first_responder_app.databinding.FragmentLoginBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.LoginViewModel;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -150,8 +151,11 @@ public class LoginFragment extends Fragment {
                         }
                         ActiveUser activeUser = ((ActiveUser)getActivity());
                         activeUser.setActive(user);
+
+                        successfullyHidAdminOptions();
                         NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
                         Navigation.findNavController(binding.getRoot()).navigate(action);
+
                         Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
                     } else {
                         binding.loginLog.setText(R.string.loginFailMsg);
@@ -167,6 +171,8 @@ public class LoginFragment extends Fragment {
         });
 
         binding.bypassBtn.setOnClickListener(v -> {
+            successfullyHidAdminOptions();
+
             NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
@@ -199,6 +205,8 @@ public class LoginFragment extends Fragment {
                             activeUser.setActive(user);
 
                             if(FirestoreDatabase.getInstance().setActiveUser(user)) {
+                                successfullyHidAdminOptions();
+
                                 NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
                                 Navigation.findNavController(binding.getRoot()).navigate(action);
                             } else {
@@ -212,6 +220,22 @@ public class LoginFragment extends Fragment {
                     checkExist = false;
                 }
             });
+        }
+    }
+
+    private void successfullyHidAdminOptions() {
+        try {
+            if(user == null || !user.isIs_admin()) {
+                NavigationView navigationView = ((NavigationView) getActivity().findViewById(R.id.navView));
+
+                // hide admin options
+                navigationView.getMenu().findItem(R.id.searchUserFragment).setVisible(false);
+                navigationView.getMenu().findItem(R.id.adminEditGroupFragment).setVisible(false);
+            }
+        }
+        catch (Exception e) {
+            Log.e(TAG, "hideAdminOptions: error", e);
+            // TODO: Do something so bad stuff doesn't happen!
         }
     }
 

@@ -96,6 +96,7 @@
     <string name="time">Time:</string>
     <string name="duration">Duration:</string>
     <string name="duration_minutes">Duration (Minutes):</string>
+    <string name="edit_group">Edit group</string>
 
     <!-- Strings related to login -->
 </resources>

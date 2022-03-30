@@ -66,11 +66,20 @@
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_icon.xml" value="0.1" />
         <entry key="..\:/Users/Cory/AndroidStudioProjects/FirstResponse/app/src/main/res/mipmap-anydpi-v26/user_round.xml" value="0.1" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/activity_main.xml" value="0.18177083333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/admin_edit_group_fragment.xml" value="0.17239583333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/admin_edit_user_fragment.xml" value="0.18645833333333334" />
         <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/create_department_fragment.xml" value="0.3625" />
         <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/create_user_fragment.xml" value="0.3625" />
         <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/fragment_announcement.xml" value="0.3625" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/fragment_event.xml" value="0.18645833333333334" />
         <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/fragment_event_new.xml" value="0.3625" />
         <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/fragment_home.xml" value="0.18177083333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/layout/search_user_fragment.xml" value="0.17239583333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/menu/admin_nav_drawer_menu.xml" value="0.18177083333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/menu/appbar_menu.xml" value="0.18177083333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/menu/nav_drawer_menu.xml" value="0.18177083333333333" />
+        <entry key="..\:/Users/mattp/StudioProjects/FirstResponse/app/src/main/res/xml/root_preferences.xml" value="0.33" />
         <entry key="app/src/main/res/layout/fragment_announcement.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/fragment_announcement_new.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/fragment_event_group.xml" value="0.23229166666666667" />

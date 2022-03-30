@@ -234,4 +234,19 @@
             android:id="@+id/action_createUserFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/adminEditGroupFragment"
+        android:name="com.example.first_responder_app.fragments.AdminEditGroupFragment"
+        android:label="admin_edit_group_fragment"
+        tools:layout="@layout/admin_edit_group_fragment" />
+    <fragment
+        android:id="@+id/adminEditUserFragment"
+        android:name="com.example.first_responder_app.fragments.AdminEditUserFragment"
+        android:label="admin_edit_user_fragment"
+        tools:layout="@layout/admin_edit_user_fragment" />
+    <fragment
+        android:id="@+id/searchUserFragment"
+        android:name="com.example.first_responder_app.fragments.SearchUserFragment"
+        android:label="search_user_fragment"
+        tools:layout="@layout/search_user_fragment" />
 </navigation>
