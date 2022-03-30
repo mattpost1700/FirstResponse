@@ -31,6 +31,7 @@ public class UsersDataModel implements Serializable {
     private String last_name;
     private Timestamp responding_time;
     private String remote_path_to_profile_picture;
+    private boolean isAdmin;
 
 
     /** Constructors **/
@@ -53,7 +54,9 @@ public class UsersDataModel implements Serializable {
 
     public UsersDataModel() {}
 
-    public UsersDataModel(Timestamp created_at, String fire_department_id, String rank_id, List<String> responses, String group_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name, Timestamp responding_time, String remote_path_to_profile_picture) {
+    public UsersDataModel(Timestamp created_at, String fire_department_id, String rank_id, List<String> responses, String group_id,
+                          String email, String address, String username, String password, String phone_number, String first_name, String last_name,
+                          Timestamp responding_time, String remote_path_to_profile_picture, boolean isAdmin) {
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.rank_id = rank_id;
@@ -68,6 +71,7 @@ public class UsersDataModel implements Serializable {
         this.last_name = last_name;
         this.responding_time = responding_time;
         this.remote_path_to_profile_picture = remote_path_to_profile_picture;
+        this.isAdmin = isAdmin;
     }
 
     public UsersDataModel(String fire_department_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name) {
@@ -211,6 +215,14 @@ public class UsersDataModel implements Serializable {
 
     public String getRemote_path_to_profile_picture() {
         return remote_path_to_profile_picture;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     /** Helpers **/

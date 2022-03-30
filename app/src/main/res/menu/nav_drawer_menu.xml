@@ -43,15 +43,11 @@
 
     <group android:id="@+id/admin_group">
         <item
-            android:id="@+id/edit_User"
-            android:menuCategory="secondary"
-            android:title="@string/edit_user"
-            android:visible="false" />
-        <item
-            android:id="@+id/edit_rank"
+            android:id="@+id/editRankFragment"
             android:menuCategory="secondary"
             android:title="@string/edit_rank"
-            android:visible="false" />
+            android:visible="true"
+            />
     </group>
 
     <group android:id="@+id/preferences_group">

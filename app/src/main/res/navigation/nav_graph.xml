@@ -53,6 +53,9 @@
         <action
             android:id="@+id/action_homeFragment_to_editUserFragment"
             app:destination="@id/editUserFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_editRankFragment"
+            app:destination="@id/editRankFragment" />
     </fragment>
 
     <fragment
@@ -251,4 +254,9 @@
             android:id="@+id/action_createUserFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/editRankFragment"
+        android:name="com.example.first_responder_app.fragments.EditRankFragment"
+        android:label="fragment_edit_rank"
+        tools:layout="@layout/fragment_edit_rank" />
 </navigation>

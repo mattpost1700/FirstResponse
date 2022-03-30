@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -166,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             NavigationUI.setupWithNavController(navView, navController);
             navView.setNavigationItemSelectedListener(this);
 
-
             //Setup Nav Drawer user click event
             View headerView = navView.getHeaderView(0);
             headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
@@ -282,6 +282,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             case R.id.reportGroupFragment:
                 navController.navigate((R.id.reportGroupFragment));
                 break;
+            case R.id.editRankFragment:
+                navController.navigate(R.id.editRankFragment);
         }
         //close navigation drawer
         closeNavDrawer();
