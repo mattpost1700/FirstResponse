@@ -107,7 +107,7 @@ public class FirestoreDatabase {
     // TODO: Add group id
     public void addAnnouncement(String title, String description, UsersDataModel user) {
         setActiveUser(user);
-        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), title, description);
+        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), activeUser.getDocumentId(), title, description);
 
         db.collection(ANNOUNCEMENTS_COLLECTION_DIR)
                 .add(newAnnoun)

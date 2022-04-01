@@ -31,6 +31,7 @@ import com.example.first_responder_app.databinding.FragmentRespondingBinding;
 import com.example.first_responder_app.recyclerViews.RespondersGroupRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.RespondingViewModel;
 import com.example.first_responder_app.viewModels.UserViewModel;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -150,8 +151,8 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
 
     private void addIncidentEventListener(){
         if(incidentListener != null) return;
-        incidentListener = db.collection("incident")
-                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+        incidentListener = FirestoreDatabase.getInstance().getDb().collection("incident")
+                .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
                 .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - RESPONDING FRAGMENT");
 
@@ -161,6 +162,7 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
             else {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
                 for (QueryDocumentSnapshot incidentDoc : value) {
+                    Log.d(TAG, "addIncidentEventListener: ");
                     IncidentDataModel incidentDataModel = incidentDoc.toObject(IncidentDataModel.class);
                     temp.add(incidentDataModel);
                 }
@@ -183,10 +185,12 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
                 for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
                     UsersDataModel user = userDoc.toObject(UsersDataModel.class);
                     List<String> responses = user.getResponses();
+                    Log.d(TAG, "refreshData: " + isActive(responses.get(responses.size() - 1)));
+
                     if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
                         temp.add(user);
                 }
-
+                Log.d(TAG, "refreshData: " + AppUtil.earliestTime(requireContext()).toDate());
                 listOfRespondingDataModel.clear();
                 listOfRespondingDataModel.addAll(temp);
                 checkRespondersEmpty();

@@ -60,7 +60,7 @@
                 android:id="@+id/incidents_group_no_active"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/no_active_incidents"
+                android:text="@string/no_incidents"
                 android:textSize="18sp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
