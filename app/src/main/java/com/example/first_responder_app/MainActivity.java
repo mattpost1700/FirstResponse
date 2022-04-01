@@ -16,8 +16,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -181,39 +179,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
-    }
-
-
-
-
-    @Override
-    public boolean onCreateOptionsMenu(@NonNull Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.appbar_menu, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.action_user:
-                if(activeUser != null) {
-                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-                    userViewModel.setUserDataModel(activeUser);
-                    navController.navigate(R.id.userFragment);
-                }else
-                    Toast.makeText(this, "You must be logged in", Toast.LENGTH_LONG).show();
-                break;
-            default:
-                if(toggle.onOptionsItemSelected(item)){
-                    return true;
-                }
-                break;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
