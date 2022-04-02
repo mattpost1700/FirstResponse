@@ -2,7 +2,6 @@ package com.example.first_responder_app.dataModels;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.io.Serializable;
 import java.util.List;
@@ -18,7 +17,7 @@ public class UsersDataModel implements Serializable {
     private String fire_department_id;
     private String rank_id;
     private List<String> responses;
-    private String group_id;
+    private List<String> group_ids;
 
     // Object params
     private String email;
@@ -37,13 +36,13 @@ public class UsersDataModel implements Serializable {
 
     public UsersDataModel() {}
 
-    public UsersDataModel(String documentId, Timestamp created_at, String fire_department_id, String rank_id, List<String> responses, String group_id, String email, String address, String username, String password, String phone_number, String first_name, String last_name, Timestamp responding_time, String remote_path_to_profile_picture, boolean is_admin) {
+    public UsersDataModel(String documentId, Timestamp created_at, String fire_department_id, String rank_id, List<String> responses, List<String> group_ids, String email, String address, String username, String password, String phone_number, String first_name, String last_name, Timestamp responding_time, String remote_path_to_profile_picture, boolean is_admin) {
         this.documentId = documentId;
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.rank_id = rank_id;
         this.responses = responses;
-        this.group_id = group_id;
+        this.group_ids = group_ids;
         this.email = email;
         this.address = address;
         this.username = username;
@@ -84,8 +83,8 @@ public class UsersDataModel implements Serializable {
         this.responses = responses;
     }
 
-    public void setGroup_id(String group_id) {
-        this.group_id = group_id;
+    public void setGroup_id(List<String> group_ids) {
+        this.group_ids = group_ids;
     }
 
     public void setEmail(String email) {
@@ -150,8 +149,8 @@ public class UsersDataModel implements Serializable {
         return responses;
     }
 
-    public String getGroup_id() {
-        return group_id;
+    public List<String> getGroup_ids() {
+        return group_ids;
     }
 
     public String getEmail() {

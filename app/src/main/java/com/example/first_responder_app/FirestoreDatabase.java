@@ -12,11 +12,9 @@ import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
-import com.example.first_responder_app.messaging.Chat;
 import com.example.first_responder_app.messaging.Message;
 import com.example.first_responder_app.recyclerViews.ChatRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.ChatViewModel;
-import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -53,6 +51,7 @@ public class FirestoreDatabase {
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_RESPONDING_TIME = "responding_time";
     public static final String FIELD_RANK_ID = "rank_id";
+    public static final String FIELD_GROUP_NAME = "name";
 
     private static FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static FirestoreDatabase instance = new FirestoreDatabase();

@@ -4,7 +4,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
-import java.util.List;
 
 public class GroupDataModel implements Serializable {
 
@@ -17,20 +16,16 @@ public class GroupDataModel implements Serializable {
     private String fire_department_id;
 
     // Object params
-    private String type_name;
+    private String name;
 
     /** Constructors **/
 
     public GroupDataModel() {}
 
-    public GroupDataModel(Timestamp created_at, String type_name) {
-        this.created_at = created_at;
-        this.type_name = type_name;
-    }
-
-    public GroupDataModel(String type_name) {
+    public GroupDataModel(String type_name, String fire_department_id) {
         this.created_at = Timestamp.now();
-        this.type_name = type_name;
+        this.name = type_name;
+        this.fire_department_id = fire_department_id;
     }
 
     /** Setters **/
@@ -47,8 +42,8 @@ public class GroupDataModel implements Serializable {
         this.fire_department_id = fire_department_id;
     }
 
-    public void setType_name(String type_name) {
-        this.type_name = type_name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /** Getters **/
@@ -65,7 +60,7 @@ public class GroupDataModel implements Serializable {
         return fire_department_id;
     }
 
-    public String getType_name() {
-        return type_name;
+    public String getName() {
+        return name;
     }
 }

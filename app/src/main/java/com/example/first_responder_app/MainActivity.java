@@ -224,6 +224,12 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             case R.id.reportGroupFragment:
                 navController.navigate((R.id.reportGroupFragment));
                 break;
+            case R.id.searchUserFragment:
+                navController.navigate((R.id.searchUserFragment));
+                break;
+            case R.id.adminEditGroupFragment:
+                navController.navigate((R.id.adminEditGroupFragment));
+                break;
         }
         //close navigation drawer
         closeNavDrawer();
