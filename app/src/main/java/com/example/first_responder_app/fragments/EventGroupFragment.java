@@ -30,6 +30,7 @@ import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventGroupBinding;
 import com.example.first_responder_app.recyclerViews.EventGroupRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.EventViewModel;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -100,7 +101,8 @@ public class EventGroupFragment extends Fragment{
     private void populateEventList(){
         db.collection("events")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                .orderBy("event_time", Query.Direction.ASCENDING)
+                .whereGreaterThanOrEqualTo("event_time", Timestamp.now())
                 .get().addOnCompleteListener(eventTask -> {
             Log.d(TAG, "READ DATABASE - EVENT GROUP FRAGMENT");
 

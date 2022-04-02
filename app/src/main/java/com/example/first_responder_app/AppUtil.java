@@ -36,7 +36,7 @@ public class AppUtil {
     public static Timestamp earliestTime(Context context){
         long now = Timestamp.now().getSeconds();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int time = prefs.getInt("respond", 30);
+        int time = Integer.parseInt(prefs.getString("respond_time", "30"));
         int numOfSeconds = time * 60;
 
         long diff = now - numOfSeconds;

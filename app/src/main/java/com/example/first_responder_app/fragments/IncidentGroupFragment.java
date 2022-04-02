@@ -125,7 +125,7 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
         if(incidentListener != null) return;
         incidentListener = db.collection("incident")
                 .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
-                .whereEqualTo("incident_complete", false).addSnapshotListener((value, error) -> {
+                .addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
 
             if(error != null) {
@@ -149,7 +149,7 @@ public class IncidentGroupFragment extends Fragment implements PopupMenu.OnMenuI
     private void refreshData() {
         db.collection("incident")
                 .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
-                .whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
+                .get().addOnCompleteListener(incidentTask -> {
             Log.d(TAG, "READ DATABASE - INCIDENT GROUP FRAGMENT");
 
             if (incidentTask.isSuccessful()) {

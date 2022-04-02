@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -256,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
                 editor.apply();
+                navController.popBackStack(R.id.nav_graph, true);
                 navController.navigate(R.id.loginFragment);
                 break;
             case R.id.homeFragment:
@@ -342,6 +344,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 incidentListener.remove();
                 incidentListener = null;
             }
+
+            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.user);
+            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageDrawable(drawable);
+
+
             stopETA();
             return;
         }
@@ -655,6 +662,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public void refresh() {
         stopETA();
         updateETA();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 }
 
