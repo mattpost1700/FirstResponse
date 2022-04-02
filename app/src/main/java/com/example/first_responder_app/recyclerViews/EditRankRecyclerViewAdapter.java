@@ -29,6 +29,7 @@ public class EditRankRecyclerViewAdapter extends RecyclerView.Adapter<EditRankRe
     private List<RanksDataModel> mData;
     private LayoutInflater mInflater;
     private EditRankRecyclerViewAdapter.ItemClickListener mClickListener;
+    private EditRankRecyclerViewAdapter.rankLongClickListener rankLongClickListener;
 
     // data is passed into the constructor
     public EditRankRecyclerViewAdapter(Context context, List<RanksDataModel> data) {
@@ -59,7 +60,7 @@ public class EditRankRecyclerViewAdapter extends RecyclerView.Adapter<EditRankRe
     }
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView title;
         RanksDataModel data;
 
@@ -67,12 +68,18 @@ public class EditRankRecyclerViewAdapter extends RecyclerView.Adapter<EditRankRe
             super(itemView);
             title = itemView.findViewById(R.id.rowlayout_edit_rank_title);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition(), data);
+        }
 
+        @Override
+        public boolean onLongClick(View view) {
+            if(rankLongClickListener != null) rankLongClickListener.onRankItemClick(view, getAdapterPosition());
+            return true;
         }
     }
 
@@ -86,8 +93,16 @@ public class EditRankRecyclerViewAdapter extends RecyclerView.Adapter<EditRankRe
         this.mClickListener = itemClickListener;
     }
 
+    public void setLongClickListener(EditRankRecyclerViewAdapter.rankLongClickListener rankLongClickListener) {
+        this.rankLongClickListener = rankLongClickListener;
+    }
+
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position, RanksDataModel data);
+    }
+
+    public interface rankLongClickListener {
+        void onRankItemClick(View view, int position);
     }
 }

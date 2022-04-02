@@ -34,10 +34,12 @@ import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
+import com.example.first_responder_app.dataModels.ReportDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEditRankBinding;
 import com.example.first_responder_app.recyclerViews.EditRankRecyclerViewAdapter;
 import com.example.first_responder_app.recyclerViews.EventGroupRecyclerViewAdapter;
+import com.example.first_responder_app.recyclerViews.ReportGroupRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.EditRankViewModel;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.viewModels.EventViewModel;
@@ -76,8 +78,8 @@ public class EditRankFragment extends Fragment {
         ranksList = new ArrayList<>();
         populateRanks();
 
+        //handles edit rank by onClick
         EditRankRecyclerViewAdapter.ItemClickListener editRankClickListener = ((view, position, data) -> {
-            //handles onClick in Edit Rank recycler
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Edit Rank")
                     .setMessage("Rank Title");
@@ -87,20 +89,62 @@ public class EditRankFragment extends Fragment {
             input.setLayoutParams(lp);
             builder.setView(input);
             builder.setPositiveButton("Confirm", (dialogInterface, i) -> {
+                RanksDataModel rank = ranksList.get(position);
+                rank.setRank_name(input.getText().toString());
+                db.collection("ranks").document(rank.getDocumentId()).set(rank);
+                editRankRecyclerViewAdapter.notifyDataSetChanged();
             });
             builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
             });
             AlertDialog dialog = builder.create();
             dialog.show();
+        });
 
+        //handles hold to delete
+        EditRankRecyclerViewAdapter.rankLongClickListener rankLongClickListener = (view, position) -> {
+            @SuppressLint("NotifyDataSetChanged") AlertDialog.Builder dialog = new AlertDialog.Builder(getContext())
+                    .setTitle("Delete rank")
+                    .setMessage("Are you sure you want to delete this rank?")
+                    .setPositiveButton("Yes", (dialogInterface, i) -> {
+                        RanksDataModel rank = ranksList.get(position);
+                        db.collection("ranks").document(rank.getDocumentId()).delete();
+                        ranksList.remove(position);
+                        checkRanksListEmpty();
+                        editRankRecyclerViewAdapter.notifyDataSetChanged();
+                    })
+                    .setNegativeButton("No", (dialogInterface, i) -> {
+
+                    });
+            dialog.show();
+        };
+
+        binding.addRankBtn.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Create Rank")
+                    .setMessage("Rank Title");
+            final EditText input = new EditText(getContext());
+            ConstraintLayout.LayoutParams lp = new ConstraintLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT);
+            input.setLayoutParams(lp);
+            builder.setView(input);
+            builder.setPositiveButton("Confirm", (dialogInterface, i) -> {
+                firestoreDatabase.addRank(input.getText().toString());
+                populateRanks();
+            });
+            builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
 
         RecyclerView editRankRecyclerView = binding.editRankRecycler;
         editRankRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         editRankRecyclerViewAdapter = new EditRankRecyclerViewAdapter(getContext(), ranksList);
         editRankRecyclerViewAdapter.setClickListener(editRankClickListener);
+        editRankRecyclerViewAdapter.setLongClickListener(rankLongClickListener);
         editRankRecyclerView.setAdapter(editRankRecyclerViewAdapter);
 
+        /*  swipe to delete (now using hold to delete)
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
@@ -116,6 +160,7 @@ public class EditRankFragment extends Fragment {
 
             }
         }).attachToRecyclerView(editRankRecyclerView);
+         */
 
         final SwipeRefreshLayout pullToRefresh = binding.rankSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
