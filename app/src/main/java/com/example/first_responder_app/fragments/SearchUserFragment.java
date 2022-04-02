@@ -1,6 +1,9 @@
 package com.example.first_responder_app.fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +15,15 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.SearchUserAdapter;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.SearchUserFragmentBinding;
 import com.example.first_responder_app.viewModels.SearchUserViewModel;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -32,10 +36,10 @@ public class SearchUserFragment extends Fragment implements SearchView.OnQueryTe
     //https://abhiandroid.com/ui/searchview
 
     ListView list;
-    //ListViewAdapter adapter;
-    SearchView editsearch;
+    SearchView editSearch;
     private UsersDataModel activeUser;
     private List<UsersDataModel> listOfAllFireDepartmentUsers;
+    private SearchUserAdapter adapter;
 
     public static SearchUserFragment newInstance() {
         return new SearchUserFragment();
@@ -46,22 +50,41 @@ public class SearchUserFragment extends Fragment implements SearchView.OnQueryTe
         SearchUserFragmentBinding binding = DataBindingUtil.inflate(inflater, R.layout.search_user_fragment, container, false);
 
         activeUser = AppUtil.getActiveUser(getActivity());
+        listOfAllFireDepartmentUsers = new ArrayList<>();
+        adapter = new SearchUserAdapter(getContext(), listOfAllFireDepartmentUsers);
+        editSearch = binding.search;
+        list = binding.listview;
 
-        FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
-                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .orderBy("first_name", Query.Direction.DESCENDING)
-                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    ArrayList<UsersDataModel> temp = new ArrayList<>();
+        fillList();
 
-                    for (QueryDocumentSnapshot userDoc : queryDocumentSnapshots) {
-                        UsersDataModel userDataModel = userDoc.toObject(UsersDataModel.class);
-                        temp.add(userDataModel);
-                    }
-
-                    listOfAllFireDepartmentUsers = temp;
+        final SwipeRefreshLayout pullToRefresh = binding.searchUserSwipe;
+        pullToRefresh.setOnRefreshListener(() -> {
+            fillList();
+            pullToRefresh.setRefreshing(false);
         });
 
+        list.setAdapter(adapter);
+        editSearch.setOnQueryTextListener(this);
+
         return binding.getRoot();
+    }
+
+    private void fillList() {
+        FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+            ArrayList<UsersDataModel> temp = new ArrayList<>();
+
+            for (QueryDocumentSnapshot userDoc : queryDocumentSnapshots) {
+                UsersDataModel userDataModel = userDoc.toObject(UsersDataModel.class);
+                temp.add(userDataModel);
+            }
+
+            listOfAllFireDepartmentUsers.clear();
+            listOfAllFireDepartmentUsers.addAll(temp);
+            adapter.notifyDataSetChanged();
+
+        }).addOnFailureListener(e -> Log.e(TAG, "onCreateView: failed to get users from department", e));
     }
 
     @Override
@@ -78,6 +101,8 @@ public class SearchUserFragment extends Fragment implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        String text = newText;
+        adapter.filter(text);
         return false;
     }
 }

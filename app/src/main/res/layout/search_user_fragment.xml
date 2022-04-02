@@ -1,17 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".fragments.SearchUserFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
         <variable
             name="viewModel"
-            type="com.example.first_responder_app.viewModels.SearchUserViewModel" />
+            type="com.example.first_responder_app.viewModels.EventGroupViewModel" />
     </data>
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/userSearchView"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/searchUserSwipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <SearchView
+                android:id="@+id/search"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:iconifiedByDefault="false">
+
+                <requestFocus />
+            </SearchView>
+
+            <ListView
+                android:id="@+id/listview"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_below="@+id/search" />
+
+        </RelativeLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </layout>
