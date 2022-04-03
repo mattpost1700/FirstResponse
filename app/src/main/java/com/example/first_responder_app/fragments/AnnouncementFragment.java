@@ -30,9 +30,12 @@ import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentAnnouncementBinding;
 import com.example.first_responder_app.recyclerViews.AnnouncementRecyclerViewAdapter;
 import com.example.first_responder_app.viewModels.AnnouncementViewModel;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +62,7 @@ public class AnnouncementFragment extends Fragment {
         NavController navController = navHostFragment.getNavController();
 
         activeUser = AppUtil.getActiveUser(getActivity());
-        if(activeUser == null) {
+        if (activeUser == null) {
             getActivity().getFragmentManager().popBackStack();
             Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
         }
@@ -86,28 +89,36 @@ public class AnnouncementFragment extends Fragment {
         return binding.getRoot();
     }
 
-    // TODO: Add group level notifs and viewing
-    private void populateAnnouncmentList(){
-        db.collection("announcements")
+    private void populateAnnouncmentList() {
+        Task getAnnoucementsForGroups = db.collection("announcements")
                 .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereIn("intended_group_id", activeUser.getGroup_ids())
                 .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
-                .get().addOnCompleteListener(announTask -> {
-            Log.d(TAG, "READ DATABASE - ANNOUNCEMENT FRAGMENT");
+                .get();
 
-            if (announTask.isSuccessful()) {
-                ArrayList<AnnouncementsDataModel> temp = new ArrayList<>();
-                for (QueryDocumentSnapshot announcementDoc : announTask.getResult()){
+        Task getAnnouncementsForAll = db.collection("announcements")
+                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                .whereEqualTo("intended_group_id", null)
+                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                .get();
+
+        Tasks.whenAllSuccess(getAnnoucementsForGroups, getAnnouncementsForAll).addOnSuccessListener(objects -> {
+            ArrayList<AnnouncementsDataModel> temp = new ArrayList<>();
+            for (Object fakeQuerySnapshot : objects) {
+                QuerySnapshot querySnapshot = ((QuerySnapshot) fakeQuerySnapshot);
+                for (QueryDocumentSnapshot announcementDoc : querySnapshot) {
                     AnnouncementsDataModel announcementDataModel = announcementDoc.toObject(AnnouncementsDataModel.class);
                     temp.add(announcementDataModel);
                 }
-                listOfAnnouncements.clear();
-                listOfAnnouncements.addAll(temp);
-                checkAnnouncementEmpty();
-                announcementAdapter.notifyDataSetChanged();
-            } else {
-                Log.d(TAG, "db get failed in announcement page " + announTask.getException());
             }
-        });
+
+            listOfAnnouncements.clear();
+            listOfAnnouncements.addAll(temp);
+            checkAnnouncementEmpty();
+            announcementAdapter.notifyDataSetChanged();
+        })
+                .addOnFailureListener(e -> Log.e(TAG, "populateAnnouncmentList: db get failed in announcement page", e));
+
     }
 
 
@@ -116,10 +127,10 @@ public class AnnouncementFragment extends Fragment {
      * If so show the "no announcements" text
      */
     private void checkAnnouncementEmpty() {
-        if(listOfAnnouncements.size() == 0){
+        if (listOfAnnouncements.size() == 0) {
             binding.rvAnnoun.setVisibility(View.GONE);
             binding.announcementNoneText.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             binding.rvAnnoun.setVisibility(View.VISIBLE);
             binding.announcementNoneText.setVisibility(View.GONE);
         }
