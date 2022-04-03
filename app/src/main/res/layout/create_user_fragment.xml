@@ -18,10 +18,11 @@
         <ScrollView
             android:id="@+id/createUserScrollView"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_height="0dp"
 
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/createUserCreateButton"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -220,14 +221,15 @@
             android:id="@+id/createUserCreateButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
             android:background="@drawable/standard_button_primary"
             android:text="@string/create"
             android:textColor="?attr/colorOnPrimary"
-            android:layout_marginTop="32dp"
 
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/createUserScrollView" />
+             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

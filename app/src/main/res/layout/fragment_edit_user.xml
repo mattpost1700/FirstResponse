@@ -90,6 +90,16 @@
                             android:inputType="textPostalAddress"
                             android:textSize="18sp" />
 
+                        <EditText
+                            android:id="@+id/userEmailAddr"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/margin_from_side"
+                            android:autofillHints="emailAddress"
+                            android:hint="@string/email"
+                            android:inputType="textEmailAddress"
+                            android:textSize="18sp" />
+
                     </LinearLayout>
                 </ScrollView>
 

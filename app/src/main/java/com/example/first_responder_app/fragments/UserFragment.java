@@ -105,6 +105,8 @@ public class UserFragment extends Fragment {
                     });
         } catch (IOException e) {
             Log.e(TAG, "onCreateView: Failed creating temp file", e);
+        }catch(IllegalArgumentException e){
+            Log.d(TAG, "No profile picture");
         }
 
         return binding.getRoot();

@@ -54,6 +54,13 @@
             android:icon="@drawable/ic_baseline_edit_24"
             android:menuCategory = "secondary"
             android:title="@string/edit_group" />
+
+        <item
+            android:id="@+id/editRankFragment"
+            android:menuCategory="secondary"
+            android:icon="@drawable/ic_baseline_edit_24"
+            android:title="@string/edit_rank"
+            android:visible="true" />
     </group>
 
     <group android:id="@+id/preferences_group">

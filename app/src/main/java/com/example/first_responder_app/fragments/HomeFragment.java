@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
@@ -267,12 +269,15 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
                 .whereGreaterThanOrEqualTo("responding_time", AppUtil.earliestTime(requireContext())).addSnapshotListener((value, error) -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (addResponderEventListener)");
 
-            if(error != null) {
+
+
+                    if(error != null) {
                 Log.w(TAG, "Listening failed for firestore users collection");
             }
             else {
                 ArrayList<UsersDataModel> temp = new ArrayList<>();
                 for(QueryDocumentSnapshot userDoc : value) {
+
                     UsersDataModel user = userDoc.toObject(UsersDataModel.class);
                     List<String> responses = user.getResponses();
                     if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
@@ -312,6 +317,7 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
                 .whereArrayContains(FirestoreDatabase.FIELD_FIRE_DEPARTMENTS, activeUser.getFire_department_id())
                 .whereEqualTo("incident_complete", false).get().addOnCompleteListener(incidentTask -> {
             Log.d(TAG, "READ DATABASE - HOME FRAGMENT (populateIncidents)");
+
 
             if (incidentTask.isSuccessful()) {
                 ArrayList<IncidentDataModel> temp = new ArrayList<>();
@@ -507,4 +513,5 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
         }
         return false;
     }
+
 }

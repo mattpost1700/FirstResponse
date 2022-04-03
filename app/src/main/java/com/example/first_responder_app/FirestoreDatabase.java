@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.dataModels.EventsDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
+import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.messaging.Message;
@@ -103,10 +104,19 @@ public class FirestoreDatabase {
                 .addOnFailureListener(e -> Log.d("new event page", "failed to create new event"));
     }
 
+    public void addRank(String rankTitle){
+        RanksDataModel newRank = new RanksDataModel(activeUserFireDepartmentId, rankTitle);
+
+        db.collection(RANKS_COLLECTION_DIR)
+                .add(newRank)
+                .addOnSuccessListener(documentReference -> Log.d("edit rank page", "new rank has been successfully created in the DB"))
+                .addOnFailureListener(e -> Log.d("edit rank page", "failed to create new rank"));
+    }
+
     // TODO: Add group id
     public void addAnnouncement(String title, String description, UsersDataModel user) {
         setActiveUser(user);
-        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), title, description);
+        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), activeUser.getDocumentId(), title, description);
 
         db.collection(ANNOUNCEMENTS_COLLECTION_DIR)
                 .add(newAnnoun)

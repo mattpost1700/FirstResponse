@@ -2,8 +2,28 @@ package com.example.first_responder_app;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -141,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             NavigationUI.setupWithNavController(navView, navController);
             navView.setNavigationItemSelectedListener(this);
 
-
             //Setup Nav Drawer user click event
             View headerView = navView.getHeaderView(0);
             headerView.findViewById(R.id.user_info).setOnClickListener(v -> {
@@ -198,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.clear();
                 editor.apply();
+                navController.popBackStack(R.id.nav_graph, true);
                 navController.navigate(R.id.loginFragment);
                 break;
             case R.id.homeFragment:
@@ -230,6 +250,8 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             case R.id.adminEditGroupFragment:
                 navController.navigate((R.id.adminEditGroupFragment));
                 break;
+            case R.id.editRankFragment:
+                navController.navigate(R.id.editRankFragment);
         }
         //close navigation drawer
         closeNavDrawer();

@@ -4,8 +4,6 @@ import static android.content.ContentValues.TAG;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.core.view.ViewCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -27,7 +25,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
@@ -58,6 +55,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -73,6 +71,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class IncidentFragment extends DialogFragment implements OnMapReadyCallback {
 
@@ -126,7 +125,6 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
 
         mMapView.getMapAsync(this);
 
-
         mViewModel = new ViewModelProvider(requireActivity()).get(IncidentViewModel.class);
         incident = mViewModel.getIncidentDataModel();
         responderList = new ArrayList<>();
@@ -146,10 +144,12 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
         });
 
         //setup the dialog upon clicking the responder count icon, clicking on individual item will redirect to their profile page
-        populateRespondersListFromDB();
         binding.incidentRespondingCount.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Responders")
+            LayoutInflater layoutInflater = getLayoutInflater();
+            View view = layoutInflater.inflate(R.layout.dialog_title, null);
+
+            builder.setCustomTitle(view)
                     .setItems(responderArr, (dialogInterface, i) -> {
                         mUserViewModel = new ViewModelProvider(requireActivity()).get(UserViewModel.class);
                         mUserViewModel.setUserDataModel(responderList.get(i));
@@ -206,6 +206,7 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
 
         setupLocationListener();
 
+        AtomicInteger prevLength = new AtomicInteger();
         if (listenerRegistration == null) {
             //Ensure that the incident data is updated if database is updated
             docRef = FirestoreDatabase.getInstance().getDb().collection("incident").document(incident.getDocumentId());
@@ -233,6 +234,13 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
                         //Get the Address object of the incident
 
                         incidentAddress = addrToCoords(incidentDataModel.getLocation());
+
+                        int currentLength = incidentDataModel.getResponding().size();
+                        if(prevLength.get() != currentLength){
+                            prevLength.set(currentLength);
+                            responderList.clear();
+                            populateRespondersListFromDB();
+                        }
                     }
 
                 } else {
@@ -248,19 +256,21 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
      *
      */
     private void populateRespondersListFromDB() {
-        if (incident.getResponding().size() != 0) {
-            int upper = Math.floorDiv(incident.getResponding().size(), 10);
+        responderList.clear();
+
+        if (incidentDataModel.getResponding().size() != 0) {
+            int upper = Math.floorDiv(incidentDataModel.getResponding().size(), 10);
             for (int i = 0; i < upper; i++) {
                 populateResponders(i * 10, i * 10 + 10);
             }
-            populateResponders((incident.getResponding().size() - incident.getResponding().size() % 10), incident.getResponding().size());
+            populateResponders((incidentDataModel.getResponding().size() - incidentDataModel.getResponding().size() % 10), incidentDataModel.getResponding().size());
         }
     }
 
     public void populateResponders(int startIdx, int endIdx) {
         FirestoreDatabase.getInstance().getDb()
                 .collection("users")
-                .whereIn(FieldPath.documentId(), incident.getResponding().subList(startIdx, endIdx))
+                .whereIn(FieldPath.documentId(), incidentDataModel.getResponding().subList(startIdx, endIdx))
                 .get().addOnCompleteListener(responderTask -> {
                     Log.d(TAG, "READ DATABASE - EVENT FRAGMENT");
 
@@ -566,6 +576,7 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
 
             LatLng loc = new LatLng(latitude, longitude);
             map.addMarker(new MarkerOptions().position(loc).title("Incident Location"));
+
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(loc, 12.0f));
             map.setTrafficEnabled(true);
 

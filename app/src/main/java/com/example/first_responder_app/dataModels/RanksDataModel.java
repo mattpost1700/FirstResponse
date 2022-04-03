@@ -18,32 +18,28 @@ public class RanksDataModel implements Serializable {
 
     // Object params
     private String rank_name;
-    private int rank_level;
 
     /** Constructors **/
 
     /**
      * @deprecated Uses old data model
      */
-    public RanksDataModel(String rank_name, int rank_level) {
+    public RanksDataModel(String rank_name) {
         this.rank_name = rank_name;
-        this.rank_level = rank_level;
     }
 
     public RanksDataModel() {}
 
-    public RanksDataModel(Timestamp created_at, String fire_department_id, String rank_name, int rank_level) {
+    public RanksDataModel(Timestamp created_at, String fire_department_id, String rank_name) {
         this.created_at = created_at;
         this.fire_department_id = fire_department_id;
         this.rank_name = rank_name;
-        this.rank_level = rank_level;
     }
 
-    public RanksDataModel(String fire_department_id, String rank_name, int rank_level) {
+    public RanksDataModel(String fire_department_id, String rank_name) {
         this.created_at = Timestamp.now();
         this.fire_department_id = fire_department_id;
         this.rank_name = rank_name;
-        this.rank_level = rank_level;
     }
 
     /** Setters **/
@@ -64,9 +60,6 @@ public class RanksDataModel implements Serializable {
         this.rank_name = rank_name;
     }
 
-    public void setRank_level(int rank_level) {
-        this.rank_level = rank_level;
-    }
 
     /** Getters **/
 
@@ -86,7 +79,4 @@ public class RanksDataModel implements Serializable {
         return rank_name;
     }
 
-    public int getRank_level() {
-        return rank_level;
-    }
 }
