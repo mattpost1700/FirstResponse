@@ -15,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.first_responder_app.AppUtil;
@@ -35,8 +37,8 @@ public class SearchUserFragment extends Fragment implements SearchView.OnQueryTe
 
     //https://abhiandroid.com/ui/searchview
 
-    ListView list;
-    SearchView editSearch;
+    ListView listView;
+    SearchView searchView;
     private UsersDataModel activeUser;
     private List<UsersDataModel> listOfAllFireDepartmentUsers;
     private SearchUserAdapter adapter;
@@ -52,10 +54,21 @@ public class SearchUserFragment extends Fragment implements SearchView.OnQueryTe
         activeUser = AppUtil.getActiveUser(getActivity());
         listOfAllFireDepartmentUsers = new ArrayList<>();
         adapter = new SearchUserAdapter(getContext(), listOfAllFireDepartmentUsers);
-        editSearch = binding.search;
-        list = binding.listview;
+        searchView = binding.search;
+        listView = binding.listview;
 
         fillList();
+
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            UsersDataModel selectedUser = listOfAllFireDepartmentUsers.get(position);
+
+            // Go to admin edit user
+            mViewModel = new ViewModelProvider(requireActivity()).get(SearchUserViewModel.class);
+            mViewModel.setSelectedUser(selectedUser);
+
+            NavDirections action = SearchUserFragmentDirections.actionSearchUserFragmentToAdminEditUserFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
+        });
 
         final SwipeRefreshLayout pullToRefresh = binding.searchUserSwipe;
         pullToRefresh.setOnRefreshListener(() -> {
@@ -63,8 +76,8 @@ public class SearchUserFragment extends Fragment implements SearchView.OnQueryTe
             pullToRefresh.setRefreshing(false);
         });
 
-        list.setAdapter(adapter);
-        editSearch.setOnQueryTextListener(this);
+        listView.setAdapter(adapter);
+        searchView.setOnQueryTextListener(this);
 
         return binding.getRoot();
     }

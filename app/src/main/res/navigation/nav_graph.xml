@@ -265,5 +265,9 @@
         android:id="@+id/searchUserFragment"
         android:name="com.example.first_responder_app.fragments.SearchUserFragment"
         android:label="search_user_fragment"
-        tools:layout="@layout/search_user_fragment" />
+        tools:layout="@layout/search_user_fragment" >
+        <action
+            android:id="@+id/action_searchUserFragment_to_adminEditUserFragment"
+            app:destination="@id/adminEditUserFragment" />
+    </fragment>
 </navigation>
