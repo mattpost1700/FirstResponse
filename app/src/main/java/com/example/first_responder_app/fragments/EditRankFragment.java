@@ -150,17 +150,15 @@ public class EditRankFragment extends Fragment {
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
-
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 RanksDataModel deletedRank = ranksList.get(viewHolder.getAdapterPosition());
                 int pos = viewHolder.getAdapterPosition();
                 ranksList.remove(pos);
                 editRankRecyclerViewAdapter.notifyItemRemoved(pos);
-
             }
         }).attachToRecyclerView(editRankRecyclerView);
-         */
+        */
 
         final SwipeRefreshLayout pullToRefresh = binding.rankSwipeRefreshLayout;
         pullToRefresh.setOnRefreshListener(() -> {
