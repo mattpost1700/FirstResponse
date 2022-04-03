@@ -231,6 +231,7 @@ public class LoginFragment extends Fragment {
                 // hide admin options
                 navigationView.getMenu().findItem(R.id.searchUserFragment).setVisible(false);
                 navigationView.getMenu().findItem(R.id.adminEditGroupFragment).setVisible(false);
+                navigationView.getMenu().findItem(R.id.editRankFragment).setVisible(false);
             }
         }
         catch (Exception e) {
