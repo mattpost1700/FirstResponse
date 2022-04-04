@@ -149,7 +149,7 @@ public class AdminEditUserFragment extends Fragment {
 
                             allGroups.add(currentGroup);
                             allGroupsStrings.add(currentGroup.getName());
-                            if (userGroups.contains(currentGroup.getDocumentId())) {
+                            if (userGroups != null && userGroups.contains(currentGroup.getDocumentId())) {
                                 userInGroupsNames.add(currentGroup.getName());
                             } else {
                                 userNotInGroupsNames.add(currentGroup.getName());
@@ -168,50 +168,55 @@ public class AdminEditUserFragment extends Fragment {
 
 
         binding.adminEditUserUpdateRankButton.setOnClickListener(v -> {
-            String selectedRankString = rankSpinner.getSelectedItem().toString();
+            if(rankSpinner.getSelectedItem() != null) {
+                String selectedRankString = rankSpinner.getSelectedItem().toString();
 
-            for (RanksDataModel ranksDataModel : listOfRanks) {
-                if(ranksDataModel.getRank_name().equals(selectedRankString)) {
-                    FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
-                            .document(userToEdit.getDocumentId()).update(FirestoreDatabase.FIELD_RANK_ID, ranksDataModel.getDocumentId())
-                            .addOnFailureListener(e -> Toast.makeText(getContext(), "onCreateView: Failed to update user", Toast.LENGTH_SHORT).show());
+                for (RanksDataModel ranksDataModel : listOfRanks) {
+                    if (ranksDataModel.getRank_name().equals(selectedRankString)) {
+                        FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
+                                .document(userToEdit.getDocumentId()).update(FirestoreDatabase.FIELD_RANK_ID, ranksDataModel.getDocumentId())
+                                .addOnFailureListener(e -> Toast.makeText(getContext(), "onCreateView: Failed to update user", Toast.LENGTH_SHORT).show());
+                    }
                 }
             }
-
         });
 
         binding.adminEditUserAddGroupButton.setOnClickListener(v -> {
-            String selectedGroupToAdd = addGroupSpinner.getSelectedItem().toString();
+            if(addGroupSpinner.getSelectedItem() != null) {
+                String selectedGroupToAdd = addGroupSpinner.getSelectedItem().toString();
 
-            for(GroupDataModel groupDataModel : allGroups) {
-                if(groupDataModel.getName().equals(selectedGroupToAdd)) {
-                    FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
-                            .document(userToEdit.getDocumentId()).update("group_ids", FieldValue.arrayUnion(groupDataModel.getDocumentId()))
-                            .addOnFailureListener(e -> Toast.makeText(getContext(), "onCreateView: Failed to update user", Toast.LENGTH_SHORT).show());
+                for (GroupDataModel groupDataModel : allGroups) {
+                    if (groupDataModel.getName().equals(selectedGroupToAdd)) {
+                        FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
+                                .document(userToEdit.getDocumentId()).update("group_ids", FieldValue.arrayUnion(groupDataModel.getDocumentId()))
+                                .addOnFailureListener(e -> Toast.makeText(getContext(), "onCreateView: Failed to update user", Toast.LENGTH_SHORT).show());
+                    }
                 }
-            }
 
-            userInGroupsNames.add(selectedGroupToAdd);
-            userNotInGroupsNames.remove(selectedGroupToAdd);
-            addGroupAdapter.notifyDataSetChanged();
-            removeGroupAdapter.notifyDataSetChanged();
+                userInGroupsNames.add(selectedGroupToAdd);
+                userNotInGroupsNames.remove(selectedGroupToAdd);
+                addGroupAdapter.notifyDataSetChanged();
+                removeGroupAdapter.notifyDataSetChanged();
+            }
         });
 
         binding.adminEditUserRemoveGroupButton.setOnClickListener(v -> {
-            String selectedGroupToRemove = removeGroupSpinner.getSelectedItem().toString();
+            if(removeGroupSpinner.getSelectedItem() != null) {
+                String selectedGroupToRemove = removeGroupSpinner.getSelectedItem().toString();
 
-            for (GroupDataModel groupDataModel : allGroups) {
-                if(groupDataModel.getName().equals(selectedGroupToRemove)) {
-                    FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
-                            .document(userToEdit.getDocumentId()).update("group_ids", FieldValue.arrayRemove(groupDataModel.getDocumentId()))
-                            .addOnFailureListener(e -> Toast.makeText(getContext(), "onCreateView: Failed to update user", Toast.LENGTH_SHORT).show());
+                for (GroupDataModel groupDataModel : allGroups) {
+                    if (groupDataModel.getName().equals(selectedGroupToRemove)) {
+                        FirestoreDatabase.getInstance().getDb().collection(FirestoreDatabase.USERS_COLLECTION_DIR)
+                                .document(userToEdit.getDocumentId()).update("group_ids", FieldValue.arrayRemove(groupDataModel.getDocumentId()))
+                                .addOnFailureListener(e -> Toast.makeText(getContext(), "onCreateView: Failed to update user", Toast.LENGTH_SHORT).show());
+                    }
                 }
-            }
 
-            userInGroupsNames.remove(selectedGroupToRemove);
-            userNotInGroupsNames.add(selectedGroupToRemove);
-            addGroupAdapter.notifyDataSetChanged();
-            removeGroupAdapter.notifyDataSetChanged();
+                userInGroupsNames.remove(selectedGroupToRemove);
+                userNotInGroupsNames.add(selectedGroupToRemove);
+                addGroupAdapter.notifyDataSetChanged();
+                removeGroupAdapter.notifyDataSetChanged();
+            }
         });
 
 

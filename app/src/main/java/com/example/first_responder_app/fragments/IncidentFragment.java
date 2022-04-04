@@ -542,8 +542,8 @@ public class IncidentFragment extends DialogFragment implements OnMapReadyCallba
             mapViewBundle = new Bundle();
             outState.putBundle(MAPVIEW_BUNDLE_KEY, mapViewBundle);
         }
-
-        mMapView.onSaveInstanceState(mapViewBundle);
+        if(mMapView != null)
+            mMapView.onSaveInstanceState(mapViewBundle);
     }
 
 
