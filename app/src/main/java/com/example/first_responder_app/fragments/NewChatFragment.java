@@ -114,11 +114,15 @@ public class NewChatFragment extends Fragment {
 
             //If user exists, is not the current user, and has not already been added
             if (result != null && !result.getDocumentId().equals(user.getDocumentId()) && !listOfNewUsers.contains(result)) {
-                binding.newChatErrorMsg.setText("");
+                binding.newChatErrorMsg.setVisibility(View.INVISIBLE);
                 listOfNewUsers.add(result);
                 newChatRecyclerViewAdapter.notifyDataSetChanged();
-            } else {
+            } else if (listOfNewUsers.contains(result)) {
                 binding.newChatErrorMsg.setText("User not found");
+                binding.newChatErrorMsg.setVisibility(View.VISIBLE);
+            } else if (result.getDocumentId().equals(user.getDocumentId())) {
+                binding.newChatErrorMsg.setText("New user cannot be yourself");
+                binding.newChatErrorMsg.setVisibility(View.VISIBLE);
             }
 
         });
@@ -128,9 +132,11 @@ public class NewChatFragment extends Fragment {
 
             if (listOfNewUsers.size() == 0) {
                 binding.newChatErrorMsg.setText("Must add users to the chat");
+                binding.newChatErrorMsg.setVisibility(View.VISIBLE);
             } else if (chatName.length() == 0) {
                 binding.newChatErrorMsg.setText("Chat name must not be blank");
-            }else {
+                binding.newChatErrorMsg.setVisibility(View.VISIBLE);
+            } else {
                 listOfNewUsers.add(user);
                 firestoreDatabase.addChat(chatName, listOfNewUsers);
             }

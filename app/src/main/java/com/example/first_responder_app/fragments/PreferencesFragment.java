@@ -23,9 +23,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.dataModels.UsersDataModel;
+import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.PreferencesViewModel;
 import com.example.first_responder_app.databinding.FragmentHomeBinding;
 import com.example.first_responder_app.databinding.PreferencesFragmentBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Objects;
 
@@ -65,6 +70,12 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
                     case "theme":
                         updateTheme(binding.getRoot().getContext());
                         break;
+                    case "fireNotificationPrefKey":
+                        subOrUnsubTopic("fire", binding.getRoot().getContext());
+                        break;
+                    case "EMSNotificationPrefKey":
+                        subOrUnsubTopic("EMS", binding.getRoot().getContext());
+
                 }
             }
         };
@@ -93,6 +104,48 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             case "system":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
             break;
+        }
+    }
+
+    public void subOrUnsubTopic(String topic, Context c) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+
+        ActiveUser activeUser = (ActiveUser)c;
+        UsersDataModel user = activeUser.getActive();
+
+        String dept_id = "";
+        if (user.getFire_department_id() != null) {
+            dept_id = user.getFire_department_id();
+        }
+
+        boolean sub;
+        if (topic.equalsIgnoreCase("fire")) {
+            sub = prefs.getBoolean("fireNotificationPrefKey", true);
+            topic = "fire_" + dept_id;
+        } else {
+            sub = prefs.getBoolean("EMSNotificationPrefKey", true);
+            topic = "EMS_" + dept_id;
+        }
+
+
+        if (sub) {
+            String finalTopic1 = topic;
+            FirebaseMessaging.getInstance().subscribeToTopic(topic)
+                    .addOnCompleteListener(new OnCompleteListener<>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.d(TAG, finalTopic1 + " successfully subscribed to!");
+                        }
+                    });
+        } else {
+            String finalTopic = topic;
+            FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                    .addOnCompleteListener(new OnCompleteListener<>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Log.d(TAG, finalTopic + " successfully unsubscribed from!");
+                        }
+                    });
         }
     }
 }
