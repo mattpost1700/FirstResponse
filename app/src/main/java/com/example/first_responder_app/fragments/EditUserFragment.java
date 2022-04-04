@@ -90,7 +90,7 @@ public class EditUserFragment extends Fragment {
     private Context applicationContext;
     private Uri selectedImage;
     private String dbPicPath;
-
+    FragmentEditUserBinding binding;
     public static EditUserFragment newInstance() {
         return new EditUserFragment();
     }
@@ -99,7 +99,7 @@ public class EditUserFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         //binding fragment with nav_map by using navHostFragment, throw this block of code in there and that allows you to switch to other fragments
-        FragmentEditUserBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_user, container, false);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_edit_user, container, false);
         NavHostFragment navHostFragment =
                 (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         // TODO: navCont created for side bar(still need to be implemented)
@@ -115,24 +115,12 @@ public class EditUserFragment extends Fragment {
             user = activeUser.getActive();
         }
 
-        Spinner rankSpinner = binding.userRank;
         imageView = binding.imageViewForProfilePic;
         ranksAndIds = new HashMap<>();
-        populateRanks(rankSpinner);
 
-        populateEditTexts(binding.userFirstName, binding.userLastName, binding.userPhone, binding.userAddress);
 
-        rankSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                rankSpinner.setSelection(position);
-            }
+        populateEditTexts(binding.userFirstName, binding.userLastName, binding.userPhone, binding.userAddress, binding.userEmailAddr);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // can leave this empty
-            }
-        });
 
         //taking picture option
         binding.floatingActionButton5.setOnClickListener(v -> {
@@ -167,6 +155,7 @@ public class EditUserFragment extends Fragment {
             String lastName = binding.userLastName.getText().toString();
             String phone = binding.userPhone.getText().toString();
             String address = binding.userAddress.getText().toString();
+            String email = binding.userEmailAddr.getText().toString();
             String id = "";
 
             if (activeUser != null) {
@@ -175,8 +164,6 @@ public class EditUserFragment extends Fragment {
                     id = user.getDocumentId();
                 }
             }
-            String rankName = binding.userRank.getSelectedItem().toString();
-            String rankID = ranksAndIds.get(rankName);
 
             if (id != null) {
                 String errorMsg = "";
@@ -186,25 +173,25 @@ public class EditUserFragment extends Fragment {
                     errorMsg = "Last name has invalid format";
                 } else if (!firestoreDatabase.validatePhone(phone)) {
                     errorMsg = "Phone number has invalid format";
+                } else if(email.equals("")){
+                    errorMsg = "Email can't be empty";
                 }
 
 
                 if (errorMsg.equals("")) {
                     //TODO: await
-                    firestoreDatabase.editUser(firstName, lastName, rankID, phone, address, id, getActivity());
+                    firestoreDatabase.editUser(firstName, lastName, user.getRank_id(), phone, address, email, id, getActivity());
                     uploadImage();
 
                     user.setFirst_name(firstName);
                     user.setLast_name(lastName);
-                    user.setRank_id(rankID);
                     user.setPhone_number(phone);
                     user.setAddress(address);
+                    user.setEmail(email);
                     user.setRemote_path_to_profile_picture(dbPicPath);
-
-                    UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+                    UserViewModel userViewModel = new ViewModelProvider(getActivity()).get(UserViewModel.class);
                     userViewModel.setUserDataModel(user);
-                    NavDirections action = EditUserFragmentDirections.actionEditUserFragmentToUserFragment();
-                    Navigation.findNavController(binding.getRoot()).navigate(action);
+
                 } else {
                     Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_SHORT).show();
                 }
@@ -214,66 +201,42 @@ public class EditUserFragment extends Fragment {
             }
 
         });
+        
+        
+        ImageView profilePictureImageView = binding.imageViewForProfilePic;
+        //load user profile picture
+        try {
+            final File localFile = File.createTempFile("Images", "bmp");
+            StorageReference ref = FirestoreDatabase.profilePictureRef.child(user.getRemote_path_to_profile_picture());
+            ref.getFile(localFile)
+                    .addOnSuccessListener(bytes -> {
+                        try {
+                            profilePictureImageView.setImageBitmap(BitmapFactory.decodeFile(localFile.getAbsolutePath()));
+                        } catch (Exception e) {
+                            Log.d(TAG, "onCreateView: No profile picture found");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.w(TAG, "getUserProfile: Could not load profile picture!", e);
+                    });
+        } catch (IOException e) {
+            Log.e(TAG, "onCreateView: Failed creating temp file", e);
+        }catch(IllegalArgumentException e){
+            Log.d(TAG, "No profile picture");
+        }
 
         return binding.getRoot();
     }
 
-    public void populateRanks(Spinner rankSpinner) {
 
-        ArrayList<String> rankNames = new ArrayList<>();
 
-        db.collection("ranks")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        Log.d(TAG, "READ DATABASE - EDIT USER FRAGMENT");
-
-                        if (task.isSuccessful()) {
-                            Log.d("DB", "task is successful!!");
-
-                            String initialRankName = null;
-                            String initialRankId = null;
-                            if (user != null) {
-                                initialRankId = user.getRank_id();
-                            }
-
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                //This array is used to populate the spinner
-                                rankNames.add((String) document.get("rank_name"));
-
-                                //This hashmap is used to get the id from the rank name selected in the spinner
-                                ranksAndIds.putIfAbsent((String) document.get("rank_name"), document.getId());
-
-                                if (initialRankId != null && initialRankId.equals(document.getId())) {
-                                    initialRankName = (String) document.get("rank_name");
-                                }
-                            }
-                            //Create spinner populated by ArrayList of rank names
-                            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, rankNames);
-                            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            rankSpinner.setAdapter(arrayAdapter);
-
-                            //Set initial position to be current rank of ActiveUser
-                            if (initialRankName != null) {
-                                int initialPosition = arrayAdapter.getPosition(initialRankName);
-                                rankSpinner.setSelection(initialPosition);
-                            }
-
-                        } else {
-                            Log.d("DB", "Error getting ranks: ", task.getException());
-                        }
-                    }
-                });
-    }
-
-    public void populateEditTexts(EditText firstName, EditText lastName, EditText phone, EditText address) {
+    public void populateEditTexts(EditText firstName, EditText lastName, EditText phone, EditText address, EditText email) {
         if (user != null) {
             firstName.setText(user.getFirst_name());
             lastName.setText(user.getLast_name());
             phone.setText(user.getPhone_number());
             address.setText(user.getAddress());
-
+            email.setText(user.getEmail());
         }
     }
 
@@ -386,6 +349,10 @@ public class EditUserFragment extends Fragment {
                                                     "Image Uploaded!!",
                                                     Toast.LENGTH_SHORT)
                                             .show();
+
+                                    NavDirections action = EditUserFragmentDirections.actionEditUserFragmentToUserFragment();
+                                    Navigation.findNavController(binding.getRoot()).navigate(action);
+                                    db.collection("users").document(user.getDocumentId()).update("remote_path_to_profile_picture", (dbPicPath));
                                 }
                             })
 
@@ -419,7 +386,11 @@ public class EditUserFragment extends Fragment {
                                                     + (int) progress + "%");
                                 }
                             });
+        }else{
+            NavDirections action = EditUserFragmentDirections.actionEditUserFragmentToUserFragment();
+            Navigation.findNavController(binding.getRoot()).navigate(action);
         }
+
     }
 
     //taking picture part
@@ -451,14 +422,13 @@ public class EditUserFragment extends Fragment {
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getContext().getPackageManager()) != null) {
+        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
             // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
                 // Error occurred while creating the File
-
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
@@ -467,6 +437,7 @@ public class EditUserFragment extends Fragment {
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 selectedImage = photoURI;
+                Log.d(TAG, "dispatchTakePictureIntent: ");
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }

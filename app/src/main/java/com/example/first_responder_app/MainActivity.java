@@ -312,6 +312,10 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 incidentListener.remove();
                 incidentListener = null;
             }
+
+            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.user);
+            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageDrawable(drawable);
+
             stopETA();
             return;
         }

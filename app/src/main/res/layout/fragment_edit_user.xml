@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewForProfilePic"
                 tools:layout_editor_absoluteX="189dp">
 
                 <ScrollView
@@ -69,15 +69,6 @@
                             android:autofillHints="phone"
                             android:hint="@string/phone_number"
                             android:inputType="phone"
-                            android:textSize="18sp" />
-
-                        <Spinner
-                            android:id="@+id/userRank"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_margin="@dimen/margin_from_side"
-                            android:contentDescription="@string/rank"
-                            android:minHeight="48dp"
                             android:textSize="18sp" />
 
                         <EditText

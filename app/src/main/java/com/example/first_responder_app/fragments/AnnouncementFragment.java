@@ -90,35 +90,39 @@ public class AnnouncementFragment extends Fragment {
     }
 
     private void populateAnnouncmentList() {
-        Task getAnnoucementsForGroups = db.collection("announcements")
-                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .whereIn("intended_group_id", activeUser.getGroup_ids())
-                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
-                .get();
+        if(activeUser.getGroup_ids() != null && activeUser.getGroup_ids().size() > 0) {
+            Task getAnnoucementsForGroups = db.collection("announcements")
+                    .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                    .whereIn("intended_group_id", activeUser.getGroup_ids())
+                    .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                    .get();
 
-        Task getAnnouncementsForAll = db.collection("announcements")
-                .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                .whereEqualTo("intended_group_id", null)
-                .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
-                .get();
+            Task getAnnouncementsForAll = db.collection("announcements")
+                    .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                    .whereEqualTo("intended_group_id", null)
+                    .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                    .get();
 
-        Tasks.whenAllSuccess(getAnnoucementsForGroups, getAnnouncementsForAll).addOnSuccessListener(objects -> {
-            ArrayList<AnnouncementsDataModel> temp = new ArrayList<>();
-            for (Object fakeQuerySnapshot : objects) {
-                QuerySnapshot querySnapshot = ((QuerySnapshot) fakeQuerySnapshot);
-                for (QueryDocumentSnapshot announcementDoc : querySnapshot) {
-                    AnnouncementsDataModel announcementDataModel = announcementDoc.toObject(AnnouncementsDataModel.class);
-                    temp.add(announcementDataModel);
+            Tasks.whenAllSuccess(getAnnoucementsForGroups, getAnnouncementsForAll).addOnSuccessListener(objects -> {
+                ArrayList<AnnouncementsDataModel> temp = new ArrayList<>();
+                for (Object fakeQuerySnapshot : objects) {
+                    QuerySnapshot querySnapshot = ((QuerySnapshot) fakeQuerySnapshot);
+                    for (QueryDocumentSnapshot announcementDoc : querySnapshot) {
+                        AnnouncementsDataModel announcementDataModel = announcementDoc.toObject(AnnouncementsDataModel.class);
+                        temp.add(announcementDataModel);
+                    }
                 }
-            }
 
-            listOfAnnouncements.clear();
-            listOfAnnouncements.addAll(temp);
+                listOfAnnouncements.clear();
+                listOfAnnouncements.addAll(temp);
+
+                checkAnnouncementEmpty();
+                announcementAdapter.notifyDataSetChanged();
+            })
+                    .addOnFailureListener(e -> Log.e(TAG, "populateAnnouncmentList: db get failed in announcement page", e));
+        }else{
             checkAnnouncementEmpty();
-            announcementAdapter.notifyDataSetChanged();
-        })
-                .addOnFailureListener(e -> Log.e(TAG, "populateAnnouncmentList: db get failed in announcement page", e));
-
+        }
     }
 
 

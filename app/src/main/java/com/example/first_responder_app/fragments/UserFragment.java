@@ -58,6 +58,7 @@ public class UserFragment extends Fragment {
 
         profilePictureImageView = binding.userProfilePictureImageView;
 
+        Log.d(TAG, "onCreateView: " + user.getRemote_path_to_profile_picture());
 
         //Get active user id
         ActiveUser active = (ActiveUser)getActivity();

@@ -333,7 +333,7 @@ public class FirestoreDatabase {
      * @param id The document id of the user being updated
      * @param context The context
      */
-    public void editUser(String firstName, String lastName, String rank, String phone, String address, String id, Context context) {
+    public void editUser(String firstName, String lastName, String rank, String phone, String address, String email, String id, Context context) {
         String phoneNum = parsePhone(phone);
 
         db.collection("users").document(id)
@@ -341,6 +341,7 @@ public class FirestoreDatabase {
                         "last_name", lastName,
                         "address", address,
                         "phone_number", phoneNum,
+                        "email", email,
                         FIELD_RANK_ID, rank)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
