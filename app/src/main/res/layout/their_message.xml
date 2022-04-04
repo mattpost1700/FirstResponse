@@ -32,6 +32,7 @@
         android:layout_below="@+id/their_name"
         android:layout_alignLeft="@+id/their_name"
         android:background="@drawable/their_message"
+        android:textColor="?attr/colorOnSecondary"
         android:elevation="2dp"
         android:paddingHorizontal="16dp"
         android:paddingVertical="12dp"
