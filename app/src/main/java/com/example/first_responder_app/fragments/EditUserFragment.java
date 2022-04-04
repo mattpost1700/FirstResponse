@@ -3,6 +3,7 @@ package com.example.first_responder_app.fragments;
 import static android.content.ContentValues.TAG;
 
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
@@ -81,6 +82,10 @@ public class EditUserFragment extends Fragment {
     private ImageView imageView;
     private static final int REQUEST_IMAGE_CAPTURE = 1001;
     private static final int REQUEST_IMAGE_SELECT = 1002;
+    public static final int MULTIPLE_PERMISSIONS = 100;
+    public static final String[] permissions = {Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private String currentPhotoPath;
     private Context applicationContext;
     private Uri selectedImage;
@@ -103,6 +108,7 @@ public class EditUserFragment extends Fragment {
         firestoreDatabase = new FirestoreDatabase();
         db = firestoreDatabase.getDb();
         applicationContext = MainActivity.getContextOfApplication();
+        getPermission();
 
         activeUser = (ActiveUser) getActivity();
         if (activeUser != null) {
@@ -129,13 +135,11 @@ public class EditUserFragment extends Fragment {
         });
 
         //taking picture option
-        /* aborted for now cuz it's kinda gross
         binding.floatingActionButton5.setOnClickListener(v -> {
             try {
                 if (ActivityCompat.checkSelfPermission(requireContext(),
                         Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_IMAGE_SELECT);
+                    getPermission();
                 } else {
                     dispatchTakePictureIntent();
                 }
@@ -143,15 +147,13 @@ public class EditUserFragment extends Fragment {
                 e.printStackTrace();
             }
         });
-         */
 
         //uploading a picture
         binding.uploadProfilePicBtn.setOnClickListener(v -> {
             try {
                 if (ActivityCompat.checkSelfPermission(requireContext(),
                         Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
-                            Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_IMAGE_SELECT);
+                    getPermission();
                 } else {
                     openGallery();
                 }
@@ -287,11 +289,19 @@ public class EditUserFragment extends Fragment {
         if (requestCode == REQUEST_IMAGE_SELECT) {
             displaySelectedImage(data);
         } else if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            dispatchTakePictureIntent();
+            displayImage();
         }
     }
 
     //picture part
+    public void getPermission(){
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(permissions,
+                    MULTIPLE_PERMISSIONS);
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
@@ -311,6 +321,9 @@ public class EditUserFragment extends Fragment {
                     //do something like displaying a message that he didn`t allow the app to access gallery and you wont be able to let him select from gallery
                 }
                 break;
+        }
+        if(requestCode == MULTIPLE_PERMISSIONS){
+            Toast.makeText(getContext(), "Permissions Granted", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -453,6 +466,7 @@ public class EditUserFragment extends Fragment {
                         "com.example.android.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                selectedImage = photoURI;
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
