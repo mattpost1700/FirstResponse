@@ -76,6 +76,28 @@
                 app:layout_constraintStart_toStartOf="@+id/event_description_text"
                 app:layout_constraintTop_toBottomOf="@+id/event_description_text" />
 
+            <TextView
+                android:id="@+id/annouceGroupSpinnerLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/anton_regular"
+                android:labelFor="@+id/newAnnounDescription"
+                android:text="Group"
+                android:textSize="24sp"
+                app:layout_constraintStart_toStartOf="@+id/newAnnounDescription"
+                app:layout_constraintTop_toBottomOf="@+id/newAnnounDescription" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/annoucGroupSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+
+                app:layout_constraintStart_toStartOf="@id/annouceGroupSpinnerLabel"
+                app:layout_constraintTop_toBottomOf="@id/annouceGroupSpinnerLabel"/>
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/announcement_create_confirm"
                 android:layout_width="0dp"
@@ -86,7 +108,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/newAnnounDescription" />
+                app:layout_constraintTop_toBottomOf="@+id/annoucGroupSpinner" />
 
             <TextView
                 android:id="@+id/new_announ_log"

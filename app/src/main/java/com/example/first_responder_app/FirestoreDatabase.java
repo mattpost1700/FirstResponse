@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.example.first_responder_app.dataModels.AnnouncementsDataModel;
 import com.example.first_responder_app.dataModels.EventsDataModel;
+import com.example.first_responder_app.dataModels.GroupDataModel;
 import com.example.first_responder_app.dataModels.IncidentDataModel;
 import com.example.first_responder_app.dataModels.RanksDataModel;
 import com.example.first_responder_app.dataModels.UsersDataModel;
@@ -114,9 +115,9 @@ public class FirestoreDatabase {
     }
 
     // TODO: Add group id
-    public void addAnnouncement(String title, String description, UsersDataModel user) {
+    public void addAnnouncement(String title, String description, GroupDataModel currentlySelectedGroup, UsersDataModel user) {
         setActiveUser(user);
-        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), activeUser.getDocumentId(), title, description);
+        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), currentlySelectedGroup.getDocumentId(), title, description);
 
         db.collection(ANNOUNCEMENTS_COLLECTION_DIR)
                 .add(newAnnoun)
