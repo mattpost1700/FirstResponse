@@ -69,49 +69,7 @@ public class LoginFragment extends Fragment {
         NavController navController = navHostFragment.getNavController();
         sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-        //check whether user finished typing and query the data
-        binding.loginUsername.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                last_text_edit = System.currentTimeMillis();
-                handler.removeCallbacks(input_finish_checker);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                mViewModel.setUsername(binding.loginUsername.getText().toString());
-                if (binding.loginPassword.getText().length() > 0){
-                    last_text_edit = System.currentTimeMillis();
-                    handler.postDelayed(input_finish_checker, 500);
-                }
-            }
-        });
-        binding.loginPassword.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                last_text_edit = System.currentTimeMillis();
-                handler.removeCallbacks(input_finish_checker);
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                mViewModel.setPassword(binding.loginPassword.getText().toString());
-                if (binding.loginPassword.getText().length() > 0){
-                    last_text_edit = System.currentTimeMillis();
-                    handler.postDelayed(input_finish_checker, 500);
-                }
-            }
-        });
 
         binding.loginCreateAccountFab.setOnClickListener(v -> {
             NavDirections action = LoginFragmentDirections.actionLoginFragmentToCreateUserFragment();
@@ -124,49 +82,51 @@ public class LoginFragment extends Fragment {
         });
 
         binding.loginSubmit.setOnClickListener(v -> {
-            if (mViewModel.getUsername() == null || mViewModel.getPassword() == null){
+            if (binding.loginUsername.getText().toString().equals("") || binding.loginPassword.getText().toString().equals("")){
                 binding.loginLog.setText(R.string.loginFailMsg);
                 binding.loginLog.setVisibility(View.VISIBLE);
                 Log.d("testing", "login failed: wrong username/password");
             }
             else {
-                if (checkUsernameExists(mViewModel.getUsername())) {
-                    if (checkPwMatch(mViewModel.getUsername(), mViewModel.getPassword())) {
-                        //wraps the shared preferences and auto encrypts keys and values using a two-schemed method
-                        try {
-                            SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString("savedUsername", mViewModel.getUsername());
-                            editor.putString("savedPassword", mViewModel.getPassword());
-                            editor.apply();
-                            String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
-                            sharedPref = EncryptedSharedPreferences.create(
-                                    "secret_shared_prefs",
-                                    masterKeyAlias,
-                                    context,
-                                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                            );
-                        } catch (Exception e){
-                            Log.d("Login Encryption: ", "Encryption failed");
+
+                db.collection("users").whereEqualTo("username", binding.loginUsername.getText().toString()).whereEqualTo("password", binding.loginPassword.getText().toString()).get().addOnCompleteListener(t -> {
+                    if (t.isSuccessful()) {
+                        if (t.getResult().isEmpty()) {
+                            binding.loginLog.setText(R.string.loginFailMsg);
+                        } else {
+                            for (QueryDocumentSnapshot userDoc : t.getResult()) {
+                                user = userDoc.toObject(UsersDataModel.class);
+                            }
+
+                            try {
+                                SharedPreferences.Editor editor = sharedPref.edit();
+                                editor.putString("savedUsername", binding.loginUsername.getText().toString());
+                                editor.putString("savedPassword", binding.loginPassword.getText().toString());
+                                editor.apply();
+                                String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+                                sharedPref = EncryptedSharedPreferences.create(
+                                        "secret_shared_prefs",
+                                        masterKeyAlias,
+                                        context,
+                                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                                );
+                            } catch (Exception e){
+                                Log.d("Login Encryption: ", "Encryption failed");
+                            }
+                            ActiveUser activeUser = ((ActiveUser)getActivity());
+                            activeUser.setActive(user);
+
+                            successfullyHidAdminOptions();
+                            NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
+                            Navigation.findNavController(binding.getRoot()).navigate(action);
                         }
-                        ActiveUser activeUser = ((ActiveUser)getActivity());
-                        activeUser.setActive(user);
-
-                        successfullyHidAdminOptions();
-                        NavDirections action = LoginFragmentDirections.actionLoginFragmentToHomeFragment();
-                        Navigation.findNavController(binding.getRoot()).navigate(action);
-
-                        Log.d("testing", "username: " + mViewModel.getUsername() + " pw: " + mViewModel.getPassword() + " Login success.");
                     } else {
-                        binding.loginLog.setText(R.string.loginFailMsg);
-                        binding.loginLog.setVisibility(View.VISIBLE);
-                        Log.d("testing", "login failed: wrong username/password");
+                        Log.d(TAG, "Error logging in");
                     }
-                } else {
-                    binding.loginLog.setText(R.string.loginFailMsg);
-                    binding.loginLog.setVisibility(View.VISIBLE);
-                    Log.d("testing", "login failed: wrong username/password");
-                }
+                });
+
+
             }
         });
 
@@ -186,8 +146,6 @@ public class LoginFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
         String usernameQuickLogin = sharedPref.getString("savedUsername", null);
         String passwordQuickLogin = sharedPref.getString("savedPassword", null);
-        Log.d("testing", "usernameQuick: " + usernameQuickLogin);
-        Log.d("testing", "pwQuick: " + passwordQuickLogin);
         if (usernameQuickLogin != null && passwordQuickLogin != null){
 
             db.collection("users")
@@ -245,39 +203,4 @@ public class LoginFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
     }
-
-    private final Runnable input_finish_checker = new Runnable() {
-        public void run() {
-            if (System.currentTimeMillis() > (last_text_edit + 250)) {
-                populateUserList(mViewModel.getUsername());
-            }
-        }
-    };
-
-    private void populateUserList(String usernameInput) {
-        db.collection("users").whereEqualTo("username", usernameInput).get().addOnCompleteListener(usersTask -> {
-            Log.d(TAG, "READ DATABASE - LOGIN FRAGMENT");
-            if (usersTask.isSuccessful()) {
-                for (QueryDocumentSnapshot userDoc : usersTask.getResult()) {
-                    user = userDoc.toObject(UsersDataModel.class);
-                    checkExist = true;
-                }
-            } else {
-                Log.d(TAG, "db get failed in Login page " + usersTask.getException());
-                checkExist = false;
-            }
-        });
-    }
-
-    //check if username is valid & fetch user info
-    private boolean checkUsernameExists(String username) {
-        Log.d(TAG, "fetch user info + validates input: ");
-        return checkExist;
-    }
-
-    //check if password matches the record in db
-    private boolean checkPwMatch(String username, String pw){
-        return pw.equals(user.getPassword());
-    }
-
 }
