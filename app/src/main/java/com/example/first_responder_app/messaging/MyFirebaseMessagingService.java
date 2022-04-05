@@ -64,7 +64,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             NotificationChannel channel = new NotificationChannel("n", "e", NotificationManager.IMPORTANCE_HIGH);
 
             if (bypassDND == true) {
-                //channel.setBypassDnd(true);
                 channel.canBypassDnd();
             }
 

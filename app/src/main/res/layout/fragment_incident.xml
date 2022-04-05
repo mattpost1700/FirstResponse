@@ -245,7 +245,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="20dp"
                         android:text="@string/hyphen"
-                        android:textSize="14sp"
+                        android:textSize="18sp"
                         app:chipBackgroundColor="?attr/chipBackgroundColor"
                         app:chipIcon="@drawable/eta_icon"
                         app:layout_constraintBottom_toTopOf="@id/google_map_view"

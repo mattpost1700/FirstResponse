@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     ListenerRegistration incidentListener;
     ListenerRegistration userListener;
     String fireDeptAddr;
+    public static Context contextOfApplication;
 
 
     final int ACCESS_LOCATION_FRAGMENT = 101;
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
         setContentView(R.layout.activity_main);
 
         setupAppBar();
+        contextOfApplication = getApplicationContext();
 
         if(savedInstanceState != null){
             String user_id = savedInstanceState.getString("user_id");
@@ -310,6 +312,10 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 incidentListener.remove();
                 incidentListener = null;
             }
+
+            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.user);
+            ((ImageView) findViewById(R.id.appDrawerProfilePicImageView)).setImageDrawable(drawable);
+
             stopETA();
             return;
         }
@@ -623,6 +629,11 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public void refresh() {
         stopETA();
         updateETA();
+    }
+
+    public static Context getContextOfApplication()
+    {
+        return contextOfApplication;
     }
 }
 
