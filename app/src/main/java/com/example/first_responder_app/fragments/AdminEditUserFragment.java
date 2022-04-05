@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.R;
 import com.example.first_responder_app.dataModels.GroupDataModel;
@@ -27,6 +29,7 @@ import com.example.first_responder_app.databinding.AdminEditUserFragmentBinding;
 import com.example.first_responder_app.viewModels.AdminEditUserViewModel;
 import com.example.first_responder_app.viewModels.SearchUserViewModel;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -36,7 +39,6 @@ public class AdminEditUserFragment extends Fragment {
 
     private AdminEditUserViewModel mViewModel;
     private String currentlySelectedRankId;
-    private List<String> currentlySelectedGroupIds;
     private ArrayList<String> userInGroupsNames;
     private ArrayList<String> userNotInGroupsNames;
 
@@ -49,6 +51,8 @@ public class AdminEditUserFragment extends Fragment {
     ArrayAdapter<String> removeGroupAdapter;
     List<GroupDataModel> allGroups = new ArrayList<>();
     List<String> allGroupsStrings = new ArrayList<>();
+
+    UsersDataModel activeUser;
 
     public static AdminEditUserFragment newInstance() {
         return new AdminEditUserFragment();
@@ -64,8 +68,14 @@ public class AdminEditUserFragment extends Fragment {
             // leave
         }
 
+        activeUser = AppUtil.getActiveUser(getActivity());
+        if(activeUser == null) {
+            getActivity().getFragmentManager().popBackStack();
+            Toast.makeText(getContext(), "User is not logged in!", Toast.LENGTH_SHORT).show();
+        }
+
+
         currentlySelectedRankId = userToEdit.getRank_id();
-        currentlySelectedGroupIds = userToEdit.getGroup_ids();
 
         ArrayList<RanksDataModel> listOfRanks = new ArrayList<>();
         ArrayList<String> listOfRankNames = new ArrayList<>();
@@ -214,7 +224,41 @@ public class AdminEditUserFragment extends Fragment {
             removeGroupAdapter.notifyDataSetChanged();
         });
 
+        // TODO: Make resources
+        final String makeAdminText = "Make admin";
+        final String revokeAdminText = "Revoke admin";
+        Button adminEditUserMakeAdminButton =  binding.adminEditUserMakeAdminButton;
 
+        if(userToEdit.isIs_admin()) {
+            adminEditUserMakeAdminButton.setText(revokeAdminText);
+        }
+        else {
+            adminEditUserMakeAdminButton.setText(makeAdminText);
+        }
+
+        adminEditUserMakeAdminButton.setOnClickListener(v -> {
+            if(!userToEdit.getDocumentId().equals(activeUser.getDocumentId())) {
+                FirebaseFirestore db = FirestoreDatabase.getInstance().getDb();
+
+                if(adminEditUserMakeAdminButton.getText().toString().equals(makeAdminText)) {
+                    // Make this person an admin
+                    db.collection(FirestoreDatabase.USERS_COLLECTION_DIR).document(userToEdit.getDocumentId())
+                            .update("is_admin", true)
+                            .addOnSuccessListener(unused -> {
+                                adminEditUserMakeAdminButton.setText(revokeAdminText);
+                            });
+                } else {
+                    // Remove person's access
+                    db.collection(FirestoreDatabase.USERS_COLLECTION_DIR).document(userToEdit.getDocumentId())
+                            .update("is_admin", false)
+                            .addOnSuccessListener(unused -> {
+                                adminEditUserMakeAdminButton.setText(makeAdminText);
+                            });
+                }
+            } else {
+                Toast.makeText(getContext(), "Cannot give or revoke access to self", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return binding.getRoot();
     }

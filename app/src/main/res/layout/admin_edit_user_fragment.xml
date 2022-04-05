@@ -88,6 +88,18 @@
             app:layout_constraintTop_toBottomOf="@id/removeGroupSpinner"
             app:layout_constraintStart_toStartOf="@id/removeGroupSpinner"/>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/adminEditUserMakeAdminButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/standard_button_primary"
+            android:text=""
+            android:textColor="?attr/colorOnPrimary"
+            android:layout_marginTop="32dp"
+
+            app:layout_constraintTop_toBottomOf="@id/adminEditUserRemoveGroupButton"
+            app:layout_constraintStart_toStartOf="@id/adminEditUserRemoveGroupButton"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
