@@ -66,16 +66,17 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
         listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
             public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
                 Log.d(TAG, "onSharedPreferenceChanged: ");
-                switch(key){
-                    case "theme":
-                        updateTheme(binding.getRoot().getContext());
-                        break;
-                    case "fireNotificationPrefKey":
-                        subOrUnsubTopic("fire", binding.getRoot().getContext());
-                        break;
-                    case "EMSNotificationPrefKey":
-                        subOrUnsubTopic("EMS", binding.getRoot().getContext());
-
+                if(key != null) {
+                    switch (key) {
+                        case "theme":
+                            updateTheme(binding.getRoot().getContext());
+                            break;
+                        case "fireNotificationPrefKey":
+                            subOrUnsubTopic("fire", binding.getRoot().getContext());
+                            break;
+                        case "EMSNotificationPrefKey":
+                            subOrUnsubTopic("EMS", binding.getRoot().getContext());
+                    }
                 }
             }
         };
@@ -127,6 +128,7 @@ public class PreferencesFragment extends PreferenceFragmentCompat {
             topic = "EMS_" + dept_id;
         }
 
+        Log.d(TAG, "subOrUnsubTopic: " + sub);
 
         if (sub) {
             String finalTopic1 = topic;

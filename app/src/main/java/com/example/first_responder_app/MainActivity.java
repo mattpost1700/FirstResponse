@@ -69,10 +69,13 @@ import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.interfaces.RefreshETAs;
 import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
@@ -214,10 +217,25 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.loginFragment:
+
+                //unsubscribe from incident notifications on logout
+                String topic = "fire_" + activeUser.getFire_department_id();
+                String finalTopic = topic;
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                        .addOnCompleteListener(task -> Log.d(TAG, finalTopic + " successfully unsubscribed from!"));
+                topic = "EMS_" + activeUser.getFire_department_id();
+                String finalTopic2 = topic;
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                        .addOnCompleteListener(task -> Log.d(TAG, finalTopic2 + " successfully unsubscribed from!"));
+
                 setActive(null);
                 SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor e = sharedPreferences.edit();
                 SharedPreferences.Editor editor = sharedPref.edit();
+                e.clear();
                 editor.clear();
+                e.apply();
                 editor.apply();
                 navController.popBackStack(R.id.nav_graph, true);
                 navController.navigate(R.id.loginFragment);

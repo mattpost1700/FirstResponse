@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
@@ -34,13 +35,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean bypassDND = prefs.getBoolean("bypass", true);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
 
         NotificationCompat.Builder builder;
-        if (bypassDND == true) {
+        if (bypassDND) {
             builder = new NotificationCompat.Builder(getApplicationContext(), "n")
-                    .setSmallIcon(R.drawable.circle)
-                    .setContentTitle("N")
+                    .setSmallIcon(R.drawable.ic_baseline_local_fire_department_24)
+                    .setContentTitle(title)
+                    .setContentText(msg)
                     .setAutoCancel(true)
                     .setOnlyAlertOnce(true)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
@@ -48,8 +50,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setContentIntent(pendingIntent);
         } else {
             builder = new NotificationCompat.Builder(getApplicationContext(), "n")
-                    .setSmallIcon(R.drawable.circle)
-                    .setContentTitle("N")
+                    .setSmallIcon(R.drawable.ic_baseline_local_fire_department_24)
+                    .setContentTitle(title)
+                    .setContentText(msg)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .setAutoCancel(true)
                     .setOnlyAlertOnce(true)
@@ -57,7 +60,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
 
 
-        builder = builder.setContent(getRemoteView(title, msg));
+        //builder = builder.setContent(getRemoteView(title, msg));
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -73,14 +76,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     }
 
-    public RemoteViews getRemoteView(String title, String msg) {
-        RemoteViews remoteView = new RemoteViews("com.example.first_responder_app", R.layout.notification);
-        remoteView.setTextViewText(R.id.notification_title, title);
-        remoteView.setTextViewText(R.id.notification_description, msg);
-        remoteView.setImageViewResource(R.id.notification_logo, R.drawable.circle);
-
-        return remoteView;
-    }
+//    public RemoteViews getRemoteView(String title, String msg) {
+//        Log.d("TAG", "getRemoteView: " + msg);
+//        RemoteViews remoteView = new RemoteViews("com.example.first_responder_app", R.layout.notification);
+//        remoteView.setTextViewText(R.id.notification_title, title);
+//        remoteView.setTextViewText(R.id.notification_description, msg);
+//        //remoteView.setImageViewResource(R.id.notification_logo, R.drawable.circle);
+//
+//        return remoteView;
+//    }
 
 
 }
