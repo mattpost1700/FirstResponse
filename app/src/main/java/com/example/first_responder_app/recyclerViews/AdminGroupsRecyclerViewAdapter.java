@@ -27,7 +27,7 @@ public class AdminGroupsRecyclerViewAdapter extends RecyclerView.Adapter<AdminGr
     }
 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.responder_row_layout, parent, false);
+        View view = inflater.inflate(R.layout.row_layout_edit_rank, parent, false);
         return new ViewHolder(view);
     }
 
@@ -48,7 +48,7 @@ public class AdminGroupsRecyclerViewAdapter extends RecyclerView.Adapter<AdminGr
 
         ViewHolder(View itemView) {
             super(itemView);
-            groupNameTextView = itemView.findViewById(R.id.responders_name_text_view);
+            groupNameTextView = itemView.findViewById(R.id.rowlayout_edit_rank_title);
             itemView.setOnClickListener(this);
         }
 
