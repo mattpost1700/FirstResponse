@@ -105,7 +105,7 @@
     <string name="email">Email</string>
     <string name="delete">Delete</string>
     <string name="no_rank_available">No Rank available</string>
-    <string name="edit_rank">Edit Rank</string>
+    <string name="edit_rank">Edit rank</string>
     <string name="no_user_available">No User Available</string>
 
     <!-- Strings related to login -->
