@@ -30,6 +30,7 @@ import com.google.firebase.Timestamp;
 
 import org.json.JSONException;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -85,6 +86,14 @@ public class NewEventFragment extends Fragment {
             String eventTime = binding.newEventTime.getText().toString();
             String duration = binding.newEventDurationText.getText().toString();
 
+            Date date = null;
+            try {
+                date = new SimpleDateFormat("MM/dd/yyyy hh:mm aa", Locale.getDefault()).parse(eventDate + " " + eventTime);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
             //sends the event that includes the following:
             //title, location, description, duration
             Intent intent = new Intent(Intent.ACTION_INSERT);
@@ -92,7 +101,13 @@ public class NewEventFragment extends Fragment {
             intent.putExtra(CalendarContract.Events.TITLE, title);
             intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
             intent.putExtra(CalendarContract.Events.DESCRIPTION, description);
-            intent.putExtra(CalendarContract.Events.DURATION, duration);
+            intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
+            if(date != null) {
+                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
+                Date endDate = new Date(date.getTime() + (Long.parseLong(duration) * 1000 * 60));
+                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
+            }
+
 
             Log.d("TAG", "onCreateView: " + intent.resolveActivity(requireContext().getPackageManager()));
             if (intent.resolveActivity(requireContext().getPackageManager()) != null){

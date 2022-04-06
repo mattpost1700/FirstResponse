@@ -50,6 +50,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.auth.User;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -155,6 +156,9 @@ public class EventFragment extends Fragment {
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
 
+
+
+
                 //sends the event that includes the following:
                 //title, location, description, duration
                 Intent intent = new Intent(Intent.ACTION_INSERT);
@@ -162,7 +166,14 @@ public class EventFragment extends Fragment {
                 intent.putExtra(CalendarContract.Events.TITLE, eventInfo.getTitle());
                 intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventInfo.getLocation());
                 intent.putExtra(CalendarContract.Events.DESCRIPTION, eventInfo.getDescription());
-                intent.putExtra(CalendarContract.Events.DURATION, eventInfo.getDuration_in_minutes());
+
+                Date date = eventInfo.getEvent_time().toDate();
+
+
+                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
+                Date endDate = new Date(date.getTime() + ((long) eventInfo.getDuration_in_minutes() * 1000 * 60));
+                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
+
                 if (intent.resolveActivity(requireContext().getPackageManager()) != null){
                     startActivity(intent);
                 } else {
