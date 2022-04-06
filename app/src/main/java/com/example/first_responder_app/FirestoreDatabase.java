@@ -117,8 +117,12 @@ public class FirestoreDatabase {
     // TODO: Add group id
     public void addAnnouncement(String title, String description, GroupDataModel currentlySelectedGroup, UsersDataModel user) {
         setActiveUser(user);
-        AnnouncementsDataModel newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), currentlySelectedGroup.getDocumentId(), title, description);
-
+        AnnouncementsDataModel newAnnoun;
+        if(currentlySelectedGroup != null) {
+            newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), currentlySelectedGroup.getDocumentId(), title, description);
+        }else{
+            newAnnoun = new AnnouncementsDataModel(activeUserFireDepartmentId, user.getDocumentId(), null, title, description);
+        }
         db.collection(ANNOUNCEMENTS_COLLECTION_DIR)
                 .add(newAnnoun)
                 .addOnSuccessListener(documentReference -> Log.d("new announcement page", "new announcement has been successfully created in the DB"))

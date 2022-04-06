@@ -2,6 +2,7 @@ package com.example.first_responder_app.fragments;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -99,6 +100,8 @@ public class NewAnnouncementFragment extends Fragment {
             mViewModel.setAnnounTitle(binding.newAnnounTitle.getText().toString());
             mViewModel.setAnnounDes(binding.newAnnounDescription.getText().toString());
             NavDirections action = NewAnnouncementFragmentDirections.actionNewAnnouncementFragmentToAnnouncementFragment();
+
+            Log.d("TAG", "onCreateView: " + currentlySelectedGroup);
 
             if (TextUtils.isEmpty(mViewModel.getAnnounTitle().toString()) || TextUtils.isEmpty(mViewModel.getAnnounDes().toString())){
                 binding.newAnnounLog.setText(R.string.new_announ_log_msg);
