@@ -113,12 +113,12 @@ public class NewEventFragment extends Fragment {
                     ActiveUser a = (ActiveUser)getActivity();
                     firestoreDatabase.setActiveUser(a.getActive());
 
-                    //firestoreDatabase.addEvent(location, title, description, d, Integer.parseInt(duration));
-//                    try {
-//                        _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                    firestoreDatabase.addEvent(location, title, description, d, Integer.parseInt(duration));
+                    try {
+                        _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     Navigation.findNavController(binding.getRoot()).navigate(action);
                 } catch (Exception e) {
                     Toast.makeText(requireContext(), "Error Creating Event", Toast.LENGTH_LONG).show();
