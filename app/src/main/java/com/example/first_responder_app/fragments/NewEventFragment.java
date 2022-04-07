@@ -1,5 +1,6 @@
 package com.example.first_responder_app.fragments;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -26,6 +27,7 @@ import com.example.first_responder_app.R;
 import com.example.first_responder_app.databinding.FragmentEventNewBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.NewEventViewModel;
+import com.example.first_responder_app.viewModels.UserViewModel;
 import com.google.firebase.Timestamp;
 
 import org.json.JSONException;
@@ -93,28 +95,39 @@ public class NewEventFragment extends Fragment {
                 e.printStackTrace();
             }
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            LayoutInflater layoutInflater = getLayoutInflater();
 
-            //sends the event that includes the following:
-            //title, location, description, duration
-            Intent intent = new Intent(Intent.ACTION_INSERT);
-            intent.setData(CalendarContract.Events.CONTENT_URI);
-            intent.putExtra(CalendarContract.Events.TITLE, title);
-            intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
-            intent.putExtra(CalendarContract.Events.DESCRIPTION, description);
-            intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
-            if(date != null) {
-                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
-                Date endDate = new Date(date.getTime() + (Long.parseLong(duration) * 1000 * 60));
-                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
-            }
+            builder.setTitle("Would you like to add this event into your calender?");
+            Date finalDate = date;
+            builder.setPositiveButton("Yes", (dialogInterface, i) -> {
 
+                //sends the event that includes the following:
+                //title, location, description, duration
+                Intent intent = new Intent(Intent.ACTION_INSERT);
+                intent.setData(CalendarContract.Events.CONTENT_URI);
+                intent.putExtra(CalendarContract.Events.TITLE, title);
+                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
+                intent.putExtra(CalendarContract.Events.DESCRIPTION, description);
+                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
+                if(finalDate != null) {
+                    intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, finalDate.getTime());
+                    Date endDate = new Date(finalDate.getTime() + (Long.parseLong(duration) * 1000 * 60));
+                    intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
+                }
 
-            Log.d("TAG", "onCreateView: " + intent.resolveActivity(requireContext().getPackageManager()));
-            if (intent.resolveActivity(requireContext().getPackageManager()) != null){
-                startActivity(intent);
-            } else {
-                Log.d("EVENT INTENT: ", "Event setup Failed");
-            }
+                Log.d("TAG", "onCreateView: " + intent.resolveActivity(requireContext().getPackageManager()));
+                if (intent.resolveActivity(requireContext().getPackageManager()) != null){
+                    startActivity(intent);
+                } else {
+                    Log.d("EVENT INTENT: ", "Event setup Failed");
+                }
+            });
+            builder.setNegativeButton("No", (dialogInterface, i) -> {
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
 
             if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || location.equals("") || eventDate.equals("MM/DD/YYYY") || eventTime.equals("HH:MM") || duration.equals("")){
                 binding.newEventLog.setText(R.string.event_title_description_is_empty);

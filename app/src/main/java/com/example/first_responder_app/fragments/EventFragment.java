@@ -130,6 +130,27 @@ public class EventFragment extends Fragment {
 
         addParticipatingEventListener();
 
+        binding.addEventToCalender.setOnClickListener( v -> {
+            //sends the event that includes the following:
+            //title, location, description, duration
+            Intent intent = new Intent(Intent.ACTION_INSERT);
+            intent.setData(CalendarContract.Events.CONTENT_URI);
+            intent.putExtra(CalendarContract.Events.TITLE, eventInfo.getTitle());
+            intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventInfo.getLocation());
+            intent.putExtra(CalendarContract.Events.DESCRIPTION, eventInfo.getDescription());
+
+            Date date = eventInfo.getEvent_time().toDate();
+
+            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
+            Date endDate = new Date(date.getTime() + ((long) eventInfo.getDuration_in_minutes() * 1000 * 60));
+            intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
+
+            if (intent.resolveActivity(requireContext().getPackageManager()) != null){
+                startActivity(intent);
+            } else {
+                Log.d("EVENT INTENT: ", "Event setup Failed");
+            }
+        });
 
         binding.signUp.setOnClickListener(v -> {
             if (binding.signUp.getText().equals("Withdraw")) {
@@ -155,30 +176,6 @@ public class EventFragment extends Fragment {
                             binding.signUp.setText("Withdraw");
                         })
                         .addOnFailureListener(e -> Log.w(TAG, "onCreateView: Could not update event UI", e));
-
-
-
-
-                //sends the event that includes the following:
-                //title, location, description, duration
-                Intent intent = new Intent(Intent.ACTION_INSERT);
-                intent.setData(CalendarContract.Events.CONTENT_URI);
-                intent.putExtra(CalendarContract.Events.TITLE, eventInfo.getTitle());
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, eventInfo.getLocation());
-                intent.putExtra(CalendarContract.Events.DESCRIPTION, eventInfo.getDescription());
-
-                Date date = eventInfo.getEvent_time().toDate();
-
-
-                intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, date.getTime());
-                Date endDate = new Date(date.getTime() + ((long) eventInfo.getDuration_in_minutes() * 1000 * 60));
-                intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
-
-                if (intent.resolveActivity(requireContext().getPackageManager()) != null){
-                    startActivity(intent);
-                } else {
-                    Log.d("EVENT INTENT: ", "Event setup Failed");
-                }
 
 //                // Calendar intent
 //                Calendar cal = Calendar.getInstance();
