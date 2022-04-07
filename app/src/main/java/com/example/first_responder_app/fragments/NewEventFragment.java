@@ -88,46 +88,6 @@ public class NewEventFragment extends Fragment {
             String eventTime = binding.newEventTime.getText().toString();
             String duration = binding.newEventDurationText.getText().toString();
 
-            Date date = null;
-            try {
-                date = new SimpleDateFormat("MM/dd/yyyy hh:mm aa", Locale.getDefault()).parse(eventDate + " " + eventTime);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            LayoutInflater layoutInflater = getLayoutInflater();
-
-            builder.setTitle("Would you like to add this event into your calender?");
-            Date finalDate = date;
-            builder.setPositiveButton("Yes", (dialogInterface, i) -> {
-
-                //sends the event that includes the following:
-                //title, location, description, duration
-                Intent intent = new Intent(Intent.ACTION_INSERT);
-                intent.setData(CalendarContract.Events.CONTENT_URI);
-                intent.putExtra(CalendarContract.Events.TITLE, title);
-                intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
-                intent.putExtra(CalendarContract.Events.DESCRIPTION, description);
-                intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
-                if(finalDate != null) {
-                    intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, finalDate.getTime());
-                    Date endDate = new Date(finalDate.getTime() + (Long.parseLong(duration) * 1000 * 60));
-                    intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
-                }
-
-                Log.d("TAG", "onCreateView: " + intent.resolveActivity(requireContext().getPackageManager()));
-                if (intent.resolveActivity(requireContext().getPackageManager()) != null){
-                    startActivity(intent);
-                } else {
-                    Log.d("EVENT INTENT: ", "Event setup Failed");
-                }
-            });
-            builder.setNegativeButton("No", (dialogInterface, i) -> {
-            });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
 
             if (TextUtils.isEmpty(title) || TextUtils.isEmpty(description) || location.equals("") || eventDate.equals("MM/DD/YYYY") || eventTime.equals("HH:MM") || duration.equals("")){
                 binding.newEventLog.setText(R.string.event_title_description_is_empty);
@@ -142,6 +102,46 @@ public class NewEventFragment extends Fragment {
                     firestoreDatabase.setActiveUser(a.getActive());
 
                     firestoreDatabase.addEvent(location, title, description, d, Integer.parseInt(duration));
+
+                    Date date = null;
+                    try {
+                        date = new SimpleDateFormat("MM/dd/yyyy hh:mm aa", Locale.getDefault()).parse(eventDate + " " + eventTime);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+
+                    builder.setTitle("Would you like to add this event into your calender?");
+                    Date finalDate = date;
+                    builder.setPositiveButton("Yes", (dialogInterface, i) -> {
+
+                        //sends the event that includes the following:
+                        //title, location, description, duration
+                        Intent intent = new Intent(Intent.ACTION_INSERT);
+                        intent.setData(CalendarContract.Events.CONTENT_URI);
+                        intent.putExtra(CalendarContract.Events.TITLE, title);
+                        intent.putExtra(CalendarContract.Events.EVENT_LOCATION, location);
+                        intent.putExtra(CalendarContract.Events.DESCRIPTION, description);
+                        intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false);
+                        if(finalDate != null) {
+                            intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, finalDate.getTime());
+                            Date endDate = new Date(finalDate.getTime() + (Long.parseLong(duration) * 1000 * 60));
+                            intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endDate.getTime());
+                        }
+
+                        Log.d("TAG", "onCreateView: " + intent.resolveActivity(requireContext().getPackageManager()));
+                        if (intent.resolveActivity(requireContext().getPackageManager()) != null){
+                            startActivity(intent);
+                        } else {
+                            Log.d("EVENT INTENT: ", "Event setup Failed");
+                        }
+                    });
+                    builder.setNegativeButton("No", (dialogInterface, i) -> {
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
                     try {
                         _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
                     } catch (JSONException e) {
