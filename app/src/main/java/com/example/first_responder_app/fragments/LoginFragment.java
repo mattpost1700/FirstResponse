@@ -93,6 +93,7 @@ public class LoginFragment extends Fragment {
                     if (t.isSuccessful()) {
                         if (t.getResult().isEmpty()) {
                             binding.loginLog.setText(R.string.loginFailMsg);
+                            binding.loginLog.setVisibility(View.VISIBLE);
                         } else {
                             for (QueryDocumentSnapshot userDoc : t.getResult()) {
                                 user = userDoc.toObject(UsersDataModel.class);

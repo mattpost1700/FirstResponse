@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageViewForProfilePic"
+                app:layout_constraintTop_toBottomOf="@+id/edit_profile_card_view"
                 tools:layout_editor_absoluteX="189dp">
 
                 <ScrollView
@@ -133,17 +133,24 @@
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <ImageView
-                android:id="@+id/imageViewForProfilePic"
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/edit_profile_card_view"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
+                app:cardCornerRadius="75dp"
                 android:layout_margin="@dimen/margin_from_side"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:background="@android:drawable/ic_menu_help"
-                android:contentDescription="@string/user_image" />
-
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/imageViewForProfilePic"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:scaleType="centerCrop"
+                    android:background="@android:drawable/ic_menu_help"
+                    android:contentDescription="@string/user_image" />
+            </androidx.cardview.widget.CardView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </FrameLayout>

@@ -29,8 +29,9 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
                 android:id="@+id/appDrawerProfilePicImageView"
                 android:contentDescription="@string/user_avatar"
                 app:srcCompat="@drawable/user"/>
