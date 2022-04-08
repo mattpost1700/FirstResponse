@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
-import android.util.Log;
-import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 import androidx.preference.PreferenceManager;
@@ -40,7 +38,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder builder;
         if (bypassDND) {
             builder = new NotificationCompat.Builder(getApplicationContext(), "n")
-                    .setSmallIcon(R.drawable.ic_baseline_local_fire_department_24)
+                    .setSmallIcon(R.drawable.notification_icon)
                     .setContentTitle(title)
                     .setContentText(msg)
                     .setAutoCancel(true)
@@ -50,7 +48,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     .setContentIntent(pendingIntent);
         } else {
             builder = new NotificationCompat.Builder(getApplicationContext(), "n")
-                    .setSmallIcon(R.drawable.ic_baseline_local_fire_department_24)
+                    .setSmallIcon(R.drawable.notification_icon)
                     .setContentTitle(title)
                     .setContentText(msg)
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)

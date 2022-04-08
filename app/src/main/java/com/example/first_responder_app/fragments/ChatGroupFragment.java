@@ -102,6 +102,13 @@ public class ChatGroupFragment extends Fragment {
             Navigation.findNavController(binding.getRoot()).navigate(action);
         });
 
+
+        binding.chatGroupSwipeRefreshLayout.setOnRefreshListener(() -> {
+            populateChatList();
+            binding.chatGroupSwipeRefreshLayout.setRefreshing(false);
+        });
+
+
         return binding.getRoot();
 
     }

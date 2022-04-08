@@ -2,6 +2,7 @@ package com.example.first_responder_app.fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -131,24 +133,55 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
         listOfRanks = new ArrayList<>();
 
         //automatically subscribes everyone who logs in to get notifications for these topics
-        FirebaseMessaging.getInstance().subscribeToTopic("events")
+        FirebaseMessaging.getInstance().subscribeToTopic("events_" + activeUser.getFire_department_id())
                 .addOnCompleteListener(new OnCompleteListener<>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                     }
                 });
-        FirebaseMessaging.getInstance().subscribeToTopic("announcements")
+
+        List<String> groups  = activeUser.getGroup_ids();
+        if(groups != null) {
+            for (int i = 0; i < groups.size(); i++) {
+                FirebaseMessaging.getInstance().subscribeToTopic("announcements_" + activeUser.getFire_department_id() + "_" + groups.get(i))
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                            }
+                        });
+            }
+        }
+        FirebaseMessaging.getInstance().subscribeToTopic("announcements_" + activeUser.getFire_department_id())
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                     }
                 });
-        FirebaseMessaging.getInstance().subscribeToTopic("incidents")
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                    }
-                });
+
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        boolean fireNotif = prefs.getBoolean("fireNotificationPrefKey", true);
+        boolean emsNotif = prefs.getBoolean("EMSNotificationPrefKey", true);
+
+        if(fireNotif){
+            FirebaseMessaging.getInstance().subscribeToTopic("fire_" + activeUser.getFire_department_id())
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                        }
+                    });
+        }
+
+        if(emsNotif){
+            FirebaseMessaging.getInstance().subscribeToTopic("EMS_" + activeUser.getFire_department_id())
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                        }
+                    });
+        }
+
 
         saveRanksCollection();
 

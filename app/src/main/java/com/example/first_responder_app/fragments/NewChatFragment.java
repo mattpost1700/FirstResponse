@@ -120,7 +120,7 @@ public class NewChatFragment extends Fragment {
             } else if (listOfNewUsers.contains(result)) {
                 binding.newChatErrorMsg.setText("User not found");
                 binding.newChatErrorMsg.setVisibility(View.VISIBLE);
-            } else if (result.getDocumentId().equals(user.getDocumentId())) {
+            } else if (result != null && result.getDocumentId().equals(user.getDocumentId())) {
                 binding.newChatErrorMsg.setText("New user cannot be yourself");
                 binding.newChatErrorMsg.setVisibility(View.VISIBLE);
             }

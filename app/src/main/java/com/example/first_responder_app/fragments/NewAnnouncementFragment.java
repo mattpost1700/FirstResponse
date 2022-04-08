@@ -74,6 +74,7 @@ public class NewAnnouncementFragment extends Fragment {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         groups.add(doc.toObject(GroupDataModel.class));
+                        groupsNames.add(doc.toObject(GroupDataModel.class).getName());
                     }
 
                     Spinner spinner = binding.annoucGroupSpinner;
@@ -111,7 +112,11 @@ public class NewAnnouncementFragment extends Fragment {
                 try {
                     firestoreDatabase.addAnnouncement(mViewModel.getAnnounTitle(), mViewModel.getAnnounDes(), currentlySelectedGroup, activeUser);
                     try {
-                        _notificationService.notifyPostReq(getContext(), "announcements", mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
+                        if(currentlySelectedGroup != null){
+                            _notificationService.notifyPostReq(getContext(), "announcements_" + activeUser.getFire_department_id() + "_" + currentlySelectedGroup.getDocumentId(), mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
+                        }else{
+                            _notificationService.notifyPostReq(getContext(), "announcements_" + activeUser.getFire_department_id(), mViewModel.getAnnounTitle(), mViewModel.getAnnounDes());
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -24,6 +24,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import com.example.first_responder_app.FirestoreDatabase;
 import com.example.first_responder_app.NotificationService;
 import com.example.first_responder_app.R;
+import com.example.first_responder_app.dataModels.UsersDataModel;
 import com.example.first_responder_app.databinding.FragmentEventNewBinding;
 import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.viewModels.NewEventViewModel;
@@ -99,7 +100,8 @@ public class NewEventFragment extends Fragment {
                     Date d = new SimpleDateFormat("MM/dd/yyyy hh:mm aa", Locale.getDefault()).parse(eventDate + " " + eventTime);
 
                     ActiveUser a = (ActiveUser)getActivity();
-                    firestoreDatabase.setActiveUser(a.getActive());
+                    UsersDataModel active = a.getActive();
+                    firestoreDatabase.setActiveUser(active);
 
                     firestoreDatabase.addEvent(location, title, description, d, Integer.parseInt(duration));
 
@@ -143,7 +145,8 @@ public class NewEventFragment extends Fragment {
                     dialog.show();
 
                     try {
-                        _notificationService.notifyPostReq(getContext(), "events", "New Event", title);
+                        if(active != null)
+                            _notificationService.notifyPostReq(getContext(), "events_" + active.getFire_department_id(), "New Event", title);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

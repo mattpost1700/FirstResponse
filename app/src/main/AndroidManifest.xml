@@ -25,6 +25,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.First_responder_app"
         >
+
+
         <activity android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -45,7 +47,10 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
+
+
         </service>
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -61,6 +66,8 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
+
+
 
     </application>
 

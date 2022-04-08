@@ -228,6 +228,27 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
                 FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
                         .addOnCompleteListener(task -> Log.d(TAG, finalTopic2 + " successfully unsubscribed from!"));
 
+                topic = "events_" + activeUser.getFire_department_id();
+                String finalTopic3 = topic;
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                        .addOnCompleteListener(task -> Log.d(TAG, finalTopic3 + " successfully unsubscribed from!"));
+
+
+                List<String> groups = activeUser.getGroup_ids();
+
+                for(int i = 0; i < groups.size(); i++) {
+                    topic = "announcements_" + activeUser.getFire_department_id() + "_" + groups.get(i);
+                    String finalTopic4 = topic;
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                            .addOnCompleteListener(task -> Log.d(TAG, finalTopic4 + " successfully unsubscribed from!"));
+                }
+
+                topic = "announcements_" + activeUser.getFire_department_id();
+                String finalTopic5 = topic;
+                FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                        .addOnCompleteListener(task -> Log.d(TAG, finalTopic5 + " successfully unsubscribed from!"));
+
+
                 setActive(null);
                 SharedPreferences sharedPref = getPreferences(MODE_PRIVATE);
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -415,26 +436,27 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
 
     public void setRespAddr(){
+        if(activeUser.getFire_department_id() != null) {
+            FirestoreDatabase.getInstance().getDb().collection("fire_department").document(activeUser.getFire_department_id()).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
 
-        FirestoreDatabase.getInstance().getDb().collection("fire_department").document(activeUser.getFire_department_id()).get().addOnCompleteListener(task -> {
-           if(task.isSuccessful()){
+                    FireDepartmentDataModel department = task.getResult().toObject(FireDepartmentDataModel.class);
+                    if (department != null)
+                        fireDeptAddr = department.getLocation();
 
-               FireDepartmentDataModel department = task.getResult().toObject(FireDepartmentDataModel.class);
-               if(department != null)
-                fireDeptAddr = department.getLocation();
-
-               Log.d(TAG, "setDeptAddr: " + fireDeptAddr);
+                    Log.d(TAG, "setDeptAddr: " + fireDeptAddr);
 
 
-               if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), this)) {
-                   setActiveUserRespondingAddr();
-               } else {
-                   stopETA();
-               }
-           }else{
-               Log.d(TAG, "Error getting department address");
-           }
-        });
+                    if (activeUser != null && AppUtil.timeIsWithin(activeUser.getResponding_time(), this)) {
+                        setActiveUserRespondingAddr();
+                    } else {
+                        stopETA();
+                    }
+                } else {
+                    Log.d(TAG, "Error getting department address");
+                }
+            });
+        }
     }
 
 

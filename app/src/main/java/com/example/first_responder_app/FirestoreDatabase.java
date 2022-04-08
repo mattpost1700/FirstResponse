@@ -147,18 +147,7 @@ public class FirestoreDatabase {
         newMsg.put("time_sent", now);
         db.collection(CHAT_COLLECTION_DIR).document(chatId).collection(MESSAGE_COLLECTION_DIR)
                 .add(newMsg)
-                .addOnSuccessListener(new OnSuccessListener() {
-                    @Override
-                    public void onSuccess(Object o) {
-                        Log.d("chat page", "new message has been successfully created in the DB");
-                        List<Message> listOfMessages = mViewModel.getListOfMessages();
-                        Message m = new Message(messageText, senderId, now);
-                        listOfMessages.add(m);
-                        mViewModel.setListOfMessages(listOfMessages);
 
-                        chatRecyclerViewAdapter.notifyDataSetChanged();
-                    }
-                })
                 .addOnFailureListener(e ->Log.d("chat page", "failed to create new message"));
 
 
