@@ -90,13 +90,24 @@ public class AnnouncementFragment extends Fragment {
     }
 
     private void populateAnnouncmentList() {
-        if(activeUser.getGroup_ids() != null && activeUser.getGroup_ids().size() > 0) {
-            Task getAnnoucementsForGroups = db.collection("announcements")
-                    .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
-                    .whereIn("intended_group_id", activeUser.getGroup_ids())
-                    .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
-                    .get();
+        Log.d(TAG, "populateAnnouncmentList: test");
+        if(activeUser.getGroup_ids() != null) {
+            Log.d(TAG, "populateAnnouncmentList: test");
 
+            Task getAnnoucementsForGroups;
+            if(activeUser.getGroup_ids().size() > 0) {
+               getAnnoucementsForGroups = db.collection("announcements")
+                        .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                        .whereIn("intended_group_id", activeUser.getGroup_ids())
+                        .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                        .get();
+            }else{
+                getAnnoucementsForGroups = db.collection("announcements")
+                        .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
+                        .whereEqualTo("intended_group_id", "")
+                        .orderBy(FirestoreDatabase.FIELD_CREATED_AT, Query.Direction.DESCENDING)
+                        .get();
+            }
             Task getAnnouncementsForAll = db.collection("announcements")
                     .whereEqualTo(FirestoreDatabase.FIELD_FIRE_DEPARTMENT_ID, activeUser.getFire_department_id())
                     .whereEqualTo("intended_group_id", null)

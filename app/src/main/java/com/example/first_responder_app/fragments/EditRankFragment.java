@@ -29,6 +29,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.example.first_responder_app.AppUtil;
 import com.example.first_responder_app.FirestoreDatabase;
@@ -128,8 +129,12 @@ public class EditRankFragment extends Fragment {
             input.setLayoutParams(lp);
             builder.setView(input);
             builder.setPositiveButton("Confirm", (dialogInterface, i) -> {
-                firestoreDatabase.addRank(input.getText().toString());
-                populateRanks();
+                if(input.getText().toString().equals("")){
+                    Toast.makeText(getContext(), "Rank title cannot be empty", Toast.LENGTH_LONG).show();
+                }else{
+                    firestoreDatabase.addRank(input.getText().toString(), activeUser.getFire_department_id());
+                    populateRanks();
+                }
             });
             builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
             });

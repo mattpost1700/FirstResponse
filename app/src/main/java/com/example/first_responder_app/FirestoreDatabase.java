@@ -105,8 +105,8 @@ public class FirestoreDatabase {
                 .addOnFailureListener(e -> Log.d("new event page", "failed to create new event"));
     }
 
-    public void addRank(String rankTitle){
-        RanksDataModel newRank = new RanksDataModel(activeUserFireDepartmentId, rankTitle);
+    public void addRank(String rankTitle, String fireDeptId){
+        RanksDataModel newRank = new RanksDataModel(fireDeptId, rankTitle);
 
         db.collection(RANKS_COLLECTION_DIR)
                 .add(newRank)

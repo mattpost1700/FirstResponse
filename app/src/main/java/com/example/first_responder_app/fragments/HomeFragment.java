@@ -82,6 +82,9 @@ public class HomeFragment extends Fragment implements PopupMenu.OnMenuItemClickL
             drawerLocker.setDrawerLocked(false);
         }
 
+
+
+
         FragmentHomeBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false);
         NavHostFragment navHostFragment = (NavHostFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         bindingView = binding.getRoot();
