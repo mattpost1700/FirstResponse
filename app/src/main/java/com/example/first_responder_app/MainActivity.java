@@ -236,11 +236,13 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
 
                 List<String> groups = activeUser.getGroup_ids();
 
-                for(int i = 0; i < groups.size(); i++) {
-                    topic = "announcements_" + activeUser.getFire_department_id() + "_" + groups.get(i);
-                    String finalTopic4 = topic;
-                    FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
-                            .addOnCompleteListener(task -> Log.d(TAG, finalTopic4 + " successfully unsubscribed from!"));
+                if(groups != null) {
+                    for (int i = 0; i < groups.size(); i++) {
+                        topic = "announcements_" + activeUser.getFire_department_id() + "_" + groups.get(i);
+                        String finalTopic4 = topic;
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic)
+                                .addOnCompleteListener(task -> Log.d(TAG, finalTopic4 + " successfully unsubscribed from!"));
+                    }
                 }
 
                 topic = "announcements_" + activeUser.getFire_department_id();
@@ -632,23 +634,24 @@ public class MainActivity extends AppCompatActivity implements DrawerLocker, Act
             public void onLocationChanged(final Location location) {
                 LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
 
-                for(int i = 0; i < respIncident.size(); i++) {
-                    LatLng destination = new LatLng(0, 0);
+                if (respIncident != null) {
+                    for (int i = 0; i < respIncident.size(); i++) {
+                        LatLng destination = new LatLng(0, 0);
 
-                    if (incidentAddr.get(i) != null) {
-                        destination = new LatLng(incidentAddr.get(i).getLatitude(), incidentAddr.get(i).getLongitude());
+                        if (incidentAddr.get(i) != null) {
+                            destination = new LatLng(incidentAddr.get(i).getLatitude(), incidentAddr.get(i).getLongitude());
+                        }
+
+                        int idx = i;
+                        ETA eta = new ETA();
+                        eta.setListener(s -> {
+                            if (respIncident != null && respIncident.size() > 0)
+                                FirestoreDatabase.getInstance().updateETA(respIncident.get(idx).getDocumentId(), activeUser.getDocumentId(), respIncident.get(idx).getEta(), s);
+                        });
+                        eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins=" + loc.latitude + "%2C" + loc.longitude);
                     }
-
-                    int idx = i;
-                    ETA eta = new ETA();
-                    eta.setListener(s -> {
-                        if (respIncident != null && respIncident.size() > 0)
-                            FirestoreDatabase.getInstance().updateETA(respIncident.get(idx).getDocumentId(), activeUser.getDocumentId(), respIncident.get(idx).getEta(), s);
-                    });
-                    eta.execute("https://maps.googleapis.com/maps/api/distancematrix/json?destinations=" + destination.latitude + "%2C" + destination.longitude + "&origins=" + loc.latitude + "%2C" + loc.longitude);
                 }
             }
-
             @Override
             public void onProviderEnabled(@NonNull String provider) {
 

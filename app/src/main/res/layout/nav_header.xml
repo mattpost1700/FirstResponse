@@ -51,6 +51,7 @@
                 android:id="@+id/nav_name"
                 android:fontFamily="@font/anton_regular"
                 android:textSize="14sp"
+                android:textColor="?attr/colorOnPrimary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
@@ -58,6 +59,7 @@
                 android:id="@+id/nav_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="?attr/colorOnPrimary"
                  />
         </LinearLayout>
 

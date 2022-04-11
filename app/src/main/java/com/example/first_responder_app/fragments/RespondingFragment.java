@@ -185,7 +185,6 @@ public class RespondingFragment extends Fragment implements PopupMenu.OnMenuItem
                 for(QueryDocumentSnapshot userDoc : userTask.getResult()) {
                     UsersDataModel user = userDoc.toObject(UsersDataModel.class);
                     List<String> responses = user.getResponses();
-                    Log.d(TAG, "refreshData: " + isActive(responses.get(responses.size() - 1)));
 
                     if(responses != null && responses.size() > 0 && isActive(responses.get(responses.size() - 1)))
                         temp.add(user);
