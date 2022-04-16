@@ -10,7 +10,7 @@
     <string name="home">Home</string>
     <string name="responding">Responding</string>
     <string name="events">Events</string>
-    <string name="first_responder">First Responder</string>
+    <string name="first_responder">First Response</string>
     <string name="defaultmsg">defaultMsg</string>
     <string name="loginFailMsg">Invalid Username or Password</string>
     <string name="password">Password</string>
