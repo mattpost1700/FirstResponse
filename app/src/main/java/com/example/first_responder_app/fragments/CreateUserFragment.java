@@ -22,6 +22,8 @@ import com.example.first_responder_app.interfaces.ActiveUser;
 import com.example.first_responder_app.interfaces.DrawerLocker;
 import com.example.first_responder_app.viewModels.CreateUserViewModel;
 
+import java.util.ArrayList;
+
 public class CreateUserFragment extends Fragment {
 
     private CreateUserViewModel mViewModel;
@@ -85,6 +87,7 @@ public class CreateUserFragment extends Fragment {
         user.setPhone_number(binding.createUserPhoneNumberEditText.getText().toString());
         user.setAddress(binding.createUserAddressEditText.getText().toString());
         user.setFire_department_id(binding.createUserFireDepartmentIdEditText.getText().toString());
+        user.setGroup_id(new ArrayList<>());
         user.setIs_admin(true);
     }
 

@@ -93,7 +93,6 @@ public class FirestoreDatabase {
         return storage;
     }
 
-    // TODO: Add event correctly
     public void addEvent(String location, String title, String description, Date date, int duration) {
         Timestamp eventTime = new Timestamp(date);
         EventsDataModel newEvent = new EventsDataModel(activeUserFireDepartmentId, "TEMP_GROUP_ID", activeUser.getDocumentId(), eventTime, title, description, location, duration);
@@ -114,7 +113,7 @@ public class FirestoreDatabase {
                 .addOnFailureListener(e -> Log.d("edit rank page", "failed to create new rank"));
     }
 
-    // TODO: Add group id
+
     public void addAnnouncement(String title, String description, GroupDataModel currentlySelectedGroup, UsersDataModel user) {
         setActiveUser(user);
         AnnouncementsDataModel newAnnoun;
@@ -233,7 +232,6 @@ public class FirestoreDatabase {
      */
     private void updateStatus(String incident_id, Map<String, String> statusList, Map<String, String> eta, String user_id, String status, List<String> responding, boolean available, List<String> responses, UpdateStatus update){
 
-        //TODO: Currently have hardcoded string "Unavailable" - Will need to be replaced with all statuses that don't update the responding count
         boolean previouslyResponding = statusList.containsKey(user_id) && !statusList.get(user_id).toString().equals("Unavailable");
 
         if(eta == null){
