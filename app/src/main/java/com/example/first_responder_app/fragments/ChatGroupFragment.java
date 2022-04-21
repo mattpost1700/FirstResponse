@@ -129,8 +129,8 @@ public class ChatGroupFragment extends Fragment {
                     ArrayList<String> members = (ArrayList<String>)  doc.get("members");
 
                     if (user != null) {
-                        String memberName = user.getFirst_name() + " " + user.getLast_name() + "/" + user.getDocumentId();
-                        if (members.contains(memberName)) {
+                        String memberName = user.getDocumentId();
+                        if (includes(members, memberName)) {
                             Timestamp t = (Timestamp) doc.get("most_recent_message_time");
                             Chat chat = new Chat(doc.getId(), (String) doc.get("most_recent_message"), members, (String) doc.get("chat_name"), t);
                             temp.add(chat);
@@ -152,4 +152,14 @@ public class ChatGroupFragment extends Fragment {
         });
     }
 
+
+    boolean includes(ArrayList<String> list, String s){
+        if(list == null) return false;
+        for(int i = 0; i < list.size(); i++){
+            if(list.get(i).contains(s)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
